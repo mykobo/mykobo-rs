@@ -1,10 +1,11 @@
 [package]
 name = "mykobo-rs"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 repository = "https://github.com/mykobo/mykobo-rs"
 description = "A MYKOBO API client written in Rust, to interact with the MYKOBO suite of services."
 license-file = "LICENSE"
+publish = false
 
 [dependencies]
 chrono = { version = "0.4.38", features = ["serde"] }
