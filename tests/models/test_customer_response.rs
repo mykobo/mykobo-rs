@@ -1,4 +1,4 @@
-use mykobo_sdk::identity::IdentityServiceClient;
+use mykobo_rs::identity::IdentityServiceClient;
 use pretty_assertions::assert_eq;
 use serde::Serialize;
 use std::env;
