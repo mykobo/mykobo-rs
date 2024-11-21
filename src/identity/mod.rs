@@ -51,10 +51,10 @@ impl IdentityServiceClient {
             validation.validate_exp = true;
 
             match decode::<TokenClaims>(service_token.token.as_str(), &key, &validation) {
-                Ok(_) => return true,
+                Ok(_) => true,
                 Err(e) => {
                     warn!("Token is invalid {:?}", e);
-                    return false;
+                    false
                 }
             }
         } else {
@@ -151,7 +151,7 @@ impl IdentityServiceClient {
                     message: Some(format!("{:?}", e).to_string()),
                     status: e
                         .status()
-                        .map(|es| MykoboStatusCode::from(es))
+                        .map(MykoboStatusCode::from)
                         .unwrap_or(MykoboStatusCode::DependencyFailed),
                 },
             };
