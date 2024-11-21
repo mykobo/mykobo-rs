@@ -18,6 +18,7 @@ pub struct IdentityServiceClient {
     pub host: String,
     pub client: reqwest::Client,
     pub max_retries: i8,
+    pub client_identifier: Option<String>,
 }
 
 impl IdentityServiceClient {
@@ -37,6 +38,7 @@ impl IdentityServiceClient {
             token: None,
             client: reqwest::Client::new(),
             max_retries,
+            client_identifier: None,
         }
     }
 
@@ -81,7 +83,10 @@ impl IdentityServiceClient {
                 );
             }
         }
-        headers.insert(USER_AGENT, "LEDGER_SERVICE_CLIENT".parse().unwrap());
+        if let Some(client_id) = &self.client_identifier {
+            headers.insert(USER_AGENT, client_id.parse().unwrap());
+        };
+
         headers
     }
 
