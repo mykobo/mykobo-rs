@@ -2,7 +2,7 @@ use crate::models::request::{Credentials, RefreshToken, TokenCheckRequest};
 use crate::models::response::{MykoboStatusCode, UserKycStatusResponse, WalletProfile};
 use crate::models::response::{ServiceError, ServiceToken, TokenCheckResponse, TokenClaims};
 use jsonwebtoken::{decode, DecodingKey, Validation};
-use log::{info, warn};
+use log::{debug, info, warn};
 use reqwest::{
     header::{HeaderMap, AUTHORIZATION, USER_AGENT},
     Response,
@@ -63,6 +63,7 @@ impl IdentityServiceClient {
     }
 
     async fn acquire_token(&self) -> Result<ServiceToken, ServiceError> {
+        debug!("Authenticating against {}", self.host);
         let response = self
             .client
             .post(format!("{}/authenticate", self.host))
@@ -161,6 +162,7 @@ impl IdentityServiceClient {
 
     pub async fn refresh_token(&mut self) {
         if let Some(service_token) = &self.token {
+            debug!("Refreshing token...");
             let response = self
                 .client
                 .post(format!("{}/authenticate/refresh", self.host))
@@ -233,7 +235,7 @@ impl IdentityServiceClient {
 
     pub async fn get_profile(&mut self, id: &str) -> Result<UserKycStatusResponse, ServiceError> {
         self.attempt_token_acquisition().await;
-
+        debug!("Getting profile with [{}] at {}", id, self.host);
         let response = self
             .client
             .get(format!("{}/kyc/profile/{}", self.host, id))
@@ -256,6 +258,11 @@ impl IdentityServiceClient {
             Some(m) => format!("{}/user/wallet/{}?memo={}", wallet_host, account_id, m),
             None => format!("{}/user/wallet/{}", wallet_host, account_id),
         };
+
+        debug!(
+            "Getting customer for account [{}] at {}...",
+            account_id, wallet_host
+        );
 
         let wallet_response = self
             .client
