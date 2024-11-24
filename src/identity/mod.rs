@@ -231,7 +231,7 @@ impl IdentityServiceClient {
         self.parse_response::<TokenCheckResponse>(response).await
     }
 
-    pub async fn get_profile(&mut self, id: String) -> Result<UserKycStatusResponse, ServiceError> {
+    pub async fn get_profile(&mut self, id: &str) -> Result<UserKycStatusResponse, ServiceError> {
         self.attempt_token_acquisition().await;
 
         let response = self
@@ -270,7 +270,7 @@ impl IdentityServiceClient {
                     self.parse_response::<WalletProfile>(wallet_profile).await;
 
                 match parsed_wallet_profile {
-                    Ok(w_profile) => self.get_profile(w_profile.profile_id).await,
+                    Ok(w_profile) => self.get_profile(&w_profile.profile_id).await,
                     Err(e) => Err(e),
                 }
             }
