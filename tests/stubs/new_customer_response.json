@@ -1,0 +1,24 @@
+{
+  "id": "urn:usrp:5028f1bf5a2e4fddb51f8d6f93a6b35f",
+  "first_name": "Test",
+  "last_name": "Test",
+  "email_address": "test7@gmail.com",
+  "additional_name": null,
+  "address": null,
+  "mobile_number": null,
+  "birth_date": "1990-01-01",
+  "birth_country_code": null,
+  "bank_account_number": null,
+  "tax_id": null,
+  "tax_id_name": null,
+  "credential_id": "urn:usr:4aaa23c86d914dbdb9f2f22cd1870e33",
+  "created_at": "2024-11-26T19:10:44.271186",
+  "updated_at": null,
+  "suspended_at": null,
+  "deleted_at": null,
+  "otp_verified": null,
+  "kyc_status": {
+    "review_status": "pending",
+    "received_at": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "created_at": "2024-11-30 22:03:45",
+  "profile_id": "urn:usrp:6bd0201b36f64008bd94209aef8d2b15",
+  "wallets": [
+    {
+      "created_at": "2024-11-30 22:03:45",
+      "id": "urn:wallet:cdf5799eb41d47498269130bdde27455",
+      "is_custodial": false,
+      "memo": null,
+      "network": "STELLAR",
+      "public_key": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6"
+    }
+  ]
+}
