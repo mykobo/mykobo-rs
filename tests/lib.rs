@@ -1,5 +1,6 @@
 mod identity;
-
+mod models;
+mod wallets;
 use std::fs;
 
 fn read_file(file: &str) -> String {

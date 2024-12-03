@@ -6,12 +6,14 @@ pub mod auth;
 pub mod identity;
 pub mod wallets;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
 pub enum MykoboStatusCode {
     NotFound,
     BadRequest,
     Unauthorised,
+    #[default]
     DependencyFailed,
+    InternalServerError,
 }
 
 impl From<StatusCode> for MykoboStatusCode {
@@ -20,6 +22,7 @@ impl From<StatusCode> for MykoboStatusCode {
             StatusCode::NOT_FOUND => MykoboStatusCode::NotFound,
             StatusCode::BAD_REQUEST => MykoboStatusCode::BadRequest,
             StatusCode::UNAUTHORIZED => MykoboStatusCode::Unauthorised,
+            StatusCode::INTERNAL_SERVER_ERROR => MykoboStatusCode::InternalServerError,
             _ => MykoboStatusCode::DependencyFailed,
         }
     }
@@ -29,6 +32,7 @@ impl From<StatusCode> for MykoboStatusCode {
 pub struct ServiceError {
     pub error: Option<String>,
     pub message: Option<String>,
+    #[serde(default = "MykoboStatusCode::default")]
     pub status: MykoboStatusCode,
 }
 

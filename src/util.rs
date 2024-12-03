@@ -34,24 +34,12 @@ pub async fn parse_response<T: DeserializeOwned>(
                 Ok(response.json::<T>().await?)
             } else {
                 let status = response.status();
-                let service_error = match response.text().await {
-                    Ok(text) => serde_json::from_str::<ServiceError>(text.as_str()).unwrap_or(
-                        ServiceError {
-                            error: Some(text.to_string()),
-                            message: Some(text),
-                            status: MykoboStatusCode::from(status),
-                        },
-                    ),
-                    Err(e) => ServiceError {
-                        error: Some(format!("{:?}", e).to_string()),
-                        message: Some(format!("{:?}", e).to_string()),
-                        status: e
-                            .status()
-                            .map(MykoboStatusCode::from)
-                            .unwrap_or(MykoboStatusCode::DependencyFailed),
-                    },
+                let error = response.json::<ServiceError>().await?;
+                let updated = ServiceError {
+                    status: MykoboStatusCode::from(status),
+                    ..error
                 };
-                Err(service_error)
+                Err(updated)
             }
         }
         Err(e) => Err(ServiceError::from(e)),
