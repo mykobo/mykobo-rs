@@ -2,9 +2,17 @@ use std::env;
 
 use log::debug;
 use reqwest::Client;
+use serde_json::json;
 
 use crate::{
-    models::response::{auth::ServiceToken, wallets::WalletProfile, ServiceError},
+    models::{
+        request::wallets::RegisterWalletRequest,
+        response::{
+            auth::ServiceToken,
+            wallets::{UserWallet, WalletProfile},
+            ServiceError,
+        },
+    },
     util::{generate_headers, parse_response},
 };
 
@@ -30,8 +38,8 @@ impl WalletServiceClient {
         }
     }
 
-    pub async fn get_customer(
-        &mut self,
+    pub async fn get_wallet_profile(
+        &self,
         token: Option<ServiceToken>,
         account_id: &str,
         memo: Option<&str>,
@@ -54,5 +62,23 @@ impl WalletServiceClient {
             .await;
 
         parse_response::<WalletProfile>(wallet_response).await
+    }
+
+    pub async fn register_wallet(
+        &self,
+        token: Option<ServiceToken>,
+        request: RegisterWalletRequest,
+    ) -> Result<UserWallet, ServiceError> {
+        debug!("Registering wallet for user...");
+        let payload = json!(request).to_string();
+        let wallet_response = self
+            .client
+            .post(format!("{}/wallet/register", self.wallet_host))
+            .headers(generate_headers(token, self.client_identifier.clone()))
+            .body(payload)
+            .send()
+            .await;
+
+        parse_response::<UserWallet>(wallet_response).await
     }
 }

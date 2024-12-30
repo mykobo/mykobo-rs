@@ -1,9 +1,10 @@
-use reqwest::StatusCode;
+use reqwest::{Error, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
 pub mod auth;
 pub mod identity;
+pub mod sumsub;
 pub mod wallets;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
@@ -14,6 +15,7 @@ pub enum MykoboStatusCode {
     #[default]
     DependencyFailed,
     InternalServerError,
+    Conflict,
 }
 
 impl From<StatusCode> for MykoboStatusCode {
@@ -23,6 +25,7 @@ impl From<StatusCode> for MykoboStatusCode {
             StatusCode::BAD_REQUEST => MykoboStatusCode::BadRequest,
             StatusCode::UNAUTHORIZED => MykoboStatusCode::Unauthorised,
             StatusCode::INTERNAL_SERVER_ERROR => MykoboStatusCode::InternalServerError,
+            StatusCode::CONFLICT => MykoboStatusCode::Conflict,
             _ => MykoboStatusCode::DependencyFailed,
         }
     }
@@ -46,14 +49,14 @@ impl Display for ServiceError {
     }
 }
 
-impl From<reqwest::Error> for ServiceError {
-    fn from(error: reqwest::Error) -> Self {
+impl From<Error> for ServiceError {
+    fn from(error: Error) -> Self {
         let r_message = if error.is_connect() || error.is_timeout() {
             Some("Connection error".to_string())
         } else if error.is_request() {
             Some("Bad Request".to_string())
         } else {
-            Some("An unknown error occurred".to_string())
+            Some(format!("{}", error))
         };
 
         ServiceError {

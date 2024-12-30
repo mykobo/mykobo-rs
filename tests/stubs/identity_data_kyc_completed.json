@@ -19,7 +19,7 @@
     "webhook_type": "applicantReviewed",
     "applicant_id": "628568d95ce0940001b2ccd2",
     "correlation_id": null,
-    "review_result": null,
+    "review_result": "GREEN",
     "received_at": "2022-05-20T21:44:57",
     "level_name": "basic-kyc-level",
     "admin_comment": null,

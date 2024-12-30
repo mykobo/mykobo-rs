@@ -1,6 +1,10 @@
-use crate::models::request::{Credentials, CustomerRequest, TokenCheckRequest};
+use crate::models::request::identity::{
+    Credentials, CustomerRequest, NewDocumentRequest, TokenCheckRequest, UpdateProfileRequest,
+};
 use crate::models::response::auth::{ServiceToken, TokenCheckResponse, TokenClaims};
-use crate::models::response::identity::{CustomerResponse, UserKycStatusResponse};
+use crate::models::response::identity::{
+    CustomerResponse, NewDocumentResponse, UserKycStatusResponse,
+};
 use crate::models::response::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use jsonwebtoken::{decode, DecodingKey, Validation};
@@ -43,16 +47,16 @@ impl IdentityServiceClient {
         }
     }
 
-    fn get_token(&self) -> Option<ServiceToken> {
+    pub fn get_token(&self) -> Option<ServiceToken> {
         self.token.clone()
     }
 
-    fn client(&self) -> Client {
-        self.client.clone()
+    fn client(&self) -> &Client {
+        &self.client
     }
 
-    fn credentials(&self) -> Credentials {
-        self.credentials.clone()
+    fn credentials(&self) -> &Credentials {
+        &self.credentials
     }
 
     fn set_token(&mut self, token: Option<ServiceToken>) {
@@ -99,14 +103,15 @@ impl IdentityServiceClient {
         parse_response::<ServiceToken>(response).await
     }
 
-    async fn attempt_token_acquisition(&mut self) {
+    pub async fn attempt_token_acquisition(&mut self) -> Option<ServiceToken> {
         if self.token_is_valid() {
-            return;
+            return self.token.clone();
         }
         match self.acquire_token().await {
             Ok(token_response) => {
                 info!("Token acquired from IDENTITY service!");
                 self.set_token(Some(token_response));
+                return self.get_token();
             }
             Err(err) => {
                 warn!("Failed to acquire token: [{}]", err);
@@ -118,7 +123,7 @@ impl IdentityServiceClient {
                                 "Successfully acquired token from IDENTITY SERVICE on attempt {}",
                                 attempt
                             );
-                            self.set_token(Some(token_response))
+                            self.set_token(Some(token_response));
                         }
                         Err(err) => {
                             info!(
@@ -126,10 +131,11 @@ impl IdentityServiceClient {
                                 err, attempt
                             );
                             sleep(Duration::from_secs(3)).await;
-                            self.set_token(None)
+                            self.set_token(None);
                         }
                     }
                 }
+                self.get_token()
             }
         }
     }
@@ -194,7 +200,7 @@ impl IdentityServiceClient {
         parse_response::<UserKycStatusResponse>(response).await
     }
 
-    pub async fn new_customer(
+    pub async fn new_profile(
         &mut self,
         customer: CustomerRequest,
     ) -> Result<CustomerResponse, ServiceError> {
@@ -213,9 +219,9 @@ impl IdentityServiceClient {
         parse_response::<CustomerResponse>(response).await
     }
 
-    pub async fn update_customer(
+    pub async fn update_profile(
         &mut self,
-        customer: CustomerRequest,
+        customer: UpdateProfileRequest,
     ) -> Result<CustomerResponse, ServiceError> {
         self.attempt_token_acquisition().await;
         let response = self
@@ -230,5 +236,26 @@ impl IdentityServiceClient {
             .await;
 
         parse_response::<CustomerResponse>(response).await
+    }
+
+    pub async fn new_document(
+        &mut self,
+        new_document_request: NewDocumentRequest,
+    ) -> Result<NewDocumentResponse, ServiceError> {
+        self.attempt_token_acquisition().await;
+        let payload = json!(new_document_request).to_string();
+        debug!("PAYLOAD FOR SUBMITTING DOCUMENT: {}", payload);
+        let response = self
+            .client
+            .put(format!("{}/kyc/documents", self.host))
+            .body(payload)
+            .headers(generate_headers(
+                self.get_token(),
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+
+        parse_response::<NewDocumentResponse>(response).await
     }
 }

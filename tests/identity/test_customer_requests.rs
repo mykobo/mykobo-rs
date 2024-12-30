@@ -1,4 +1,4 @@
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
 use fake::{
     faker::{
         address::en::SecondaryAddress,
@@ -9,7 +9,10 @@ use fake::{
     },
     Fake,
 };
-use mykobo_rs::{identity::IdentityServiceClient, models::request::CustomerRequest};
+use mykobo_rs::{
+    identity::IdentityServiceClient,
+    models::request::identity::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
+};
 use pretty_assertions::assert_eq;
 use serde::Serialize;
 use std::{env, str::FromStr};
@@ -117,8 +120,107 @@ async fn test_create_customer() {
         credential_id: Some("urn:svcp:fb497b2fcbfa479991de4e8b0abecad6".to_string()),
     };
 
-    let new_customer = identity_service_client.new_customer(request.clone()).await;
+    let new_customer = identity_service_client.new_profile(request.clone()).await;
     assert!(new_customer.is_ok());
     let new_customer = new_customer.unwrap();
     assert_eq!(new_customer.first_name, "Test".to_string());
+}
+
+#[tokio::test]
+async fn test_update_customer() {
+    let mock_server = MockServer::start().await;
+    let wallet_server = MockServer::start().await;
+
+    env::set_var("IDENTITY_ACCESS_KEY", "TEST_ACCESS_KEY");
+    env::set_var("IDENTITY_SECRET_KEY", "TEST_SECRET_KEY");
+    env::set_var("IDENTITY_SERVICE_HOST", mock_server.uri());
+    env::set_var("WALLET_HOST", wallet_server.uri());
+
+    Mock::given(method("POST"))
+        .and(path("/authenticate"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_string(read_file("tests/stubs/authenticate.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("PATCH"))
+        .and(path("/user/profile/update"))
+        .respond_with(
+            ResponseTemplate::new(202)
+                .set_body_string(read_file("tests/stubs/new_customer_response.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
+    let request = UpdateProfileRequest {
+        bank_account_number: Some("GB29NWBK60161331926819".to_string()),
+        tax_id: None,
+        tax_id_name: None,
+        suspended_at: None,
+        deleted_at: None,
+    };
+
+    let mut identity_service_client = IdentityServiceClient::new(3);
+
+    let updated_customer = identity_service_client
+        .update_profile(request.clone())
+        .await;
+
+    assert!(updated_customer.is_ok());
+    let updated_customer = updated_customer.unwrap();
+    assert_eq!(
+        updated_customer.bank_account_number,
+        Some("GB29NWBK60161331926819".to_string())
+    );
+}
+
+#[tokio::test]
+async fn test_new_document() {
+    let mock_server = MockServer::start().await;
+    let wallet_server = MockServer::start().await;
+
+    env::set_var("IDENTITY_ACCESS_KEY", "TEST_ACCESS_KEY");
+    env::set_var("IDENTITY_SECRET_KEY", "TEST_SECRET_KEY");
+    env::set_var("IDENTITY_SERVICE_HOST", mock_server.uri());
+    env::set_var("WALLET_HOST", wallet_server.uri());
+
+    Mock::given(method("POST"))
+        .and(path("/authenticate"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_string(read_file("tests/stubs/authenticate.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("PUT"))
+        .and(path("/kyc/documents"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(read_file("tests/stubs/new_document_response.json")),
+        )
+        .mount(&mock_server)
+        .await;
+    let mut identity_service_client = IdentityServiceClient::new(3);
+
+    let request = NewDocumentRequest {
+        profile_id: "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6".to_string(),
+        document_type: "photo_id_front".to_string(),
+        document_sub_type: Some("passport".to_string()),
+        document_path: Some(
+            "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6/photo_id_front.png".to_string(),
+        ),
+        document_status: "pending".to_string(),
+        created_at: Utc::now().naive_utc(),
+        updated_at: None,
+    };
+    let new_document = identity_service_client.new_document(request.clone()).await;
+    print!("{:?}", new_document);
+    assert!(new_document.is_ok());
+    let new_document = new_document.unwrap();
+    assert_eq!(new_document.document_type, "photo_id_front".to_string());
+    assert_eq!(
+        new_document.profile_id,
+        "urn:usrp:5028f1bf5a2e4fddb51f8d6f93a6b35f".to_string()
+    )
 }

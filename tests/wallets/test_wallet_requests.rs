@@ -37,9 +37,9 @@ async fn test_get_customer_with_account_id() {
         .mount(&wallet_server)
         .await;
 
-    let mut wallet_service_client = WalletServiceClient::new(3);
+    let wallet_service_client = WalletServiceClient::new(3);
     let wallet_customer = wallet_service_client
-        .get_customer(
+        .get_wallet_profile(
             Some(ServiceToken {
                 subject_id: "SUBJECT_ID".to_string(),
                 token: "TOKEN".to_string(),
@@ -87,9 +87,9 @@ async fn test_get_customer_not_found() {
         .mount(&wallet_server)
         .await;
 
-    let mut wallet_service_client = WalletServiceClient::new(3);
+    let wallet_service_client = WalletServiceClient::new(3);
     let wallet_customer = wallet_service_client
-        .get_customer(
+        .get_wallet_profile(
             Some(ServiceToken {
                 subject_id: "SUBJECT_ID".to_string(),
                 token: "TOKEN".to_string(),
@@ -99,6 +99,5 @@ async fn test_get_customer_not_found() {
             None,
         )
         .await;
-    print!("{:?}", wallet_customer);
     assert!(wallet_customer.is_err());
 }

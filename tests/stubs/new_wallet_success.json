@@ -1,11 +1,10 @@
 {
-  "created_at": "2024-11-30 22:03:45",
+  "created_at": "2024-12-06T23:17:06.579592",
   "profile_id": "urn:usrp:6bd0201b36f64008bd94209aef8d2b15",
   "wallets": [
     {
-      "created_at": "2024-11-30 22:03:45",
-      "id": "urn:wallet:cdf5799eb41d47498269130bdde27455",
-      "is_custodial": false,
+      "created_at": "2024-12-06T23:17:06.581754",
+      "id": "urn:wallet:57f810612b5848ddabdbcc0fe8473862",
       "memo": null,
       "network": "STELLAR",
       "public_key": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6"

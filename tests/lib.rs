@@ -1,5 +1,6 @@
 mod identity;
 mod models;
+mod sumsub;
 mod wallets;
 use std::fs;
 

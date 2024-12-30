@@ -108,3 +108,16 @@ pub struct CustomerResponse {
     pub otp_verified: Option<bool>,
     pub kyc_status: KycStatus,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct NewDocumentResponse {
+    pub profile_id: String,
+    pub document_type: String,
+    pub document_status: Option<String>,
+    pub document_path: Option<String>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
+    pub document_sub_type: Option<String>,
+    pub reject_reason: Option<String>,
+    pub id: String,
+}
