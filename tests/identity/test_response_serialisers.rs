@@ -54,13 +54,13 @@ fn test_deserialise_identity_response() {
     let pending: UserKycStatusResponse = pending.unwrap();
     assert!(pending
         .kyc_status
-        .is_some_and(|k| k.review_status == "init".to_string()));
+        .is_some_and(|k| k.review_status == *"init"));
     // ---- Completed KYC response
     let completed_response = read_file("tests/stubs/identity_data_kyc_completed.json");
     let completed = serde_json::from_str(&completed_response);
     assert!(completed.is_ok());
     let completed: UserKycStatusResponse = completed.unwrap();
     assert!(completed.kyc_status.is_some_and(|k| {
-        k.review_status == "completed".to_string() && k.review_result == Some("GREEN".to_string())
+        k.review_status == *"completed" && k.review_result == Some("GREEN".to_string())
     }))
 }

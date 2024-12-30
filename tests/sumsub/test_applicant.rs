@@ -104,8 +104,8 @@ async fn test_submit_document() {
     let document_request = NewDocumentRequest {
         metadata: DocumentMetadata {
             id_doc_type: "ID_CARD".to_string(),
-            id_doc_sub_type: "FRONT_SIDE".to_string(),
-            country: "DEU".to_string(),
+            id_doc_sub_type: Some("FRONT_SIDE".to_string()),
+            country: Some("DEU".to_string()),
         },
         file_path: "urn:usrp:bfac71ae055e4c4dbedc0e3c7b56b79e/photo_id_front.png".to_string(),
         applicant_id: "676c51021125c521e0b6704f".to_string(),
@@ -119,5 +119,5 @@ async fn test_submit_document() {
     assert_eq!(document.doc_id, "439993055".to_string());
     assert_eq!(document.id_doc_type, "ID_CARD".to_string());
     assert_eq!(document.id_doc_sub_type, Some("FRONT_SIDE".to_string()));
-    assert_eq!(document.country, "DEU".to_string());
+    assert_eq!(document.country, Some("DEU".to_string()));
 }

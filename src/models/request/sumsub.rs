@@ -29,8 +29,8 @@ pub struct NewApplicantRequest {
 #[serde(rename_all = "camelCase")]
 pub struct DocumentMetadata {
     pub id_doc_type: String,
-    pub id_doc_sub_type: String,
-    pub country: String,
+    pub id_doc_sub_type: Option<String>,
+    pub country: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

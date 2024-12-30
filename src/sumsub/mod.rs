@@ -14,8 +14,14 @@ use crate::{
 };
 
 pub struct SumsubClient {
-    host: String,
+    pub host: String,
     pub client: reqwest::Client,
+}
+
+impl Default for SumsubClient {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SumsubClient {
@@ -28,7 +34,7 @@ impl SumsubClient {
 
     // Generate an access token for a given profile.
     pub async fn get_access_token(
-        self,
+        &self,
         request: AccessTokenRequest,
     ) -> Result<AccessTokenResponse, ServiceError> {
         let url = format!("{}/access_token", self.host);
@@ -39,7 +45,7 @@ impl SumsubClient {
 
     // Given a profile id, get the details from sumsub.
     pub async fn get_applicant(
-        self,
+        &self,
         profile_id: String,
     ) -> Result<ApplicantResponse, ServiceError> {
         let url = format!("{}/get_applicant/{}", self.host, profile_id);

@@ -111,7 +111,7 @@ impl IdentityServiceClient {
             Ok(token_response) => {
                 info!("Token acquired from IDENTITY service!");
                 self.set_token(Some(token_response));
-                return self.get_token();
+                self.get_token()
             }
             Err(err) => {
                 warn!("Failed to acquire token: [{}]", err);
