@@ -137,8 +137,7 @@ impl IdentityServiceClient {
         }
     }
 
-    #[allow(dead_code)]
-    async fn check_scope(
+    pub async fn check_scope(
         &mut self,
         requester_token: &str,
         scope: &str,
@@ -159,8 +158,7 @@ impl IdentityServiceClient {
         parse_response::<TokenCheckResponse>(response).await
     }
 
-    #[allow(dead_code)]
-    async fn check_subject(
+    pub async fn check_subject(
         &mut self,
         subject_token: &str,
         subject: &str,
