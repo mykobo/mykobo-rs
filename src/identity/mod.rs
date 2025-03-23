@@ -9,6 +9,7 @@ use crate::models::response::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use jsonwebtoken::{decode, DecodingKey, Validation};
 use log::{debug, info, warn};
+use reqwest::header::AUTHORIZATION;
 use reqwest::Client;
 use serde_json::json;
 use std::env;
@@ -179,18 +180,32 @@ impl IdentityServiceClient {
         parse_response::<TokenCheckResponse>(response).await
     }
 
-    pub async fn get_profile(&mut self, id: &str) -> Result<UserKycStatusResponse, ServiceError> {
+    pub async fn get_profile(
+        &mut self,
+        user_token: Option<&String>,
+        id: Option<String>,
+    ) -> Result<UserKycStatusResponse, ServiceError> {
         self.attempt_token_acquisition().await;
-        debug!("Getting profile with [{}] at {}", id, self.host);
-        let response = self
-            .client
-            .get(format!("{}/kyc/profile/{}", self.host, id))
-            .headers(generate_headers(
-                self.get_token(),
-                self.client_identifier.clone(),
-            ))
-            .send()
-            .await;
+
+        let (headers, url) = if let Some(token) = user_token {
+            let mut h = generate_headers(None, None);
+            h.insert(AUTHORIZATION, format!("Bearer {}", token).parse().unwrap());
+            (h, format!("{}/user/profile", self.host))
+        } else if let Some(id) = id {
+            (
+                generate_headers(None, None),
+                format!("{}/user/profile/{}", self.host, id),
+            )
+        } else {
+            return Err(ServiceError {
+                error: Some("No token or id provided".to_string()),
+                message: Some("No token or id provided".to_string()),
+                description: Some("No token or id provided".to_string()),
+                status: crate::models::response::MykoboStatusCode::BadRequest,
+            });
+        };
+
+        let response = self.client.get(url).headers(headers).send().await;
 
         parse_response::<UserKycStatusResponse>(response).await
     }
