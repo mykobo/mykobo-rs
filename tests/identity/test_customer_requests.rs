@@ -61,10 +61,7 @@ async fn test_customer_not_found() {
     let mut identity_service_client = IdentityServiceClient::new(3);
 
     let profile = identity_service_client
-        .get_profile(
-            None,
-            Some("urn:usrp:fb497b2fcbfa479991de4e8b0abecad6".to_string()),
-        )
+        .get_profile("urn:usrp:fb497b2fcbfa479991de4e8b0abecad6")
         .await;
 
     assert!(profile.is_ok());

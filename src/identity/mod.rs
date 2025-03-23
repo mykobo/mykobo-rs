@@ -180,33 +180,24 @@ impl IdentityServiceClient {
         parse_response::<TokenCheckResponse>(response).await
     }
 
-    pub async fn get_profile(
-        &mut self,
-        user_token: Option<&String>,
-        id: Option<String>,
-    ) -> Result<UserKycStatusResponse, ServiceError> {
-        self.attempt_token_acquisition().await;
+    pub async fn get_profile(&mut self, id: &str) -> Result<UserKycStatusResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
 
-        let (headers, url) = if let Some(token) = user_token {
-            let mut h = generate_headers(None, None);
-            h.insert(AUTHORIZATION, format!("Bearer {}", token).parse().unwrap());
-            (h, format!("{}/user/profile", self.host))
-        } else if let Some(id) = id {
-            (
-                generate_headers(None, None),
-                format!("{}/user/profile/{}", self.host, id),
-            )
-        } else {
-            return Err(ServiceError {
-                error: Some("No token or id provided".to_string()),
-                message: Some("No token or id provided".to_string()),
-                description: Some("No token or id provided".to_string()),
-                status: crate::models::response::MykoboStatusCode::BadRequest,
-            });
-        };
-
+        let headers = generate_headers(service_token, None);
+        let url = format!("{}/user/profile/{}", self.host, id);
         let response = self.client.get(url).headers(headers).send().await;
 
+        parse_response::<UserKycStatusResponse>(response).await
+    }
+
+    pub async fn get_profile_with_token(
+        &self,
+        token: &str,
+    ) -> Result<UserKycStatusResponse, ServiceError> {
+        let mut h = generate_headers(None, None);
+        h.insert(AUTHORIZATION, format!("Bearer {}", token).parse().unwrap());
+        let url = format!("{}/user/profile", self.host);
+        let response = self.client.get(url).headers(h).send().await;
         parse_response::<UserKycStatusResponse>(response).await
     }
 
