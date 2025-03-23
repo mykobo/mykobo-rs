@@ -3,7 +3,8 @@ use std::env;
 use crate::read_file;
 use mykobo_rs::{
     models::request::sumsub::{
-        DocumentMetadata, NewApplicantRequest, NewDocumentRequest, ProfileData,
+        DocumentMetadata, InitiateVerificationRequest, NewApplicantRequest, NewDocumentRequest,
+        ProfileData,
     },
     sumsub::SumsubClient,
 };
@@ -120,4 +121,31 @@ async fn test_submit_document() {
     assert_eq!(document.id_doc_type, "ID_CARD".to_string());
     assert_eq!(document.id_doc_sub_type, Some("FRONT_SIDE".to_string()));
     assert_eq!(document.country, Some("DEU".to_string()));
+}
+
+#[tokio::test]
+async fn test_initiate_check_success() {
+    let sumsub_server = MockServer::start().await;
+
+    env::set_var("SUMSUB_HOST", sumsub_server.uri());
+
+    Mock::given(method("POST"))
+        .and(path("/initiate_verification"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(read_file("tests/stubs/sumsub_initiate_check_success.json")),
+        )
+        .mount(&sumsub_server)
+        .await;
+
+    let sumsub_client = SumsubClient::new();
+
+    let init_check_request = InitiateVerificationRequest {
+        applicant_id: "676c51021125c521e0b6704f".to_string(),
+        reason: "Documents uploaded via API".to_string(),
+    };
+
+    let init_check_response = sumsub_client.initiate_check(init_check_request).await;
+    assert!(init_check_response.is_ok());
+    assert!(init_check_response.unwrap().ok == 1);
 }

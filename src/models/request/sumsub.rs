@@ -40,3 +40,10 @@ pub struct NewDocumentRequest {
     pub file_path: String,
     pub applicant_id: String,
 }
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InitiateVerificationRequest {
+    pub applicant_id: String,
+    pub reason: String,
+}

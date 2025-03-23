@@ -23,14 +23,12 @@ pub struct IdentityServiceClient {
     pub client: reqwest::Client,
     pub max_retries: i8,
     pub client_identifier: Option<String>,
-    pub wallet_host: String,
 }
 
 impl IdentityServiceClient {
     pub fn new(max_retries: i8) -> Self {
         let identity_service_host =
             env::var("IDENTITY_SERVICE_HOST").expect("IDENTITY_SERVICE_HOST must be set");
-        let wallet_host = env::var("WALLET_HOST").expect("WALLET_HOST must be set");
         let credentials = Credentials {
             access_key: env::var("IDENTITY_ACCESS_KEY").expect("IDENTITY_ACCESS_KEY must be set"),
             secret_key: env::var("IDENTITY_SECRET_KEY").expect("IDENTITY_SECRET_KEY must be set"),
@@ -43,7 +41,6 @@ impl IdentityServiceClient {
             client: reqwest::Client::new(),
             max_retries,
             client_identifier: None,
-            wallet_host,
         }
     }
 
@@ -126,7 +123,7 @@ impl IdentityServiceClient {
                             self.set_token(Some(token_response));
                         }
                         Err(err) => {
-                            info!(
+                            warn!(
                                 "Failed to acquire token [{}], retrying attempt {}",
                                 err, attempt
                             );

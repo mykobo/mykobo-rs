@@ -4,9 +4,15 @@ use reqwest::Client;
 
 use crate::{
     models::{
-        request::sumsub::{AccessTokenRequest, NewApplicantRequest, NewDocumentRequest},
+        request::sumsub::{
+            AccessTokenRequest, InitiateVerificationRequest, NewApplicantRequest,
+            NewDocumentRequest,
+        },
         response::{
-            sumsub::{AccessTokenResponse, ApplicantResponse, NewDocumentResponse},
+            sumsub::{
+                AccessTokenResponse, ApplicantResponse, InitiateVerificationResponse,
+                NewDocumentResponse,
+            },
             ServiceError,
         },
     },
@@ -76,5 +82,19 @@ impl SumsubClient {
             .send()
             .await;
         parse_response::<NewDocumentResponse>(response).await
+    }
+
+    pub async fn initiate_check(
+        &self,
+        initiate_verification_request: InitiateVerificationRequest,
+    ) -> Result<InitiateVerificationResponse, ServiceError> {
+        let url = format!("{}/initiate_verification", self.host);
+        let response = self
+            .client
+            .post(url)
+            .json(&initiate_verification_request)
+            .send()
+            .await;
+        parse_response::<InitiateVerificationResponse>(response).await
     }
 }

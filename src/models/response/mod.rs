@@ -35,6 +35,7 @@ impl From<StatusCode> for MykoboStatusCode {
 pub struct ServiceError {
     pub error: Option<String>,
     pub message: Option<String>,
+    pub description: Option<String>,
     #[serde(default = "MykoboStatusCode::default")]
     pub status: MykoboStatusCode,
 }
@@ -62,6 +63,7 @@ impl From<Error> for ServiceError {
         ServiceError {
             error: r_message.clone().unwrap().to_string().into(),
             message: r_message,
+            description: None,
             status: MykoboStatusCode::from(error.status().unwrap_or(StatusCode::BAD_REQUEST)),
         }
     }

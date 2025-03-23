@@ -41,3 +41,9 @@ pub struct ApplicantResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub review: Option<ApplicantReview>,
 }
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InitiateVerificationResponse {
+    pub ok: i8,
+}
