@@ -180,16 +180,37 @@ impl IdentityServiceClient {
         parse_response::<TokenCheckResponse>(response).await
     }
 
-    pub async fn get_profile(&mut self, id: &str) -> Result<UserKycStatusResponse, ServiceError> {
+    /**
+     * Get a user's profile information. This function will usually be invoked by a service as this uses
+     * the implicit service token to get the user's profile information. If a user token is provided, it will be used instead.
+     */
+    pub async fn get_profile_by_id(
+        &mut self,
+        id: &str,
+        user_token: Option<String>,
+    ) -> Result<UserKycStatusResponse, ServiceError> {
         let service_token = self.attempt_token_acquisition().await;
+        let headers = if let Some(u_token) = user_token {
+            let mut h = generate_headers(service_token, None);
+            h.insert(
+                AUTHORIZATION,
+                format!("Bearer {}", u_token).parse().unwrap(),
+            );
+            h
+        } else {
+            generate_headers(service_token, None)
+        };
 
-        let headers = generate_headers(service_token, None);
         let url = format!("{}/user/profile/{}", self.host, id);
         let response = self.client.get(url).headers(headers).send().await;
 
         parse_response::<UserKycStatusResponse>(response).await
     }
 
+    /**
+    This function allows a service to get a user's profile information using a token. This token would be the user token. It can be invoked by a service but
+    the service token will NOT be used for this operation. Instead a provided user token will be used to get the user's profile information.
+    */
     pub async fn get_profile_with_token(
         &self,
         token: &str,
