@@ -180,6 +180,33 @@ impl IdentityServiceClient {
         parse_response::<TokenCheckResponse>(response).await
     }
 
+    /** Get a more detailed KYC status with the user profile
+     */
+
+    pub async fn get_kyc_status_with_profile(
+        &mut self,
+        id: &str,
+        user_token: Option<String>,
+    ) -> Result<UserKycStatusResponse, ServiceError> {
+        self.attempt_token_acquisition().await;
+        let service_token = self.attempt_token_acquisition().await;
+        let headers = if let Some(u_token) = user_token {
+            let mut h = generate_headers(service_token, None);
+            h.insert(
+                AUTHORIZATION,
+                format!("Bearer {}", u_token).parse().unwrap(),
+            );
+            h
+        } else {
+            generate_headers(service_token, None)
+        };
+
+        let url = format!("{}/kyc/profile/{}", self.host, id);
+        let response = self.client.get(url).headers(headers).send().await;
+
+        parse_response::<UserKycStatusResponse>(response).await
+    }
+
     /**
      * Get a user's profile information. This function will usually be invoked by a service as this uses
      * the implicit service token to get the user's profile information. If a user token is provided, it will be used instead.
@@ -188,7 +215,7 @@ impl IdentityServiceClient {
         &mut self,
         id: &str,
         user_token: Option<String>,
-    ) -> Result<UserKycStatusResponse, ServiceError> {
+    ) -> Result<CustomerResponse, ServiceError> {
         let service_token = self.attempt_token_acquisition().await;
         let headers = if let Some(u_token) = user_token {
             let mut h = generate_headers(service_token, None);
@@ -204,7 +231,7 @@ impl IdentityServiceClient {
         let url = format!("{}/user/profile/{}", self.host, id);
         let response = self.client.get(url).headers(headers).send().await;
 
-        parse_response::<UserKycStatusResponse>(response).await
+        parse_response::<CustomerResponse>(response).await
     }
 
     /**
@@ -214,12 +241,12 @@ impl IdentityServiceClient {
     pub async fn get_profile_with_token(
         &self,
         token: &str,
-    ) -> Result<UserKycStatusResponse, ServiceError> {
+    ) -> Result<CustomerResponse, ServiceError> {
         let mut h = generate_headers(None, None);
         h.insert(AUTHORIZATION, format!("Bearer {}", token).parse().unwrap());
         let url = format!("{}/user/profile", self.host);
         let response = self.client.get(url).headers(h).send().await;
-        parse_response::<UserKycStatusResponse>(response).await
+        parse_response::<CustomerResponse>(response).await
     }
 
     pub async fn new_profile(

@@ -61,7 +61,7 @@ async fn test_customer_not_found() {
     let mut identity_service_client = IdentityServiceClient::new(3);
 
     let profile = identity_service_client
-        .get_profile("urn:usrp:fb497b2fcbfa479991de4e8b0abecad6", None)
+        .get_kyc_status_with_profile("urn:usrp:fb497b2fcbfa479991de4e8b0abecad6", None)
         .await;
 
     assert!(profile.is_ok());
@@ -73,6 +73,51 @@ async fn test_customer_not_found() {
         "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6".to_string()
     );
     assert!(profile.kyc_status.is_some())
+}
+
+#[tokio::test]
+async fn test_get_profile() {
+    let mock_server = MockServer::start().await;
+    let wallet_server = MockServer::start().await;
+
+    env::set_var("IDENTITY_ACCESS_KEY", "TEST_ACCESS_KEY");
+    env::set_var("IDENTITY_SECRET_KEY", "TEST_SECRET_KEY");
+    env::set_var("IDENTITY_SERVICE_HOST", mock_server.uri());
+    env::set_var("WALLET_HOST", wallet_server.uri());
+
+    Mock::given(method("POST"))
+        .and(path("/authenticate"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_string(read_file("tests/stubs/authenticate.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path(
+            "/user/profile/urn:usrp:acc7f99158f4419bb57613b38b68d494",
+        ))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_string(read_file("tests/stubs/get_profile.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
+    let mut identity_service_client = IdentityServiceClient::new(3);
+
+    let profile = identity_service_client
+        .get_profile_by_id("urn:usrp:acc7f99158f4419bb57613b38b68d494", None)
+        .await;
+
+    assert!(profile.is_ok());
+    let profile = profile.unwrap();
+
+    assert_eq!(
+        profile.id,
+        "urn:usrp:acc7f99158f4419bb57613b38b68d494".to_string()
+    );
+
+    assert_eq!(profile.kyc_status.review_status, "pending")
 }
 
 #[tokio::test]

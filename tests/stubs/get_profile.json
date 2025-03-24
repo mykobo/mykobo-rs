@@ -1,0 +1,24 @@
+{
+  "id": "urn:usrp:acc7f99158f4419bb57613b38b68d494",
+  "first_name": "Kwabena",
+  "last_name": "Aning",
+  "email_address": "kwabena@mykobo.co",
+  "additional_name": null,
+  "address": null,
+  "mobile_number": null,
+  "birth_date": null,
+  "birth_country_code": null,
+  "bank_account_number": "gb82372364763435",
+  "tax_id": null,
+  "tax_id_name": null,
+  "credential_id": "urn:usr:382498fbcc304f229e9e41b3b0c8ea88",
+  "created_at": "2025-02-09T21:48:01.269522",
+  "updated_at": null,
+  "suspended_at": null,
+  "deleted_at": null,
+  "otp_verified": true,
+  "kyc_status": {
+    "review_status": "pending",
+    "received_at": null
+  }
+}
