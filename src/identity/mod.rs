@@ -143,11 +143,11 @@ impl IdentityServiceClient {
         requester_token: &str,
         scope: &str,
     ) -> Result<TokenCheckResponse, ServiceError> {
-        self.attempt_token_acquisition().await;
+        let service_token = self.attempt_token_acquisition().await;
         let response = self
             .client()
             .post(format!("{}/authorise/scope", self.host()))
-            .headers(generate_headers(None, None))
+            .headers(generate_headers(service_token, None))
             .json(&TokenCheckRequest {
                 token: requester_token.to_string(),
                 scope: Some(scope.to_string()),
@@ -164,11 +164,11 @@ impl IdentityServiceClient {
         subject_token: &str,
         subject: &str,
     ) -> Result<TokenCheckResponse, ServiceError> {
-        self.attempt_token_acquisition().await;
+        let service_token = self.attempt_token_acquisition().await;
         let response = self
             .client()
             .post(format!("{}/authorise/subject", self.host()))
-            .headers(generate_headers(None, None))
+            .headers(generate_headers(service_token, None))
             .json(&TokenCheckRequest {
                 token: subject_token.to_string(),
                 subject: Some(subject.to_string()),
