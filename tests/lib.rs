@@ -2,6 +2,7 @@ mod identity;
 mod models;
 mod sumsub;
 mod wallets;
+
 use std::fs;
 
 fn read_file(file: &str) -> String {
