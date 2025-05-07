@@ -182,7 +182,6 @@ impl IdentityServiceClient {
 
     /** Get a more detailed KYC status with the user profile
      */
-
     pub async fn get_kyc_status_with_profile(
         &mut self,
         id: &str,
