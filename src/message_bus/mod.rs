@@ -4,11 +4,11 @@ use aws_sdk_sqs::error::SdkError;
 use aws_sdk_sqs::operation::RequestId;
 use aws_sdk_sqs::types::{Message, MessageAttributeValue};
 use aws_sdk_sqs::Client;
+use log::{debug, info, warn};
 use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
-use tracing::{debug, info, warn};
 
 #[derive(Debug)]
 pub struct SQSMessage {
@@ -94,7 +94,7 @@ pub async fn send_message(
         .map_err(|err| SQSError::new(format!("Error sending message: {:#?}", err)))
 }
 
-pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &mut Sender<Message>) {
+pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &Sender<Message>) {
     debug!(
         "Attempting retrieval of messages from queue with url: {}/{}",
         client_config.queue_endpoint, queue
@@ -125,8 +125,11 @@ pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &mut Se
                 warn!("We did not construct this request properly")
             }
             SdkError::TimeoutError(_) => warn!("Request timed out"),
-            SdkError::DispatchFailure(_) => {
-                warn!("There might have been an error sending this request")
+            SdkError::DispatchFailure(e) => {
+                warn!(
+                    "There might have been an error sending this request [{:?}]",
+                    e
+                )
             }
             SdkError::ResponseError(response_error) => {
                 let error = response_error.raw();

@@ -1,5 +1,6 @@
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde::de::DeserializeOwned;
+use uuid::Uuid;
 
 use crate::models::response::{auth::ServiceToken, MykoboStatusCode, ServiceError};
 
@@ -44,4 +45,11 @@ pub async fn parse_response<T: DeserializeOwned>(
         }
         Err(e) => Err(ServiceError::from(e)),
     }
+}
+
+/**
+ * Generates a unique identifier with the given prefix. NOTE no trailing colon.
+ */
+pub fn generate_id(prefix: &str) -> String {
+    format!("{}:{}", prefix, Uuid::new_v4().to_string().replace('-', ""))
 }
