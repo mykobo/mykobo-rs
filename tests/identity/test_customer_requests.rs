@@ -204,7 +204,6 @@ async fn test_update_customer() {
 
     let bic: String = "LWAOBOU1".to_string();
     let request = UpdateProfileRequest {
-        
         bank_account_number: Some("GB29NWBK60161331926819".to_string()),
         bank_number: Some(bic.clone()),
         tax_id: None,
@@ -228,10 +227,7 @@ async fn test_update_customer() {
         updated_customer.bank_account_number,
         Some("GB29NWBK60161331926819".to_string())
     );
-    assert_eq!(
-        updated_customer.bank_number,
-        Some("LWAOBOU1".to_string())
-    )
+    assert_eq!(updated_customer.bank_number, Some("LWAOBOU1".to_string()))
 }
 
 #[tokio::test]
