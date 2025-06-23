@@ -110,10 +110,13 @@ pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &Sender
             if received_messages.messages.is_some() {
                 debug!("Successfully retrieved message ");
                 for m in received_messages.messages.unwrap_or_default() {
-                    if (tx.send(m.clone()).await).is_ok() {
-                        info!("Message sent to channel for processing...")
-                    } else {
-                        warn!("Could not send message to channel")
+                    match tx.send(m.clone()).await {
+                        Ok(_) => {
+                            info!("Message sent to channel for processing...")
+                        }
+                        Err(err) => {
+                            warn!("Could not send message to channel {:?}", err.0.message_id())
+                        }
                     }
                 }
             } else {
