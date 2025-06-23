@@ -48,7 +48,9 @@ pub struct CustomerRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub address: Option<String>,
+    pub address_line_1: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address_line_2: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mobile_number: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,7 +58,11 @@ pub struct CustomerRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub birth_country_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub id_country_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bank_account_number: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_number: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tax_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,8 +74,12 @@ pub struct CustomerRequest {
 #[derive(Serialize, Debug, Clone, Default)]
 pub struct UpdateProfileRequest {
     pub bank_account_number: Option<String>,
+    pub bank_number: Option<String>,
     pub tax_id: Option<String>,
     pub tax_id_name: Option<String>,
+    pub address_line_1: Option<String>,
+    pub address_line_2: Option<String>,
+    pub id_country_code: Option<String>,
     pub suspended_at: Option<String>,
     pub deleted_at: Option<String>,
 }

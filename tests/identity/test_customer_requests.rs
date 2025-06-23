@@ -2,7 +2,7 @@ use chrono::{NaiveDate, Utc};
 use fake::{
     faker::{
         address::en::SecondaryAddress,
-        finance::en::Bic,
+        finance::en::Isin,
         internet::en::FreeEmail,
         name::{en::FirstName, en::LastName},
         phone_number::en::PhoneNumber,
@@ -155,11 +155,14 @@ async fn test_create_customer() {
         last_name: Some(LastName().fake()),
         email_address: FreeEmail().fake(),
         additional_name: None,
-        address: SecondaryAddress().fake(),
+        address_line_1: SecondaryAddress().fake(),
+        address_line_2: SecondaryAddress().fake(),
         mobile_number: PhoneNumber().fake(),
         birth_date: Some(NaiveDate::from_str("1990-01-01").unwrap()),
         birth_country_code: Some("UK".to_string()),
-        bank_account_number: Some(Bic().fake()),
+        id_country_code: Some("UK".to_string()),
+        bank_account_number: Some("LWAOBOU1".to_string()),
+        bank_number: Some(Isin().fake()),
         tax_id: None,
         tax_id_name: None,
         credential_id: Some("urn:svcp:fb497b2fcbfa479991de4e8b0abecad6".to_string()),
@@ -169,6 +172,7 @@ async fn test_create_customer() {
     assert!(new_customer.is_ok());
     let new_customer = new_customer.unwrap();
     assert_eq!(new_customer.first_name, "Test".to_string());
+    assert_eq!(new_customer.id_country_code, Some("UK".to_string()));
 }
 
 #[tokio::test]
@@ -198,10 +202,16 @@ async fn test_update_customer() {
         .mount(&mock_server)
         .await;
 
+    let bic: String = "LWAOBOU1".to_string();
     let request = UpdateProfileRequest {
+        
         bank_account_number: Some("GB29NWBK60161331926819".to_string()),
+        bank_number: Some(bic.clone()),
         tax_id: None,
         tax_id_name: None,
+        address_line_1: None,
+        address_line_2: None,
+        id_country_code: None,
         suspended_at: None,
         deleted_at: None,
     };
@@ -218,6 +228,10 @@ async fn test_update_customer() {
         updated_customer.bank_account_number,
         Some("GB29NWBK60161331926819".to_string())
     );
+    assert_eq!(
+        updated_customer.bank_number,
+        Some("LWAOBOU1".to_string())
+    )
 }
 
 #[tokio::test]
