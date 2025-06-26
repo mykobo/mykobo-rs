@@ -218,7 +218,7 @@ async fn test_update_customer() {
     let mut identity_service_client = IdentityServiceClient::new(3);
 
     let updated_customer = identity_service_client
-        .update_profile(request.clone())
+        .update_profile(request.clone(), None)
         .await;
 
     assert!(updated_customer.is_ok());
@@ -270,8 +270,7 @@ async fn test_new_document() {
         updated_at: None,
     };
     let new_document = identity_service_client.new_document(request.clone()).await;
-    print!("{:?}", new_document);
-    assert!(new_document.is_ok());
+
     let new_document = new_document.unwrap();
     assert_eq!(new_document.document_type, "photo_id_front".to_string());
     assert_eq!(

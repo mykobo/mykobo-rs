@@ -270,11 +270,16 @@ impl IdentityServiceClient {
     pub async fn update_profile(
         &mut self,
         customer: UpdateProfileRequest,
+        id: Option<&str>,
     ) -> Result<CustomerResponse, ServiceError> {
         self.attempt_token_acquisition().await;
+        let url = match id {
+            Some(id) => format!("{}/user/profile/update/{}", self.host, id),
+            None => format!("{}/user/profile/update", self.host),
+        };
         let response = self
             .client
-            .patch(format!("{}/user/profile/update", self.host))
+            .patch(url)
             .body(json!(customer).to_string())
             .headers(generate_headers(
                 self.get_token(),
