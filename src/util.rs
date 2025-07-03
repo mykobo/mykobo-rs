@@ -53,3 +53,5 @@ pub async fn parse_response<T: DeserializeOwned>(
 pub fn generate_id(prefix: &str) -> String {
     format!("{}:{}", prefix, Uuid::new_v4().to_string().replace('-', ""))
 }
+
+pub const DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%SZ";
