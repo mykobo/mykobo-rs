@@ -80,7 +80,7 @@ impl IdentityServiceClient {
             match decode::<TokenClaims>(service_token.token.as_str(), &key, &validation) {
                 Ok(_) => true,
                 Err(e) => {
-                    warn!("Token is invalid {:?}", e);
+                    warn!("Token is invalid {e:?}");
                     false
                 }
             }
@@ -112,21 +112,19 @@ impl IdentityServiceClient {
                 self.get_token()
             }
             Err(err) => {
-                warn!("Failed to acquire token: [{}]", err);
+                warn!("Failed to acquire token: [{err}]");
                 for attempt in 0..self.max_retries() {
-                    info!("Attempting to acquire token {} again...", attempt);
+                    info!("Attempting to acquire token {attempt} again...");
                     match self.acquire_token().await {
                         Ok(token_response) => {
                             info!(
-                                "Successfully acquired token from IDENTITY SERVICE on attempt {}",
-                                attempt
+                                "Successfully acquired token from IDENTITY SERVICE on attempt {attempt}"
                             );
                             self.set_token(Some(token_response));
                         }
                         Err(err) => {
                             warn!(
-                                "Failed to acquire token [{}], retrying attempt {}",
-                                err, attempt
+                                "Failed to acquire token [{err}], retrying attempt {attempt}"
                             );
                             sleep(Duration::from_secs(3)).await;
                             self.set_token(None);
@@ -193,7 +191,7 @@ impl IdentityServiceClient {
             let mut h = generate_headers(service_token, None);
             h.insert(
                 AUTHORIZATION,
-                format!("Bearer {}", u_token).parse().unwrap(),
+                format!("Bearer {u_token}").parse().unwrap(),
             );
             h
         } else {
@@ -220,7 +218,7 @@ impl IdentityServiceClient {
             let mut h = generate_headers(service_token, None);
             h.insert(
                 AUTHORIZATION,
-                format!("Bearer {}", u_token).parse().unwrap(),
+                format!("Bearer {u_token}").parse().unwrap(),
             );
             h
         } else {
@@ -242,7 +240,7 @@ impl IdentityServiceClient {
         token: &str,
     ) -> Result<CustomerResponse, ServiceError> {
         let mut h = generate_headers(None, None);
-        h.insert(AUTHORIZATION, format!("Bearer {}", token).parse().unwrap());
+        h.insert(AUTHORIZATION, format!("Bearer {token}").parse().unwrap());
         let url = format!("{}/user/profile", self.host);
         let response = self.client.get(url).headers(h).send().await;
         parse_response::<CustomerResponse>(response).await
@@ -297,7 +295,7 @@ impl IdentityServiceClient {
     ) -> Result<NewDocumentResponse, ServiceError> {
         self.attempt_token_acquisition().await;
         let payload = json!(new_document_request).to_string();
-        debug!("PAYLOAD FOR SUBMITTING DOCUMENT: {}", payload);
+        debug!("PAYLOAD FOR SUBMITTING DOCUMENT: {payload}");
         let response = self
             .client
             .put(format!("{}/kyc/documents", self.host))

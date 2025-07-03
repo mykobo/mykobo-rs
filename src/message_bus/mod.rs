@@ -60,7 +60,7 @@ pub async fn send_message(
     attributes: HashMap<String, String>,
 ) -> Result<Option<String>, SQSError> {
     let queue_url = format!("{}/{}", client_config.queue_endpoint, queue);
-    println!("Sending message to queue with URL: {}", queue_url);
+    println!("Sending message to queue with URL: {queue_url}");
 
     let msg = client_config
         .client
@@ -76,7 +76,7 @@ pub async fn send_message(
         match attr {
             Ok(attribute) => acc.message_attributes(k, attribute),
             Err(err) => {
-                warn!("Could not create message attribute: {}", err);
+                warn!("Could not create message attribute: {err}");
                 acc
             }
         }
@@ -91,7 +91,7 @@ pub async fn send_message(
         .send()
         .await
         .map(|output| output.message_id)
-        .map_err(|err| SQSError::new(format!("Error sending message: {:#?}", err)))
+        .map_err(|err| SQSError::new(format!("Error sending message: {err:#?}")))
 }
 
 pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &Sender<Message>) {
@@ -130,15 +130,14 @@ pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &Sender
             SdkError::TimeoutError(_) => warn!("Request timed out"),
             SdkError::DispatchFailure(e) => {
                 warn!(
-                    "There might have been an error sending this request [{:?}]",
-                    e
+                    "There might have been an error sending this request [{e:?}]"
                 )
             }
             SdkError::ResponseError(response_error) => {
                 let error = response_error.raw();
                 let error_body = error.body();
                 if error.status().is_client_error() {
-                    warn!("We did something wrong response returned: {:?}", error_body)
+                    warn!("We did something wrong response returned: {error_body:?}")
                 } else {
                     warn!("Issue with the service {}", response_error.raw().status())
                 }
@@ -173,7 +172,7 @@ pub async fn delete_message(client_config: &Arc<ClientConfig>, queue: &str, msg_
             "Message deleted {}",
             c.request_id().unwrap_or("Unknown Request ID")
         ),
-        Err(err) => warn!("Could not delete message {}{}", queue_url, err),
+        Err(err) => warn!("Could not delete message {queue_url}{err}"),
     }
 }
 

@@ -46,7 +46,7 @@ impl Display for ServiceError {
             .error
             .clone()
             .unwrap_or("Unknown error - U".to_string());
-        write!(f, "{}", message)
+        write!(f, "{message}")
     }
 }
 
@@ -57,7 +57,7 @@ impl From<Error> for ServiceError {
         } else if error.is_request() {
             Some("Bad Request".to_string())
         } else {
-            Some(format!("{}", error))
+            Some(format!("{error}"))
         };
 
         ServiceError {
