@@ -129,9 +129,7 @@ pub async fn receive(client_config: &Arc<ClientConfig>, queue: &str, tx: &Sender
             }
             SdkError::TimeoutError(_) => warn!("Request timed out"),
             SdkError::DispatchFailure(e) => {
-                warn!(
-                    "There might have been an error sending this request [{e:?}]"
-                )
+                warn!("There might have been an error sending this request [{e:?}]")
             }
             SdkError::ResponseError(response_error) => {
                 let error = response_error.raw();

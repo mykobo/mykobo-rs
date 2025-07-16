@@ -123,9 +123,7 @@ impl IdentityServiceClient {
                             self.set_token(Some(token_response));
                         }
                         Err(err) => {
-                            warn!(
-                                "Failed to acquire token [{err}], retrying attempt {attempt}"
-                            );
+                            warn!("Failed to acquire token [{err}], retrying attempt {attempt}");
                             sleep(Duration::from_secs(3)).await;
                             self.set_token(None);
                         }
@@ -189,10 +187,7 @@ impl IdentityServiceClient {
         let service_token = self.attempt_token_acquisition().await;
         let headers = if let Some(u_token) = user_token {
             let mut h = generate_headers(service_token, None);
-            h.insert(
-                AUTHORIZATION,
-                format!("Bearer {u_token}").parse().unwrap(),
-            );
+            h.insert(AUTHORIZATION, format!("Bearer {u_token}").parse().unwrap());
             h
         } else {
             generate_headers(service_token, None)
@@ -216,16 +211,36 @@ impl IdentityServiceClient {
         let service_token = self.attempt_token_acquisition().await;
         let headers = if let Some(u_token) = user_token {
             let mut h = generate_headers(service_token, None);
-            h.insert(
-                AUTHORIZATION,
-                format!("Bearer {u_token}").parse().unwrap(),
-            );
+            h.insert(AUTHORIZATION, format!("Bearer {u_token}").parse().unwrap());
             h
         } else {
             generate_headers(service_token, None)
         };
 
         let url = format!("{}/user/profile/{}", self.host, id);
+        let response = self.client.get(url).headers(headers).send().await;
+
+        parse_response::<CustomerResponse>(response).await
+    }
+
+    /**
+     * Given an email address return a user profile
+     */
+    pub async fn get_profile_by_email(
+        &mut self,
+        email: &str,
+        user_token: Option<String>,
+    ) -> Result<CustomerResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let headers = if let Some(u_token) = user_token {
+            let mut h = generate_headers(service_token, None);
+            h.insert(AUTHORIZATION, format!("Bearer {u_token}").parse().unwrap());
+            h
+        } else {
+            generate_headers(service_token, None)
+        };
+
+        let url = format!("{}/user/profile/email/{}", self.host, email);
         let response = self.client.get(url).headers(headers).send().await;
 
         parse_response::<CustomerResponse>(response).await

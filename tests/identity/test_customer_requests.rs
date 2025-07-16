@@ -103,6 +103,14 @@ async fn test_get_profile() {
         .mount(&mock_server)
         .await;
 
+    Mock::given(method("GET"))
+        .and(path("/user/profile/email/kwabena@mykobo.co"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_string(read_file("tests/stubs/get_profile.json")),
+        )
+        .mount(&mock_server)
+        .await;
+
     let mut identity_service_client = IdentityServiceClient::new(3);
 
     let profile = identity_service_client
@@ -117,7 +125,18 @@ async fn test_get_profile() {
         "urn:usrp:acc7f99158f4419bb57613b38b68d494".to_string()
     );
 
-    assert_eq!(profile.kyc_status.review_status, "pending")
+    assert_eq!(profile.kyc_status.review_status, "pending");
+
+    let profile_by_email = identity_service_client
+        .get_profile_by_email("kwabena@mykobo.co", None)
+        .await;
+
+    assert!(profile_by_email.is_ok());
+    let profile_by_email = profile_by_email.unwrap();
+    assert_eq!(
+        profile_by_email.id,
+        "urn:usrp:acc7f99158f4419bb57613b38b68d494".to_string()
+    );
 }
 
 #[tokio::test]
