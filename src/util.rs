@@ -5,7 +5,7 @@ use uuid::Uuid;
 use crate::models::response::{auth::ServiceToken, MykoboStatusCode, ServiceError};
 
 pub fn generate_headers(token: Option<ServiceToken>, client_id: Option<String>) -> HeaderMap {
-    let mut headers = reqwest::header::HeaderMap::new();
+    let mut headers = HeaderMap::new();
 
     if let Some(token) = token {
         headers.insert(
