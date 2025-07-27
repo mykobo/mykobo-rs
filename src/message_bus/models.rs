@@ -1,6 +1,6 @@
-use std::fmt::Display;
 use aws_sdk_sqs::Client;
 use serde::Serialize;
+use std::fmt::Display;
 
 #[derive(Debug)]
 pub struct SQSMessage {
@@ -35,7 +35,10 @@ pub struct Metadata {
 }
 
 #[derive(Serialize, Debug, Clone)]
-pub struct MessageEnvelope<T> where T: Serialize {
+pub struct MessageEnvelope<T>
+where
+    T: Serialize,
+{
     pub meta_data: Metadata,
     pub payload: T,
 }
