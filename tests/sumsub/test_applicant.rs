@@ -113,8 +113,6 @@ async fn test_submit_document() {
     };
 
     let new_document = sumsub_client.submit_document(document_request).await;
-
-    println!("{new_document:?}");
     assert!(new_document.is_ok());
     let document = new_document.unwrap();
     assert_eq!(document.doc_id, "439993055".to_string());

@@ -3,6 +3,7 @@ mod identity;
 mod models;
 mod sumsub;
 mod wallets;
+mod message_bus;
 
 use std::fs;
 

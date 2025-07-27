@@ -1,36 +1,35 @@
+use crate::message_bus::models::{ClientConfig, Metadata, SQSError, SQSMessage};
 use aws_config::meta::region::RegionProviderChain;
 use aws_config::Region;
 use aws_sdk_sqs::error::SdkError;
 use aws_sdk_sqs::operation::RequestId;
 use aws_sdk_sqs::types::{Message, MessageAttributeValue};
 use aws_sdk_sqs::Client;
+use chrono::{SecondsFormat, Utc};
 use log::{debug, info, warn};
 use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
+use uuid::Uuid;
 
-#[derive(Debug)]
-pub struct SQSMessage {
-    pub body: String,
-    pub group: Option<String>,
-}
+pub mod models;
 
-#[derive(Debug, Clone)]
-pub struct SQSError {
-    pub message: String,
-}
-
-impl SQSError {
-    pub fn new(message: String) -> Self {
-        SQSError { message }
+pub fn generate_meta_data(
+    event: &str,
+    source: &str,
+    token: &str,
+    idempotency_key: Option<String>,
+    date_time_override: Option<String>,
+) -> Metadata {
+    Metadata {
+        event: event.to_string(),
+        source: source.to_string(),
+        created_at: date_time_override
+            .unwrap_or(Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true)),
+        token: token.to_string(),
+        idempotency_key: idempotency_key.unwrap_or(Uuid::new_v4().to_string()),
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct ClientConfig {
-    pub client: Client,
-    pub queue_endpoint: String,
 }
 
 pub async fn configure_client() -> ClientConfig {
@@ -60,7 +59,7 @@ pub async fn send_message(
     attributes: HashMap<String, String>,
 ) -> Result<Option<String>, SQSError> {
     let queue_url = format!("{}/{}", client_config.queue_endpoint, queue);
-    println!("Sending message to queue with URL: {queue_url}");
+    info!("Sending message to queue with URL: {queue_url}");
 
     let msg = client_config
         .client
