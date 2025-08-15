@@ -21,7 +21,7 @@ pub struct IdentityServiceClient {
     pub credentials: Credentials,
     pub token: Option<ServiceToken>,
     pub host: String,
-    pub client: reqwest::Client,
+    pub client: Client,
     pub max_retries: i8,
     pub client_identifier: Option<String>,
 }
@@ -39,7 +39,7 @@ impl IdentityServiceClient {
             credentials,
             host: identity_service_host,
             token: None,
-            client: reqwest::Client::new(),
+            client: Client::new(),
             max_retries,
             client_identifier: None,
         }

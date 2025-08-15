@@ -2,6 +2,7 @@ use reqwest::{Error, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
+pub mod anchor;
 pub mod auth;
 pub mod identity;
 pub mod sumsub;

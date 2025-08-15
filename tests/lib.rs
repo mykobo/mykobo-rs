@@ -1,3 +1,4 @@
+mod anchor;
 mod business;
 mod identity;
 mod message_bus;

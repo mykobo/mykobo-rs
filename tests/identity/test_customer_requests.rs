@@ -14,7 +14,6 @@ use mykobo_rs::{
     models::request::identity::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
 };
 use pretty_assertions::assert_eq;
-use serde::Serialize;
 use std::{env, str::FromStr};
 use wiremock::{
     matchers::{method, path},
@@ -22,12 +21,6 @@ use wiremock::{
 };
 
 use crate::read_file;
-
-#[derive(Debug, Clone, Serialize)]
-pub struct Credentials {
-    pub access_key: String,
-    pub secret_key: String,
-}
 
 #[tokio::test]
 async fn test_customer_not_found() {
