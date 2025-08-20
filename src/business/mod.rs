@@ -41,8 +41,71 @@ pub fn whitelisted_countries() -> HashMap<&'static str, &'static str> {
     map
 }
 
-pub fn whitelisted_geo_zones() -> HashMap<&'static str, &'static str> {
-    let mut map = whitelisted_countries();
-    map.insert("AD", "Andorra");
+pub fn blacklisted_countries() -> HashMap<&'static str, &'static str> {
+    let mut map = HashMap::new();
+    map.insert("AF", "Afghanistan");
+    map.insert("AL", "Albania");
+    map.insert("AS", "American Samoa");
+    map.insert("AO", "Angola");
+    map.insert("AM", "Armenia");
+    map.insert("BB", "Barbados");
+    map.insert("BY", "Belarus");
+    map.insert("BF", "Burkina Faso");
+    map.insert("KH", "Cambodia");
+    map.insert("KY", "Cayman Islands");
+    map.insert("CF", "Central African Republic");
+    map.insert("TD", "Chad");
+    map.insert("KM", "Comoros");
+    map.insert("CN", "China");
+    map.insert("CU", "Cuba");
+    map.insert("KP", "North Korea");
+    map.insert("CD", "Democratic Republic of the Congo");
+    map.insert("GQ", "Equatorial Guinea");
+    map.insert("FJ", "Fiji");
+    map.insert("GA", "Gabon");
+    map.insert("GU", "Guam");
+    map.insert("GW", "Guinea-Bissau");
+    map.insert("HT", "Haiti");
+    map.insert("HK", "Hong Kong");
+    map.insert("IN", "India");
+    map.insert("IR", "Iran");
+    map.insert("IQ", "Iraq");
+    map.insert("IL", "Israel");
+    map.insert("JM", "Jamaica");
+    map.insert("JO", "Jordan");
+    map.insert("KZ", "Kazakhstan");
+    map.insert("KG", "Kyrgyzstan");
+    map.insert("LA", "Laos");
+    map.insert("LB", "Lebanon");
+    map.insert("LY", "Libya");
+    map.insert("ML", "Mali");
+    map.insert("MX", "Mexico");
+    map.insert("MA", "Morocco");
+    map.insert("MZ", "Mozambique");
+    map.insert("MM", "Myanmar");
+    map.insert("NI", "Nicaragua");
+    map.insert("PK", "Pakistan");
+    map.insert("PS", "Palestine");
+    map.insert("PA", "Panama");
+    map.insert("PH", "Philippines");
+    map.insert("RU", "Russia");
+    map.insert("WS", "Samoa");
+    map.insert("SN", "Senegal");
+    map.insert("SO", "Somalia");
+    map.insert("SS", "South Sudan");
+    map.insert("SD", "Sudan");
+    map.insert("SY", "Syria");
+    map.insert("TT", "Trinidad and Tobago");
+    map.insert("TR", "Turkey");
+    map.insert("UG", "Uganda");
+    map.insert("UA", "Ukraine");
+    map.insert("VI", "U.S. Virgin Islands");
+    map.insert("UZ", "Uzbekistan");
+    map.insert("VU", "Vanuatu");
+    map.insert("YE", "Yemen");
+    map.insert("GB", "United Kingdom");
+    map.insert("VE", "Venezuela");
+    map.insert("ZW", "Zimbabwe");
+    // Special regions (Crimea, Donetsk, etc.) can be handled separately if needed
     map
 }
