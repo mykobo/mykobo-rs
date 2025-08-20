@@ -3,6 +3,7 @@ use std::collections::HashMap;
 pub fn whitelisted_countries() -> HashMap<&'static str, &'static str> {
     let mut map = HashMap::new();
     map.insert("AU", "Australia");
+    map.insert("AR", "Argentina");
     map.insert("AT", "Austria");
     map.insert("BE", "Belgium");
     map.insert("BG", "Bulgaria");
@@ -37,5 +38,11 @@ pub fn whitelisted_countries() -> HashMap<&'static str, &'static str> {
     map.insert("SE", "Sweden");
     map.insert("CH", "Switzerland");
     map.insert("US", "United States");
+    map
+}
+
+pub fn whitelisted_geo_zones() -> HashMap<&'static str, &'static str> {
+    let mut map = whitelisted_countries();
+    map.insert("AD", "Andorra");
     map
 }
