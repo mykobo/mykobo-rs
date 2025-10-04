@@ -1,6 +1,6 @@
+pub mod error;
 pub mod request;
 pub mod response;
-
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]

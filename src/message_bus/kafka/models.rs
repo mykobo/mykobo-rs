@@ -24,7 +24,7 @@ impl ConsumerContext for CustomContext {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IncomingMessage<T> {
     pub headers: HashMap<String, String>,
     pub payload: T,
