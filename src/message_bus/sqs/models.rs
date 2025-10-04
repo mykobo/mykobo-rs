@@ -1,7 +1,7 @@
+use crate::message_bus::Metadata;
 use aws_sdk_sqs::Client;
 use serde::Serialize;
 use std::fmt::Display;
-use crate::message_bus::Metadata;
 
 #[derive(Debug)]
 pub struct SQSMessage {

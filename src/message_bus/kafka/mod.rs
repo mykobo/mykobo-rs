@@ -1,4 +1,5 @@
 use crate::message_bus::kafka::models::{CustomContext, IncomingMessage};
+use log::{error, warn};
 use rdkafka::config::RDKafkaLogLevel;
 use rdkafka::consumer::stream_consumer::StreamConsumer;
 use rdkafka::consumer::{CommitMode, Consumer};
@@ -7,7 +8,6 @@ use rdkafka::{ClientConfig, Message};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::env;
-use log::{error, warn};
 
 pub mod models;
 pub fn configure_consumer(

@@ -1,2 +1,2 @@
-mod test_message_serialisation;
 mod test_kafka_message_bus;
+mod test_message_serialisation;

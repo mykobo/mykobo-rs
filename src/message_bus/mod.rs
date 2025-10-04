@@ -1,9 +1,8 @@
 use chrono::{SecondsFormat, Utc};
 use serde::Serialize;
 use uuid::Uuid;
-pub mod sqs;
 pub mod kafka;
-
+pub mod sqs;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct Metadata {
@@ -13,7 +12,6 @@ pub struct Metadata {
     pub token: String,
     pub idempotency_key: String,
 }
-
 
 pub fn generate_meta_data(
     event: &str,

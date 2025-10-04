@@ -1,5 +1,5 @@
-use std::env;
 use mykobo_rs::message_bus::kafka::configure_consumer;
+use std::env;
 
 #[test]
 #[should_panic(expected = "Missing KAFKA_API_KEY environment variable")]
