@@ -62,7 +62,7 @@ pub async fn receive<'a, T: Default + for<'de> Deserialize<'de>>(
             IncomingMessage::default()
         }
         Ok(m) => {
-            let headers = match m.headers().map(|h| h) {
+            let headers = match m.headers() {
                 Some(maybe_headers) => maybe_headers
                     .iter()
                     .map(|h| {
