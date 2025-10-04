@@ -1,5 +1,5 @@
 use mykobo_rs::message_bus::generate_meta_data;
-use mykobo_rs::message_bus::models::{MessageEnvelope, SQSMessage};
+use mykobo_rs::message_bus::sqs::models::{MessageEnvelope, SQSMessage};
 use pretty_assertions::assert_eq;
 
 #[test]

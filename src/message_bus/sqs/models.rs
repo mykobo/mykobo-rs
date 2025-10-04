@@ -1,6 +1,7 @@
 use aws_sdk_sqs::Client;
 use serde::Serialize;
 use std::fmt::Display;
+use crate::message_bus::Metadata;
 
 #[derive(Debug)]
 pub struct SQSMessage {
@@ -23,15 +24,6 @@ impl SQSError {
 pub struct ClientConfig {
     pub client: Client,
     pub queue_endpoint: String,
-}
-
-#[derive(Serialize, Debug, Clone)]
-pub struct Metadata {
-    pub source: String,
-    pub event: String,
-    pub created_at: String,
-    pub token: String,
-    pub idempotency_key: String,
 }
 
 #[derive(Serialize, Debug, Clone)]

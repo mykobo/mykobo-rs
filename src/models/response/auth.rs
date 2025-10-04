@@ -13,7 +13,7 @@ pub struct TokenCheckResponse {
     pub message: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TokenClaims {
     pub sub: String,
     pub iat: usize,
