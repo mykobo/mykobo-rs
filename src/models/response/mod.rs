@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter};
 
 pub mod anchor;
 pub mod auth;
+pub mod dapp;
 pub mod identity;
 pub mod sumsub;
 pub mod wallets;
