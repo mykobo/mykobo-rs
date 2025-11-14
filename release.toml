@@ -3,27 +3,19 @@
 # Disable pushing to crates.io (set to true when ready to publish)
 publish = false
 
-# Don't create release tags (we'll do it manually with proper changelog)
+# Enable git tagging
 tag = true
 tag-message = "chore: Release {{crate_name}} version {{version}}"
 tag-name = "v{{version}}"
 
-# Enable pushing to git remote
+# Disable pushing to git remote (do manually)
 push = false
-
-# Pre-release replacements and commands
-pre-release-replacements = [
-  # Update version in Cargo.toml is handled automatically
-]
 
 # Pre-release hook to update CHANGELOG
 pre-release-hook = ["git", "cliff", "--tag", "v{{version}}", "-o", "CHANGELOG.md"]
 
 # Commit message for the release
-release-message = "chore: Release {{crate_name}} version {{version}}"
+pre-release-commit-message = "chore: Release {{crate_name}} version {{version}}"
 
-# Allow dirty working directory (since we're modifying CHANGELOG)
-allow-dirty = ["CHANGELOG.md"]
-
-# Disable git-cliff output to prevent confusion
+# Disable git-cliff consolidation
 consolidate-commits = false
