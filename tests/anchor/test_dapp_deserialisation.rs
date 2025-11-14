@@ -1,4 +1,4 @@
-use mykobo_rs::models::response::dapp::{Transaction, TransactionSource, TransactionStatus, TransactionType};
+use mykobo_rs::anchor::models::{DappTransaction as Transaction, TransactionSource, TransactionStatus, TransactionType};
 
 #[test]
 fn test_new_transaction() {

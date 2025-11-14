@@ -1,13 +1,13 @@
-use crate::models::request::identity::{
-    Credentials, CustomerRequest, NewDocumentRequest, TokenCheckRequest, UpdateProfileRequest,
+pub mod models;
+
+use crate::models::error::ServiceError;
+use models::{
+    Credentials, CustomerRequest, CustomerResponse, NewDocumentRequest, NewDocumentResponse,
+    ServiceToken, TokenCheckRequest, TokenCheckResponse, TokenClaims, UpdateProfileRequest,
+    UserKycStatusResponse,
 };
-use crate::models::response::auth::{ServiceToken, TokenCheckResponse, TokenClaims};
-use crate::models::response::identity::{
-    CustomerResponse, NewDocumentResponse, UserKycStatusResponse,
-};
-use crate::models::response::ServiceError;
 use crate::util::{generate_headers, parse_response};
-use jsonwebtoken::{decode, DecodingKey, Validation};
+use jsonwebtoken::dangerous::insecure_decode;
 use log::{debug, info, warn};
 use reqwest::header::AUTHORIZATION;
 use reqwest::Client;
@@ -71,13 +71,7 @@ impl IdentityServiceClient {
 
     fn token_is_valid(&self) -> bool {
         if let Some(service_token) = &self.get_token() {
-            let key = DecodingKey::from_secret(&[]);
-            let mut validation = Validation::new(jsonwebtoken::Algorithm::HS256);
-            validation.insecure_disable_signature_validation();
-            validation.set_audience(&["Service"]);
-            validation.validate_exp = true;
-
-            match decode::<TokenClaims>(service_token.token.as_str(), &key, &validation) {
+            match insecure_decode::<TokenClaims>(service_token.token.as_str()) {
                 Ok(_) => true,
                 Err(e) => {
                     warn!("Token is invalid {e:?}");

@@ -1,7 +1,5 @@
 use crate::read_file;
-use mykobo_rs::models::response::anchor::stellar::{
-    AnchorRpcResponse, AnchorRpcResponseResult, Transaction,
-};
+use mykobo_rs::anchor::models::{AnchorRpcResponse, AnchorRpcResponseResult, StellarTransaction as Transaction};
 
 #[test]
 fn test_transaction_response_extract() {

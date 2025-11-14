@@ -1,0 +1,160 @@
+use serde::{Deserialize, Serialize};
+use std::fmt;
+
+/// Enum for message instruction types
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum InstructionType {
+    Payment,
+    StatusUpdate,
+    Correction,
+    Transaction,
+}
+
+impl fmt::Display for InstructionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_value(self)
+                .ok()
+                .and_then(|v| v.as_str().map(String::from))
+                .unwrap_or_default()
+        )
+    }
+}
+
+/// Enum for transaction types
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum TransactionType {
+    Deposit,
+    Withdraw,
+}
+
+impl fmt::Display for TransactionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_value(self)
+                .ok()
+                .and_then(|v| v.as_str().map(String::from))
+                .unwrap_or_default()
+        )
+    }
+}
+
+/// Enum for event types
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum EventType {
+    NewTransaction,
+    TransactionStatusUpdate,
+    NewBankPayment,
+    NewChainPayment,
+    NewProfile,
+    NewUser,
+    VerificationRequested,
+    PasswordResetRequested,
+    KycEvent,
+}
+
+impl fmt::Display for EventType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_value(self)
+                .ok()
+                .and_then(|v| v.as_str().map(String::from))
+                .unwrap_or_default()
+        )
+    }
+}
+
+/// Validation error for required fields
+#[derive(Debug, Clone, thiserror::Error)]
+pub struct ValidationError {
+    pub class_name: String,
+    pub fields: Vec<String>,
+}
+
+impl std::fmt::Display for ValidationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} missing required fields: {}",
+            self.class_name,
+            self.fields.join(", ")
+        )
+    }
+}
+
+/// Validate that required string fields are not empty or whitespace only
+pub fn validate_required_fields(
+    fields: &[(&str, &str)],
+    class_name: &str,
+) -> Result<(), ValidationError> {
+    let missing_fields: Vec<String> = fields
+        .iter()
+        .filter(|(_, value)| value.trim().is_empty())
+        .map(|(name, _)| name.to_string())
+        .collect();
+
+    if !missing_fields.is_empty() {
+        return Err(ValidationError {
+            class_name: class_name.to_string(),
+            fields: missing_fields,
+        });
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_instruction_type_display() {
+        assert_eq!(InstructionType::Payment.to_string(), "PAYMENT");
+        assert_eq!(InstructionType::StatusUpdate.to_string(), "STATUS_UPDATE");
+    }
+
+    #[test]
+    fn test_transaction_type_display() {
+        assert_eq!(TransactionType::Deposit.to_string(), "DEPOSIT");
+        assert_eq!(TransactionType::Withdraw.to_string(), "WITHDRAW");
+    }
+
+    #[test]
+    fn test_event_type_display() {
+        assert_eq!(EventType::NewTransaction.to_string(), "NEW_TRANSACTION");
+        assert_eq!(EventType::KycEvent.to_string(), "KYC_EVENT");
+    }
+
+    #[test]
+    fn test_validate_required_fields_success() {
+        let fields = vec![("source", "BANKING_SERVICE"), ("token", "test.token")];
+        assert!(validate_required_fields(&fields, "TestClass").is_ok());
+    }
+
+    #[test]
+    fn test_validate_required_fields_empty() {
+        let fields = vec![("source", ""), ("token", "test.token")];
+        let result = validate_required_fields(&fields, "TestClass");
+        assert!(result.is_err());
+        if let Err(e) = result {
+            assert_eq!(e.class_name, "TestClass");
+            assert_eq!(e.fields, vec!["source"]);
+        }
+    }
+
+    #[test]
+    fn test_validate_required_fields_whitespace() {
+        let fields = vec![("source", "  "), ("token", "test.token")];
+        let result = validate_required_fields(&fields, "TestClass");
+        assert!(result.is_err());
+    }
+}

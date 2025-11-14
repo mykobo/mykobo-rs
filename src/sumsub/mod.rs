@@ -1,22 +1,16 @@
+pub mod models;
+
 use std::env;
 
 use reqwest::Client;
 
 use crate::{
-    models::{
-        request::sumsub::{
-            AccessTokenRequest, InitiateVerificationRequest, NewApplicantRequest,
-            NewDocumentRequest,
-        },
-        response::{
-            sumsub::{
-                AccessTokenResponse, ApplicantResponse, InitiateVerificationResponse,
-                NewDocumentResponse,
-            },
-            ServiceError,
-        },
-    },
+    models::error::ServiceError,
     util::parse_response,
+};
+use models::{
+    AccessTokenRequest, AccessTokenResponse, ApplicantResponse, InitiateVerificationRequest,
+    InitiateVerificationResponse, NewApplicantRequest, NewDocumentRequest, NewDocumentResponse,
 };
 
 pub struct SumsubClient {

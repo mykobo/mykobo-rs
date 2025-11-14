@@ -2,19 +2,23 @@ use std::env;
 
 use crate::read_file;
 use mykobo_rs::{
-    models::request::sumsub::{
-        DocumentMetadata, InitiateVerificationRequest, NewApplicantRequest, NewDocumentRequest,
-        ProfileData,
+    sumsub::{
+        models::{
+            DocumentMetadata, InitiateVerificationRequest, NewApplicantRequest,
+            NewDocumentRequest, ProfileData,
+        },
+        SumsubClient,
     },
-    sumsub::SumsubClient,
 };
 use pretty_assertions::assert_eq;
+use serial_test::serial;
 use wiremock::{
     matchers::{method, path},
     Mock, MockServer, ResponseTemplate,
 };
 
 #[tokio::test]
+#[serial]
 async fn test_new_applicant() {
     let sumsub_server = MockServer::start().await;
 
@@ -54,6 +58,7 @@ async fn test_new_applicant() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_get_applicant() {
     let sumsub_server = MockServer::start().await;
 
@@ -86,6 +91,7 @@ async fn test_get_applicant() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_submit_document() {
     let sumsub_server = MockServer::start().await;
 
@@ -122,6 +128,7 @@ async fn test_submit_document() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_initiate_check_success() {
     let sumsub_server = MockServer::start().await;
 

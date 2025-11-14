@@ -1,4 +1,4 @@
-use crate::message_bus::Metadata;
+use crate::message_bus::MetaData;
 use aws_sdk_sqs::Client;
 use serde::Serialize;
 use std::fmt::Display;
@@ -27,11 +27,12 @@ pub struct ClientConfig {
 }
 
 #[derive(Serialize, Debug, Clone)]
+#[serde_with::skip_serializing_none]
 pub struct MessageEnvelope<T>
 where
     T: Serialize,
 {
-    pub meta_data: Metadata,
+    pub meta_data: MetaData,
     pub payload: T,
 }
 

@@ -1,4 +1,4 @@
-use mykobo_rs::models::response::{MykoboStatusCode, ServiceError};
+use mykobo_rs::models::{MykoboStatusCode, ServiceError};
 
 use crate::read_file;
 

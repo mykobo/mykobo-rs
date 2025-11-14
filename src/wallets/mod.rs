@@ -1,3 +1,5 @@
+pub mod models;
+
 use std::env;
 
 use log::debug;
@@ -5,16 +7,11 @@ use reqwest::Client;
 use serde_json::json;
 
 use crate::{
-    models::{
-        request::wallets::RegisterWalletRequest,
-        response::{
-            auth::ServiceToken,
-            wallets::{UserWallet, WalletProfile},
-            ServiceError,
-        },
-    },
+    identity::models::ServiceToken,
+    models::error::ServiceError,
     util::{generate_headers, parse_response},
 };
+use models::{RegisterWalletRequest, UserWallet, WalletProfile};
 
 #[derive(Clone)]
 pub struct WalletServiceClient {

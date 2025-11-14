@@ -10,10 +10,13 @@ use fake::{
     Fake,
 };
 use mykobo_rs::{
-    identity::IdentityServiceClient,
-    models::request::identity::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
+    identity::{
+        models::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
+        IdentityServiceClient,
+    },
 };
 use pretty_assertions::assert_eq;
+use serial_test::serial;
 use std::{env, str::FromStr};
 use wiremock::{
     matchers::{method, path},
@@ -23,6 +26,7 @@ use wiremock::{
 use crate::read_file;
 
 #[tokio::test]
+#[serial]
 async fn test_customer_not_found() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
@@ -69,6 +73,7 @@ async fn test_customer_not_found() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_get_profile() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
@@ -133,6 +138,7 @@ async fn test_get_profile() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_create_customer() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
@@ -188,6 +194,7 @@ async fn test_create_customer() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_update_customer() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
@@ -243,6 +250,7 @@ async fn test_update_customer() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_new_document() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;

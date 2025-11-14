@@ -2,7 +2,8 @@ use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde::de::DeserializeOwned;
 use uuid::Uuid;
 
-use crate::models::response::{auth::ServiceToken, MykoboStatusCode, ServiceError};
+use crate::identity::models::ServiceToken;
+use crate::models::error::{MykoboStatusCode, ServiceError};
 
 pub fn generate_headers(token: Option<ServiceToken>, client_id: Option<String>) -> HeaderMap {
     let mut headers = HeaderMap::new();

@@ -1,7 +1,7 @@
 use log::debug;
 use reqwest::Client;
-use crate::models::response::dapp::Transaction;
-use crate::models::response::ServiceError;
+use crate::anchor::models::DappTransaction as Transaction;
+use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
 
 pub struct DappAnchor {

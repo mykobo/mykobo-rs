@@ -1,8 +1,5 @@
 use crate::read_file;
-use mykobo_rs::models::response::{
-    auth::ServiceToken,
-    identity::{CustomerResponse, UserKycStatusResponse},
-};
+use mykobo_rs::identity::models::{CustomerResponse, ServiceToken, UserKycStatusResponse};
 use pretty_assertions::assert_eq;
 
 #[test]

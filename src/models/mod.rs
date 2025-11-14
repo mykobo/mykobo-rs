@@ -1,7 +1,9 @@
 pub mod error;
-pub mod request;
-pub mod response;
+
 use serde::Serialize;
+
+// Re-export commonly used error types
+pub use error::{KafkaError, KafkaResult, MykoboStatusCode, ServiceError};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct AuthError {

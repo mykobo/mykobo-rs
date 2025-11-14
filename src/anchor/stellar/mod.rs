@@ -1,5 +1,5 @@
-use crate::models::response::anchor::stellar::Transaction;
-use crate::models::response::ServiceError;
+use crate::anchor::models::StellarTransaction as Transaction;
+use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use log::debug;
 use reqwest::Client;

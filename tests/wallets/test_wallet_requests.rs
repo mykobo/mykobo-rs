@@ -1,6 +1,7 @@
 use std::env;
 
-use mykobo_rs::{models::response::auth::ServiceToken, wallets::WalletServiceClient};
+use mykobo_rs::{identity::models::ServiceToken, wallets::WalletServiceClient};
+use serial_test::serial;
 use wiremock::{
     matchers::{method, path},
     Mock, MockServer, ResponseTemplate,
@@ -9,6 +10,7 @@ use wiremock::{
 use crate::read_file;
 
 #[tokio::test]
+#[serial]
 async fn test_get_customer_with_account_id() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
@@ -59,6 +61,7 @@ async fn test_get_customer_with_account_id() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_get_customer_not_found() {
     let mock_server = MockServer::start().await;
     let wallet_server = MockServer::start().await;
