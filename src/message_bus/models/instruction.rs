@@ -58,14 +58,20 @@ impl From<String> for PaymentPayload {
     }
 }
 
+impl From<PaymentPayload> for String {
+    fn from(val: PaymentPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize PaymentPayload to String")
+    }
+}
+
+#[serde_with::skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ChainPaymentPayload {
-    chain: String,
-    hash: String,
-    reference: String,
-    status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    transaction_id: Option<String>,
+    pub chain: String,
+    pub hash: String,
+    pub reference: String,
+    pub status: String,
+    pub transaction_id: Option<String>,
 }
 
 impl ChainPaymentPayload {
@@ -103,6 +109,12 @@ impl ChainPaymentPayload {
 impl From<String> for ChainPaymentPayload {
     fn from(value: String) -> Self {
         serde_json::from_str(&value).expect("Failed to deserialize ChainPaymentPayload from String")
+    }
+}
+
+impl From<ChainPaymentPayload> for String {
+    fn from(val: ChainPaymentPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize ChainPaymentPayload to String")
     }
 }
 
@@ -146,6 +158,12 @@ impl StatusUpdatePayload {
 impl From<String> for StatusUpdatePayload {
     fn from(value: String) -> Self {
         serde_json::from_str(&value).expect("Failed to deserialize StatusUpdatePayload from String")
+    }
+}
+
+impl From<StatusUpdatePayload> for String {
+    fn from(val: StatusUpdatePayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize StatusUpdatePayload to String")
     }
 }
 
@@ -196,6 +214,12 @@ impl CorrectionPayload {
 impl From<String> for CorrectionPayload {
     fn from(value: String) -> Self {
         serde_json::from_str(&value).expect("Failed to deserialize CorrectionPayload from String")
+    }
+}
+
+impl From<CorrectionPayload> for String {
+    fn from(val: CorrectionPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize CorrectionPayload to String")
     }
 }
 
@@ -297,6 +321,12 @@ impl From<String> for TransactionPayload {
     }
 }
 
+impl From<TransactionPayload> for String {
+    fn from(val: TransactionPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize TransactionPayload to String")
+    }
+}
+
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BankPaymentRequestPayload {
@@ -344,6 +374,13 @@ impl From<String> for BankPaymentRequestPayload {
     fn from(value: String) -> Self {
         serde_json::from_str(&value)
             .expect("Failed to deserialize BankPaymentRequestPayload from String")
+    }
+}
+
+impl From<BankPaymentRequestPayload> for String {
+    fn from(val: BankPaymentRequestPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize BankPaymentRequestPayload to String")
     }
 }
 
@@ -565,5 +602,268 @@ mod tests {
         assert_eq!(payload.currency, "GBP");
         assert_eq!(payload.profile_id, "PROF456");
         assert_eq!(payload.message, Some("Bank transfer".to_string()));
+    }
+
+    // Serialization/Deserialization Round-trip Tests
+
+    #[test]
+    fn test_payment_payload_serialization_roundtrip() {
+        let original = PaymentPayload::new(
+            "P763763453G".to_string(),
+            "EUR".to_string(),
+            "123.00".to_string(),
+            "BANK_MODULR".to_string(),
+            "MYK123344545".to_string(),
+            Some("John Doe".to_string()),
+            Some("GB123266734836738787454".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: PaymentPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_payment_payload_serialization_without_optionals() {
+        let payload = PaymentPayload::new(
+            "P763763453G".to_string(),
+            "EUR".to_string(),
+            "123.00".to_string(),
+            "BANK_MODULR".to_string(),
+            "MYK123344545".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Optional fields should not appear in JSON
+        assert!(!serialized.contains("payer_name"));
+        assert!(!serialized.contains("bank_account_number"));
+
+        let deserialized: PaymentPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_status_update_payload_serialization_roundtrip() {
+        let original = StatusUpdatePayload::new(
+            "REF123".to_string(),
+            "COMPLETED".to_string(),
+            Some("Payment processed".to_string()),
+            Some("TXN456".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: StatusUpdatePayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_status_update_payload_serialization_without_optionals() {
+        let payload =
+            StatusUpdatePayload::new("REF123".to_string(), "PENDING".to_string(), None, None)
+                .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Optional fields should not appear in JSON
+        assert!(!serialized.contains("message"));
+        assert!(!serialized.contains("transaction_id"));
+
+        let deserialized: StatusUpdatePayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_correction_payload_serialization_roundtrip() {
+        let original = CorrectionPayload::new(
+            "REF123".to_string(),
+            "50.00".to_string(),
+            "Corrected amount".to_string(),
+            "USD".to_string(),
+            "BANK_XYZ".to_string(),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: CorrectionPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_transaction_payload_serialization_roundtrip() {
+        let original = TransactionPayload::new(
+            "EXT123".to_string(),
+            "BANKING_SERVICE".to_string(),
+            "REF123".to_string(),
+            "John".to_string(),
+            "Doe".to_string(),
+            TransactionType::Deposit,
+            "PENDING".to_string(),
+            "EUR".to_string(),
+            "USD".to_string(),
+            "100.00".to_string(),
+            "1.50".to_string(),
+            Some("Bank Account 123".to_string()),
+            None,
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: TransactionPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_transaction_payload_serialization_without_optionals() {
+        let payload = TransactionPayload::new(
+            "EXT123".to_string(),
+            "BANKING_SERVICE".to_string(),
+            "REF123".to_string(),
+            "John".to_string(),
+            "Doe".to_string(),
+            TransactionType::Withdraw,
+            "PENDING".to_string(),
+            "EUR".to_string(),
+            "USD".to_string(),
+            "100.00".to_string(),
+            "1.50".to_string(),
+            None,
+            Some("Payee Account".to_string()),
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Optional payer field should not appear in JSON
+        assert!(!serialized.contains("payer"));
+        // But payee should appear
+        assert!(serialized.contains("payee"));
+
+        let deserialized: TransactionPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_chain_payment_payload_serialization_roundtrip() {
+        let original = ChainPaymentPayload::new(
+            "STELLAR".to_string(),
+            "0x123abc".to_string(),
+            "REF123".to_string(),
+            "CONFIRMED".to_string(),
+            Some("TXN456".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: ChainPaymentPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_chain_payment_payload_serialization_without_optionals() {
+        let payload = ChainPaymentPayload::new(
+            "ETHEREUM".to_string(),
+            "0xabc123".to_string(),
+            "REF321".to_string(),
+            "PENDING".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Optional field should not appear in JSON
+        assert!(!serialized.contains("transaction_id"));
+
+        let deserialized: ChainPaymentPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_bank_payment_request_payload_serialization_roundtrip() {
+        let original = BankPaymentRequestPayload::new(
+            "BANK_REF123".to_string(),
+            "500.00".to_string(),
+            "GBP".to_string(),
+            "PROF456".to_string(),
+            Some("Bank transfer".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: BankPaymentRequestPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_bank_payment_request_payload_serialization_without_optionals() {
+        let payload = BankPaymentRequestPayload::new(
+            "BANK_REF123".to_string(),
+            "500.00".to_string(),
+            "GBP".to_string(),
+            "PROF456".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Optional field should not appear in JSON
+        assert!(!serialized.contains("message"));
+
+        let deserialized: BankPaymentRequestPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_payload_with_special_characters() {
+        let payload = CorrectionPayload::new(
+            "REF-123/456".to_string(),
+            "50.00".to_string(),
+            "Corrected: \"quoted\" & <escaped>".to_string(),
+            "USD".to_string(),
+            "BANK_XYZ".to_string(),
+        )
+        .unwrap();
+
+        let serialized: String = payload.clone().into();
+        let deserialized: CorrectionPayload = serialized.into();
+
+        assert_eq!(payload, deserialized);
+        assert_eq!(deserialized.message, "Corrected: \"quoted\" & <escaped>");
+    }
+
+    #[test]
+    fn test_payload_with_unicode() {
+        let payload = PaymentPayload::new(
+            "P763763453G".to_string(),
+            "EUR".to_string(),
+            "123.00".to_string(),
+            "BANK_MODULR".to_string(),
+            "MYK123344545".to_string(),
+            Some("José María García 日本語 🚀".to_string()),
+            None,
+        )
+        .unwrap();
+
+        let serialized: String = payload.clone().into();
+        let deserialized: PaymentPayload = serialized.into();
+
+        assert_eq!(payload, deserialized);
+        assert_eq!(
+            deserialized.payer_name,
+            Some("José María García 日本語 🚀".to_string())
+        );
     }
 }

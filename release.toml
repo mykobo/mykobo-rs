@@ -8,8 +8,9 @@ tag = true
 tag-message = "chore: Release {{crate_name}} version {{version}}"
 tag-name = "v{{version}}"
 
-# Disable pushing to git remote (do manually)
-push = false
+# Enable pushing to git remote (includes tags)
+push = true
+push-remote = "origin"
 
 # Pre-release hook to update CHANGELOG
 pre-release-hook = ["git", "cliff", "--tag", "v{{version}}", "-o", "CHANGELOG.md"]

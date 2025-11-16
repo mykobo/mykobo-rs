@@ -81,7 +81,7 @@ pub struct ValidationError {
     pub fields: Vec<String>,
 }
 
-impl std::fmt::Display for ValidationError {
+impl fmt::Display for ValidationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
