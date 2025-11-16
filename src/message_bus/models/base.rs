@@ -5,10 +5,12 @@ use std::fmt;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum InstructionType {
-    Payment,
+    Payment, // ledger payment instruction
     StatusUpdate,
     Correction,
     Transaction,
+    BankPaymentRequest, // banking gateway payment request instruction
+    ChainPayment, // this is for anchors that require an update from the chain
 }
 
 impl fmt::Display for InstructionType {
@@ -51,8 +53,7 @@ impl fmt::Display for TransactionType {
 pub enum EventType {
     NewTransaction,
     TransactionStatusUpdate,
-    NewBankPayment,
-    NewChainPayment,
+    Payment,
     NewProfile,
     NewUser,
     VerificationRequested,

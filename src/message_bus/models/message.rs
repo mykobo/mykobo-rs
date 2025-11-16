@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use super::base::{validate_required_fields, EventType, InstructionType, ValidationError};
 use super::event::*;
 use super::instruction::*;
@@ -72,6 +73,25 @@ impl MetaData {
 }
 
 /// Enum containing all possible payload types
+///
+/// Each variant implements `From<String>` for easy conversion from JSON strings:
+///
+/// # Examples
+///
+/// ```
+/// use mykobo_rs::message_bus::models::instruction::PaymentPayload;
+///
+/// let json = r#"{
+///     "external_reference": "P123",
+///     "currency": "EUR",
+///     "value": "100.00",
+///     "source": "BANK",
+///     "reference": "REF123"
+/// }"#;
+///
+/// let payload: PaymentPayload = json.to_string().into();
+/// assert_eq!(payload.currency, "EUR");
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum Payload {
@@ -80,15 +100,27 @@ pub enum Payload {
     StatusUpdate(StatusUpdatePayload),
     Correction(CorrectionPayload),
     Transaction(TransactionPayload),
+    BankPaymentRequest(BankPaymentRequestPayload),
+    ChainPayment(ChainPaymentPayload),
 
     // Event payloads
     NewTransaction(NewTransactionEventPayload),
     TransactionStatus(TransactionStatusEventPayload),
     PaymentEvent(PaymentEventPayload),
     Profile(ProfileEventPayload),
+    NewUser(NewUserEventPayload),
     Kyc(KycEventPayload),
     PasswordReset(PasswordResetEventPayload),
     VerificationRequested(VerificationRequestedEventPayload),
+
+    // Generic payload
+    Raw(String),
+}
+
+impl Display for Payload {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 /// Complete message bus message structure
@@ -112,6 +144,11 @@ impl MessageBusMessage {
     pub fn validate(&self) -> Result<(), ValidationError> {
         self.meta_data.validate()?;
 
+        // Raw payloads skip type validation
+        if matches!(&self.payload, Payload::Raw(_)) {
+            return Ok(());
+        }
+
         // Validate that the payload type matches the instruction_type or event
         if let Some(instruction_type) = &self.meta_data.instruction_type {
             match (instruction_type, &self.payload) {
@@ -119,6 +156,8 @@ impl MessageBusMessage {
                 (InstructionType::StatusUpdate, Payload::StatusUpdate(_)) => Ok(()),
                 (InstructionType::Correction, Payload::Correction(_)) => Ok(()),
                 (InstructionType::Transaction, Payload::Transaction(_)) => Ok(()),
+                (InstructionType::BankPaymentRequest, Payload::BankPaymentRequest(_)) => Ok(()),
+                (InstructionType::ChainPayment, Payload::ChainPayment(_)) => Ok(()),
                 _ => Err(ValidationError {
                     class_name: "MessageBusMessage".to_string(),
                     fields: vec![format!(
@@ -131,9 +170,9 @@ impl MessageBusMessage {
             match (event, &self.payload) {
                 (EventType::NewTransaction, Payload::NewTransaction(_)) => Ok(()),
                 (EventType::TransactionStatusUpdate, Payload::TransactionStatus(_)) => Ok(()),
-                (EventType::NewBankPayment, Payload::PaymentEvent(_)) => Ok(()),
-                (EventType::NewChainPayment, Payload::PaymentEvent(_)) => Ok(()),
+                (EventType::Payment, Payload::PaymentEvent(_)) => Ok(()),
                 (EventType::NewProfile, Payload::Profile(_)) => Ok(()),
+                (EventType::NewUser, Payload::NewUser(_)) => Ok(()),
                 (EventType::KycEvent, Payload::Kyc(_)) => Ok(()),
                 (EventType::PasswordResetRequested, Payload::PasswordReset(_)) => Ok(()),
                 (EventType::VerificationRequested, Payload::VerificationRequested(_)) => Ok(()),
@@ -312,7 +351,8 @@ mod tests {
         let payload = StatusUpdatePayload::new(
             "REF123".to_string(),
             "PENDING".to_string(),
-            "Test".to_string(),
+            Some("Test".to_string()),
+            None
         )
         .unwrap();
 
@@ -329,5 +369,205 @@ mod tests {
 
         let message = MessageBusMessage::new(metadata, Payload::StatusUpdate(payload));
         assert!(message.is_err());
+    }
+
+    #[test]
+    fn test_raw_payload_creation() {
+        let raw_data = r#"{"custom_field": "value", "another_field": 123}"#.to_string();
+        let payload = Payload::Raw(raw_data.clone());
+
+        // Verify the payload contains the expected data
+        match payload {
+            Payload::Raw(data) => assert_eq!(data, raw_data),
+            _ => panic!("Expected Raw payload variant"),
+        }
+    }
+
+    #[test]
+    fn test_raw_payload_serialization() {
+        let raw_data = r#"{"custom_field": "value"}"#.to_string();
+        let payload = Payload::Raw(raw_data.clone());
+
+        // Serialize the payload
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Deserialize it back
+        let deserialized: Payload = serde_json::from_str(&serialized).unwrap();
+
+        // Verify the deserialized payload matches
+        match deserialized {
+            Payload::Raw(data) => assert_eq!(data, raw_data),
+            _ => panic!("Expected Raw payload variant after deserialization"),
+        }
+    }
+
+    #[test]
+    fn test_raw_payload_with_plain_string() {
+        let raw_data = "Simple text message".to_string();
+        let payload = Payload::Raw(raw_data.clone());
+
+        match payload {
+            Payload::Raw(data) => assert_eq!(data, "Simple text message"),
+            _ => panic!("Expected Raw payload variant"),
+        }
+    }
+
+    #[test]
+    fn test_raw_payload_with_message_bus_message() {
+        // Test Raw payload with instruction type
+        let raw_data = r#"{"custom": "data"}"#.to_string();
+        let message = MessageBusMessage::create(
+            "TEST_SERVICE".to_string(),
+            Payload::Raw(raw_data.clone()),
+            "test.token.here".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        match msg.payload {
+            Payload::Raw(data) => assert_eq!(data, raw_data),
+            _ => panic!("Expected Raw payload"),
+        }
+    }
+
+    #[test]
+    fn test_raw_payload_with_event_type() {
+        // Test Raw payload with event type
+        let raw_data = "raw event data".to_string();
+        let message = MessageBusMessage::create(
+            "TEST_SERVICE".to_string(),
+            Payload::Raw(raw_data.clone()),
+            "test.token.here".to_string(),
+            None,
+            Some(EventType::NewTransaction),
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        match msg.payload {
+            Payload::Raw(data) => assert_eq!(data, raw_data),
+            _ => panic!("Expected Raw payload"),
+        }
+    }
+
+    #[test]
+    fn test_raw_payload_bypasses_type_validation() {
+        // Test that Raw payload doesn't require matching instruction/event type
+        let metadata = MetaData::new(
+            "TEST_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+        )
+        .unwrap();
+
+        // This should succeed even though Payment instruction type doesn't match Raw payload
+        let message = MessageBusMessage::new(metadata, Payload::Raw("anything".to_string()));
+        assert!(message.is_ok());
+    }
+
+    #[test]
+    fn test_message_with_bank_payment_request() {
+        let payload = BankPaymentRequestPayload::new(
+            "REF123".to_string(),
+            "100.00".to_string(),
+            "USD".to_string(),
+            "PROF123".to_string(),
+            Some("Payment".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "BANKING_SERVICE".to_string(),
+            Payload::BankPaymentRequest(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::BankPaymentRequest),
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(
+            msg.meta_data.instruction_type,
+            Some(InstructionType::BankPaymentRequest)
+        );
+    }
+
+    #[test]
+    fn test_message_with_chain_payment() {
+        let payload = ChainPaymentPayload::new(
+            "STELLAR".to_string(),
+            "0xabc123".to_string(),
+            "REF456".to_string(),
+            "CONFIRMED".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "CHAIN_SERVICE".to_string(),
+            Payload::ChainPayment(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::ChainPayment),
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+    }
+
+    #[test]
+    fn test_message_validates_new_payload_types() {
+        // Test that wrong payload type still fails for new types
+        let payload = BankPaymentRequestPayload::new(
+            "REF123".to_string(),
+            "100.00".to_string(),
+            "USD".to_string(),
+            "PROF123".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-123".to_string(),
+            Some(InstructionType::Payment), // Wrong instruction type
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::new(metadata, Payload::BankPaymentRequest(payload));
+        assert!(message.is_err());
+    }
+
+    #[test]
+    fn test_message_with_new_user_event() {
+        let payload = NewUserEventPayload::new(
+            "New User".to_string(),
+            "USER123".to_string(),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "IDENTITY_SERVICE".to_string(),
+            Payload::NewUser(payload),
+            "test.token.here".to_string(),
+            None,
+            Some(EventType::NewUser),
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.event, Some(EventType::NewUser));
     }
 }

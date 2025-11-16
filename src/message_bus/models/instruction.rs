@@ -52,20 +52,66 @@ impl PaymentPayload {
     }
 }
 
+impl From<String> for PaymentPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize PaymentPayload from String")
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ChainPaymentPayload {
+    chain:String,
+    hash: String,
+    reference: String,
+    status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    transaction_id: Option<String>,
+}
+
+impl ChainPaymentPayload {
+    pub fn new(chain:String, hash: String, reference: String, status: String, transaction_id: Option<String>) -> Result<Self, ValidationError> {
+        let payload = Self { chain, hash, reference, status, transaction_id };
+
+        payload.validate()?;
+        Ok(payload)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(
+            &[
+                ("chain", &self.chain),
+                ("hash", &self.hash),
+                ("reference", &self.reference),
+                ("status", &self.status)
+            ],
+            "ChainPaymentPayload",
+        )
+    }
+}
+impl From<String> for ChainPaymentPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize ChainPaymentPayload from String")
+    }
+}
+
 /// Payload for status update instructions
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct StatusUpdatePayload {
     pub reference: String,
     pub status: String,
-    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_id: Option<String>,
 }
 
 impl StatusUpdatePayload {
-    pub fn new(reference: String, status: String, message: String) -> Result<Self, ValidationError> {
+    pub fn new(reference: String, status: String, message: Option<String>, transaction_id: Option<String>) -> Result<Self, ValidationError> {
         let payload = Self {
             reference: reference.clone(),
             status: status.clone(),
-            message: message.clone(),
+            message,
+            transaction_id,
         };
 
         payload.validate()?;
@@ -77,10 +123,15 @@ impl StatusUpdatePayload {
             &[
                 ("reference", &self.reference),
                 ("status", &self.status),
-                ("message", &self.message),
             ],
             "StatusUpdatePayload",
         )
+    }
+}
+
+impl From<String> for StatusUpdatePayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize StatusUpdatePayload from String")
     }
 }
 
@@ -125,6 +176,12 @@ impl CorrectionPayload {
             ],
             "CorrectionPayload",
         )
+    }
+}
+
+impl From<String> for CorrectionPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize CorrectionPayload from String")
     }
 }
 
@@ -220,6 +277,62 @@ impl TransactionPayload {
     }
 }
 
+impl From<String> for TransactionPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize TransactionPayload from String")
+    }
+}
+
+#[serde_with::skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct BankPaymentRequestPayload {
+    pub reference: String,
+    pub value: String,
+    pub currency: String,
+    pub profile_id: String,
+    pub message: Option<String>,
+}
+
+impl BankPaymentRequestPayload {
+    pub fn new(
+        reference: String,
+        value: String,
+        currency: String,
+        profile_id: String,
+        message: Option<String>,
+    ) -> Result<Self, ValidationError> {
+        let payload = Self {
+            reference: reference.clone(),
+            value: value.clone(),
+            currency: currency.clone(),
+            profile_id: profile_id.clone(),
+            message,
+        };
+
+        payload.validate()?;
+        Ok(payload)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(
+            &[
+                ("reference", &self.reference),
+                ("value", &self.value),
+                ("currency", &self.currency),
+                ("profile_id", &self.profile_id),
+            ],
+            "BankPaymentRequestPayload",
+        )
+    }
+}
+
+impl From<String> for BankPaymentRequestPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize BankPaymentRequestPayload from String")
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -290,5 +403,154 @@ mod tests {
             None, // Missing payee
         );
         assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_payment_payload_from_string() {
+        let json = r#"{
+            "external_reference": "P763763453G",
+            "currency": "EUR",
+            "value": "123.00",
+            "source": "BANK_MODULR",
+            "reference": "MYK123344545",
+            "payer_name": "John Doe",
+            "bank_account_number": "GB123266734836738787454"
+        }"#;
+
+        let payload: PaymentPayload = json.to_string().into();
+        assert_eq!(payload.external_reference, "P763763453G");
+        assert_eq!(payload.currency, "EUR");
+        assert_eq!(payload.value, "123.00");
+        assert_eq!(payload.source, "BANK_MODULR");
+        assert_eq!(payload.reference, "MYK123344545");
+    }
+
+    #[test]
+    fn test_status_update_payload_from_string() {
+        let json = r#"{
+            "reference": "REF123",
+            "status": "COMPLETED",
+            "message": "Payment processed successfully"
+        }"#;
+
+        let payload: StatusUpdatePayload = json.to_string().into();
+        assert_eq!(payload.reference, "REF123");
+        assert_eq!(payload.status, "COMPLETED");
+        assert_eq!(payload.message, Some("Payment processed successfully".to_string()));
+    }
+
+    #[test]
+    fn test_status_update_payload_without_message() {
+        let payload = StatusUpdatePayload::new(
+            "REF456".to_string(),
+            "PENDING".to_string(),
+            None,
+            None,
+        );
+        assert!(payload.is_ok());
+        let p = payload.unwrap();
+        assert_eq!(p.reference, "REF456");
+        assert_eq!(p.status, "PENDING");
+        assert_eq!(p.message, None);
+    }
+
+    #[test]
+    fn test_correction_payload_from_string() {
+        let json = r#"{
+            "reference": "REF123",
+            "value": "50.00",
+            "message": "Corrected amount",
+            "currency": "USD",
+            "source": "BANK_XYZ"
+        }"#;
+
+        let payload: CorrectionPayload = json.to_string().into();
+        assert_eq!(payload.reference, "REF123");
+        assert_eq!(payload.value, "50.00");
+        assert_eq!(payload.currency, "USD");
+    }
+
+    #[test]
+    fn test_transaction_payload_from_string() {
+        let json = r#"{
+            "external_reference": "EXT123",
+            "source": "BANKING_SERVICE",
+            "reference": "REF123",
+            "first_name": "John",
+            "last_name": "Doe",
+            "transaction_type": "DEPOSIT",
+            "status": "PENDING",
+            "incoming_currency": "EUR",
+            "outgoing_currency": "USD",
+            "value": "100.00",
+            "fee": "1.50",
+            "payer": "Bank Account 123"
+        }"#;
+
+        let payload: TransactionPayload = json.to_string().into();
+        assert_eq!(payload.external_reference, "EXT123");
+        assert_eq!(payload.first_name, "John");
+        assert_eq!(payload.last_name, "Doe");
+        assert_eq!(payload.transaction_type, TransactionType::Deposit);
+    }
+
+    #[test]
+    fn test_bank_payment_request_payload_valid() {
+        let payload = BankPaymentRequestPayload::new(
+            "REF456".to_string(),
+            "250.00".to_string(),
+            "USD".to_string(),
+            "PROFILE123".to_string(),
+            Some("Test payment".to_string()),
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_chain_payment_payload_valid() {
+        let payload = ChainPaymentPayload::new(
+            "STELLAR".to_string(),
+            "0x123abc".to_string(),
+            "REF123".to_string(),
+            "CONFIRMED".to_string(),
+            Some("TXN456".to_string()),
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_chain_payment_payload_from_string() {
+        let json = r#"{
+            "chain": "ETHEREUM",
+            "hash": "0xabc123def456",
+            "reference": "REF321",
+            "status": "PENDING",
+            "transaction_id": "TXN789"
+        }"#;
+
+        let payload: ChainPaymentPayload = json.to_string().into();
+        assert_eq!(payload.chain, "ETHEREUM");
+        assert_eq!(payload.hash, "0xabc123def456");
+        assert_eq!(payload.reference, "REF321");
+        assert_eq!(payload.status, "PENDING");
+        assert_eq!(payload.transaction_id, Some("TXN789".to_string()));
+    }
+
+    #[test]
+    fn test_bank_payment_request_payload_from_string() {
+        let json = r#"{
+            "reference": "BANK_REF123",
+            "value": "500.00",
+            "currency": "GBP",
+            "profile_id": "PROF456",
+            "message": "Bank transfer"
+        }"#;
+
+        let payload: BankPaymentRequestPayload = json.to_string().into();
+        assert_eq!(payload.reference, "BANK_REF123");
+        assert_eq!(payload.value, "500.00");
+        assert_eq!(payload.currency, "GBP");
+        assert_eq!(payload.profile_id, "PROF456");
+        assert_eq!(payload.message, Some("Bank transfer".to_string()));
     }
 }

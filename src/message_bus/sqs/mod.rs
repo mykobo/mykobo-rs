@@ -1,4 +1,4 @@
-use crate::message_bus::sqs::models::{ClientConfig, SQSError, SQSMessage};
+use crate::message_bus::sqs::models::{ClientConfig, SQSError};
 use aws_config::meta::region::RegionProviderChain;
 use aws_config::Region;
 use aws_sdk_sqs::error::SdkError;
@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
+use crate::message_bus::MessageBusMessage;
 
 pub mod models;
 
@@ -37,7 +38,7 @@ pub async fn configure_client() -> ClientConfig {
 pub async fn send_message(
     client_config: &Arc<ClientConfig>,
     queue: &str,
-    message: &SQSMessage,
+    message: &MessageBusMessage,
     attributes: HashMap<String, String>,
 ) -> Result<Option<String>, SQSError> {
     let queue_url = format!("{}/{}", client_config.queue_endpoint, queue);
@@ -47,7 +48,7 @@ pub async fn send_message(
         .client
         .send_message()
         .queue_url(queue_url)
-        .message_body(&message.body);
+        .message_body(&message.payload.to_string());
 
     let msg = attributes.into_iter().fold(msg, |acc, (k, v)| {
         let attr = MessageAttributeValue::builder()
@@ -63,12 +64,7 @@ pub async fn send_message(
         }
     });
 
-    let rsp = match &message.group {
-        Some(group) => msg.message_group_id(group.to_string()),
-        None => msg,
-    };
-
-    rsp.clone()
+    msg.clone()
         .send()
         .await
         .map(|output| output.message_id)
