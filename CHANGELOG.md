@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2025-11-16
+
+### ⛰️  Features
+
+- Consolidating message bus messages
+- Consolidating message bus messages
+
 ## [0.1.0] - 2025-11-14
 
 ### ⛰️  Features
@@ -11,6 +18,10 @@ All notable changes to this project will be documented in this file.
 ### 🐛 Bug Fixes
 
 - **release**: Correct cargo-release configuration field name
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 0.1.0
 
 ## [0.0.27] - 2025-11-03
 
