@@ -32,6 +32,7 @@ impl fmt::Display for InstructionType {
 pub enum TransactionType {
     Deposit,
     Withdraw,
+    Transfer,
 }
 
 impl fmt::Display for TransactionType {
