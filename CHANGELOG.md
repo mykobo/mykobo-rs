@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2025-11-16
+
+### 🐛 Bug Fixes
+
+- Add serialisers for payloads
+
 ## [1.0.0] - 2025-11-16
 
 ### ⛰️  Features
 
 - Consolidating message bus messages
 - Consolidating message bus messages
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.0
 
 ## [0.1.0] - 2025-11-14
 
