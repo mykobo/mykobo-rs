@@ -1,2 +1,2 @@
-mod test_stellar_deserialisation;
 mod test_dapp_deserialisation;
+mod test_stellar_deserialisation;

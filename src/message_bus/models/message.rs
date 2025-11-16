@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter};
 use super::base::{validate_required_fields, EventType, InstructionType, ValidationError};
 use super::event::*;
 use super::instruction::*;
 use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use uuid::Uuid;
 
 /// Metadata for message bus messages
@@ -352,7 +352,7 @@ mod tests {
             "REF123".to_string(),
             "PENDING".to_string(),
             Some("Test".to_string()),
-            None
+            None,
         )
         .unwrap();
 
@@ -551,11 +551,8 @@ mod tests {
 
     #[test]
     fn test_message_with_new_user_event() {
-        let payload = NewUserEventPayload::new(
-            "New User".to_string(),
-            "USER123".to_string(),
-        )
-        .unwrap();
+        let payload =
+            NewUserEventPayload::new("New User".to_string(), "USER123".to_string()).unwrap();
 
         let message = MessageBusMessage::create(
             "IDENTITY_SERVICE".to_string(),

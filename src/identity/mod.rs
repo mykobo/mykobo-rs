@@ -1,14 +1,14 @@
 pub mod models;
 
 use crate::models::error::ServiceError;
+use crate::util::{generate_headers, parse_response};
+use jsonwebtoken::dangerous::insecure_decode;
+use log::{debug, info, warn};
 use models::{
     Credentials, CustomerRequest, CustomerResponse, NewDocumentRequest, NewDocumentResponse,
     ServiceToken, TokenCheckRequest, TokenCheckResponse, TokenClaims, UpdateProfileRequest,
     UserKycStatusResponse,
 };
-use crate::util::{generate_headers, parse_response};
-use jsonwebtoken::dangerous::insecure_decode;
-use log::{debug, info, warn};
 use reqwest::header::AUTHORIZATION;
 use reqwest::Client;
 use serde_json::json;

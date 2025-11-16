@@ -1,4 +1,5 @@
 use crate::message_bus::sqs::models::{ClientConfig, SQSError};
+use crate::message_bus::MessageBusMessage;
 use aws_config::meta::region::RegionProviderChain;
 use aws_config::Region;
 use aws_sdk_sqs::error::SdkError;
@@ -10,7 +11,6 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
-use crate::message_bus::MessageBusMessage;
 
 pub mod models;
 
@@ -48,7 +48,7 @@ pub async fn send_message(
         .client
         .send_message()
         .queue_url(queue_url)
-        .message_body(&message.payload.to_string());
+        .message_body(message.payload.to_string());
 
     let msg = attributes.into_iter().fold(msg, |acc, (k, v)| {
         let attr = MessageAttributeValue::builder()

@@ -60,7 +60,7 @@ impl From<String> for PaymentPayload {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ChainPaymentPayload {
-    chain:String,
+    chain: String,
     hash: String,
     reference: String,
     status: String,
@@ -69,8 +69,20 @@ pub struct ChainPaymentPayload {
 }
 
 impl ChainPaymentPayload {
-    pub fn new(chain:String, hash: String, reference: String, status: String, transaction_id: Option<String>) -> Result<Self, ValidationError> {
-        let payload = Self { chain, hash, reference, status, transaction_id };
+    pub fn new(
+        chain: String,
+        hash: String,
+        reference: String,
+        status: String,
+        transaction_id: Option<String>,
+    ) -> Result<Self, ValidationError> {
+        let payload = Self {
+            chain,
+            hash,
+            reference,
+            status,
+            transaction_id,
+        };
 
         payload.validate()?;
         Ok(payload)
@@ -82,7 +94,7 @@ impl ChainPaymentPayload {
                 ("chain", &self.chain),
                 ("hash", &self.hash),
                 ("reference", &self.reference),
-                ("status", &self.status)
+                ("status", &self.status),
             ],
             "ChainPaymentPayload",
         )
@@ -106,7 +118,12 @@ pub struct StatusUpdatePayload {
 }
 
 impl StatusUpdatePayload {
-    pub fn new(reference: String, status: String, message: Option<String>, transaction_id: Option<String>) -> Result<Self, ValidationError> {
+    pub fn new(
+        reference: String,
+        status: String,
+        message: Option<String>,
+        transaction_id: Option<String>,
+    ) -> Result<Self, ValidationError> {
         let payload = Self {
             reference: reference.clone(),
             status: status.clone(),
@@ -120,10 +137,7 @@ impl StatusUpdatePayload {
 
     pub fn validate(&self) -> Result<(), ValidationError> {
         validate_required_fields(
-            &[
-                ("reference", &self.reference),
-                ("status", &self.status),
-            ],
+            &[("reference", &self.reference), ("status", &self.status)],
             "StatusUpdatePayload",
         )
     }
@@ -328,10 +342,10 @@ impl BankPaymentRequestPayload {
 
 impl From<String> for BankPaymentRequestPayload {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize BankPaymentRequestPayload from String")
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize BankPaymentRequestPayload from String")
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -436,17 +450,16 @@ mod tests {
         let payload: StatusUpdatePayload = json.to_string().into();
         assert_eq!(payload.reference, "REF123");
         assert_eq!(payload.status, "COMPLETED");
-        assert_eq!(payload.message, Some("Payment processed successfully".to_string()));
+        assert_eq!(
+            payload.message,
+            Some("Payment processed successfully".to_string())
+        );
     }
 
     #[test]
     fn test_status_update_payload_without_message() {
-        let payload = StatusUpdatePayload::new(
-            "REF456".to_string(),
-            "PENDING".to_string(),
-            None,
-            None,
-        );
+        let payload =
+            StatusUpdatePayload::new("REF456".to_string(), "PENDING".to_string(), None, None);
         assert!(payload.is_ok());
         let p = payload.unwrap();
         assert_eq!(p.reference, "REF456");

@@ -4,10 +4,7 @@ use std::env;
 
 use reqwest::Client;
 
-use crate::{
-    models::error::ServiceError,
-    util::parse_response,
-};
+use crate::{models::error::ServiceError, util::parse_response};
 use models::{
     AccessTokenRequest, AccessTokenResponse, ApplicantResponse, InitiateVerificationRequest,
     InitiateVerificationResponse, NewApplicantRequest, NewDocumentRequest, NewDocumentResponse,

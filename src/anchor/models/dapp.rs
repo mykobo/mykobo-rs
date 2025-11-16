@@ -93,7 +93,7 @@ impl Transaction {
         value: String,
         fee: String,
         wallet_address: String,
-        source: TransactionSource
+        source: TransactionSource,
     ) -> Self {
         let now = Utc::now();
         Self {
@@ -141,7 +141,12 @@ impl Transaction {
     }
 
     /// Sets the payer information
-    pub fn set_payer(&mut self, payer_id: String, first_name: Option<String>, last_name: Option<String>) {
+    pub fn set_payer(
+        &mut self,
+        payer_id: String,
+        first_name: Option<String>,
+        last_name: Option<String>,
+    ) {
         self.payer_id = Some(payer_id);
         self.first_name = first_name;
         self.last_name = last_name;

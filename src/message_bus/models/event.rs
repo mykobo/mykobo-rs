@@ -42,7 +42,8 @@ impl NewTransactionEventPayload {
 
 impl From<String> for NewTransactionEventPayload {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize NewTransactionEventPayload from String")
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize NewTransactionEventPayload from String")
     }
 }
 
@@ -74,7 +75,8 @@ impl TransactionStatusEventPayload {
 
 impl From<String> for TransactionStatusEventPayload {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize TransactionStatusEventPayload from String")
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize TransactionStatusEventPayload from String")
     }
 }
 
@@ -223,8 +225,9 @@ impl KycEventPayload {
             if status.to_lowercase() == "completed" && self.review_result.is_none() {
                 return Err(ValidationError {
                     class_name: "KycEventPayload".to_string(),
-                    fields: vec!["review_result must be provided if review_status is completed"
-                        .to_string()],
+                    fields: vec![
+                        "review_result must be provided if review_status is completed".to_string(),
+                    ],
                 });
             }
         }
@@ -267,7 +270,8 @@ impl PasswordResetEventPayload {
 
 impl From<String> for PasswordResetEventPayload {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize PasswordResetEventPayload from String")
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize PasswordResetEventPayload from String")
     }
 }
 
@@ -299,7 +303,8 @@ impl VerificationRequestedEventPayload {
 
 impl From<String> for VerificationRequestedEventPayload {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize VerificationRequestedEventPayload from String")
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize VerificationRequestedEventPayload from String")
     }
 }
 
@@ -396,10 +401,7 @@ mod tests {
 
     #[test]
     fn test_new_user_event_payload_valid() {
-        let payload = NewUserEventPayload::new(
-            "User Profile".to_string(),
-            "USER456".to_string(),
-        );
+        let payload = NewUserEventPayload::new("User Profile".to_string(), "USER456".to_string());
         assert!(payload.is_ok());
     }
 

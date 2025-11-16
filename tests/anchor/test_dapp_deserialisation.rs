@@ -1,4 +1,6 @@
-use mykobo_rs::anchor::models::{DappTransaction as Transaction, TransactionSource, TransactionStatus, TransactionType};
+use mykobo_rs::anchor::models::{
+    DappTransaction as Transaction, TransactionSource, TransactionStatus, TransactionType,
+};
 
 #[test]
 fn test_new_transaction() {
@@ -12,7 +14,7 @@ fn test_new_transaction() {
         "100.50".to_string(),
         "0.25".to_string(),
         "wallet-address-123".to_string(),
-        TransactionSource::AnchorSolana
+        TransactionSource::AnchorSolana,
     );
 
     assert_eq!(tx.reference, "REF-123");
@@ -107,7 +109,10 @@ fn test_deserialization() {
         "#;
 
     let transaction: Transaction = serde_json::from_str(payload).unwrap();
-    assert_eq!(transaction.wallet_address, "7xKWv8QRt9YZN3pM5cD2jFqH4sX6wL8aB1vN9mT5rP3k");
+    assert_eq!(
+        transaction.wallet_address,
+        "7xKWv8QRt9YZN3pM5cD2jFqH4sX6wL8aB1vN9mT5rP3k"
+    );
     assert_eq!(transaction.source, TransactionSource::AnchorSolana);
     assert_eq!(transaction.status, TransactionStatus::Completed);
     assert_eq!(transaction.transaction_type, TransactionType::Withdraw);
@@ -115,8 +120,12 @@ fn test_deserialization() {
     assert_eq!(transaction.outgoing_currency, "USD");
     assert_eq!(transaction.value, "250.00");
     assert_eq!(transaction.fee, "5.50");
-    assert!(transaction.payee_id.is_some_and(|id| id == "user_abc123xyz"));
+    assert!(transaction
+        .payee_id
+        .is_some_and(|id| id == "user_abc123xyz"));
     assert!(transaction.first_name.is_some_and(|name| name == "John"));
     assert!(transaction.last_name.is_some_and(|name| name == "Doe"));
-    assert!(transaction.message_id.is_some_and(|id| id == "b2e5f8a1-c3d4-5678-90ab-def123456789"));
+    assert!(transaction
+        .message_id
+        .is_some_and(|id| id == "b2e5f8a1-c3d4-5678-90ab-def123456789"));
 }

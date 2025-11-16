@@ -1,8 +1,8 @@
-use log::debug;
-use reqwest::Client;
 use crate::anchor::models::DappTransaction as Transaction;
 use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
+use log::debug;
+use reqwest::Client;
 
 pub struct DappAnchor {
     pub host: String,

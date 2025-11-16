@@ -1,14 +1,12 @@
 use std::env;
 
 use crate::read_file;
-use mykobo_rs::{
-    sumsub::{
-        models::{
-            DocumentMetadata, InitiateVerificationRequest, NewApplicantRequest,
-            NewDocumentRequest, ProfileData,
-        },
-        SumsubClient,
+use mykobo_rs::sumsub::{
+    models::{
+        DocumentMetadata, InitiateVerificationRequest, NewApplicantRequest, NewDocumentRequest,
+        ProfileData,
     },
+    SumsubClient,
 };
 use pretty_assertions::assert_eq;
 use serial_test::serial;

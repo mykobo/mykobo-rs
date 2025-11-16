@@ -10,7 +10,7 @@ pub enum InstructionType {
     Correction,
     Transaction,
     BankPaymentRequest, // banking gateway payment request instruction
-    ChainPayment, // this is for anchors that require an update from the chain
+    ChainPayment,       // this is for anchors that require an update from the chain
 }
 
 impl fmt::Display for InstructionType {

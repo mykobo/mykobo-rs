@@ -9,11 +9,9 @@ use fake::{
     },
     Fake,
 };
-use mykobo_rs::{
-    identity::{
-        models::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
-        IdentityServiceClient,
-    },
+use mykobo_rs::identity::{
+    models::{CustomerRequest, NewDocumentRequest, UpdateProfileRequest},
+    IdentityServiceClient,
 };
 use pretty_assertions::assert_eq;
 use serial_test::serial;
