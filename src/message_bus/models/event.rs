@@ -1,7 +1,7 @@
 use super::base::{validate_required_fields, TransactionType, ValidationError};
 use serde::{Deserialize, Serialize};
 
-/// Payload for new transaction event
+/// Payload for a new transaction event mainly for notification purposes
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NewTransactionEventPayload {
     pub created_at: String,
@@ -54,16 +54,23 @@ impl From<NewTransactionEventPayload> for String {
     }
 }
 
-/// Payload for transaction status update event
+/// Payload for transaction status update event for notification purposes, this can go to either business server or notification server
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde_with::skip_serializing_none]
 pub struct TransactionStatusEventPayload {
+    pub external_reference: Option<String>,
     pub reference: String,
     pub status: String,
 }
 
 impl TransactionStatusEventPayload {
-    pub fn new(reference: String, status: String) -> Result<Self, ValidationError> {
+    pub fn new(
+        reference: String,
+        status: String,
+        external_reference: Option<String>,
+    ) -> Result<Self, ValidationError> {
         let payload = Self {
+            external_reference: external_reference.clone(),
             reference: reference.clone(),
             status: status.clone(),
         };
@@ -530,7 +537,7 @@ mod tests {
     #[test]
     fn test_transaction_status_event_payload_serialization_roundtrip() {
         let original =
-            TransactionStatusEventPayload::new("TXN123".to_string(), "COMPLETED".to_string())
+            TransactionStatusEventPayload::new("TXN123".to_string(), "COMPLETED".to_string(), None)
                 .unwrap();
 
         let serialized: String = original.clone().into();

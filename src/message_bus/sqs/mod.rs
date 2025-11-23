@@ -44,11 +44,14 @@ pub async fn send_message(
     let queue_url = format!("{}/{}", client_config.queue_endpoint, queue);
     info!("Sending message to queue with URL: {queue_url}");
 
+    let message_body = serde_json::to_string(message)
+        .map_err(|e| SQSError::new(format!("Failed to serialize message: {}", e)))?;
+
     let msg = client_config
         .client
         .send_message()
         .queue_url(queue_url)
-        .message_body(message.payload.to_string());
+        .message_body(message_body);
 
     let msg = attributes.into_iter().fold(msg, |acc, (k, v)| {
         let attr = MessageAttributeValue::builder()

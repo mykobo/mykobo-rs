@@ -220,6 +220,12 @@ impl MessageBusMessage {
     }
 }
 
+impl From<MessageBusMessage> for String {
+    fn from(val: MessageBusMessage) -> Self {
+        serde_json::to_string(&val).unwrap()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
