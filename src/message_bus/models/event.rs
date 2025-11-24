@@ -59,6 +59,7 @@ impl From<NewTransactionEventPayload> for String {
 #[serde_with::skip_serializing_none]
 pub struct TransactionStatusEventPayload {
     pub external_reference: Option<String>,
+    pub transaction_id: Option<String>,
     pub reference: String,
     pub status: String,
 }
@@ -68,9 +69,11 @@ impl TransactionStatusEventPayload {
         reference: String,
         status: String,
         external_reference: Option<String>,
+        transaction_id: Option<String>,
     ) -> Result<Self, ValidationError> {
         let payload = Self {
             external_reference: external_reference.clone(),
+            transaction_id: transaction_id.clone(),
             reference: reference.clone(),
             status: status.clone(),
         };
@@ -536,9 +539,13 @@ mod tests {
 
     #[test]
     fn test_transaction_status_event_payload_serialization_roundtrip() {
-        let original =
-            TransactionStatusEventPayload::new("TXN123".to_string(), "COMPLETED".to_string(), None)
-                .unwrap();
+        let original = TransactionStatusEventPayload::new(
+            "TXN123".to_string(),
+            "COMPLETED".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
 
         let serialized: String = original.clone().into();
         let deserialized: TransactionStatusEventPayload = serialized.into();
