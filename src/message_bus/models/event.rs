@@ -59,7 +59,6 @@ impl From<NewTransactionEventPayload> for String {
 #[serde_with::skip_serializing_none]
 pub struct TransactionStatusEventPayload {
     pub external_reference: Option<String>,
-    pub transaction_id: Option<String>,
     pub reference: String,
     pub status: String,
 }
@@ -73,7 +72,6 @@ impl TransactionStatusEventPayload {
     ) -> Result<Self, ValidationError> {
         let payload = Self {
             external_reference: external_reference.clone(),
-            transaction_id: transaction_id.clone(),
             reference: reference.clone(),
             status: status.clone(),
         };
