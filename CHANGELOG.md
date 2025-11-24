@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2025-11-24
+
+### 🐛 Bug Fixes
+
+- Use updated mykobo-ext sdk to include transaction id
+
 ## [1.0.3] - 2025-11-23
 
 ### 🐛 Bug Fixes
 
 - Message serialisation
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.3
 
 ## [1.0.2] - 2025-11-16
 
