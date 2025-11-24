@@ -54,7 +54,7 @@ impl From<NewTransactionEventPayload> for String {
     }
 }
 
-/// Payload for transaction status update event for notification purposes, this can go to either business server or notification server
+/// Payload for transaction status update event for notification purposes, this can go to the notification server
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde_with::skip_serializing_none]
 pub struct TransactionStatusEventPayload {
@@ -67,8 +67,7 @@ impl TransactionStatusEventPayload {
     pub fn new(
         reference: String,
         status: String,
-        external_reference: Option<String>,
-        transaction_id: Option<String>,
+        external_reference: Option<String>
     ) -> Result<Self, ValidationError> {
         let payload = Self {
             external_reference: external_reference.clone(),
@@ -99,6 +98,62 @@ impl From<TransactionStatusEventPayload> for String {
     fn from(val: TransactionStatusEventPayload) -> Self {
         serde_json::to_string(&val)
             .expect("Failed to serialize TransactionStatusEventPayload to String")
+    }
+}
+
+
+/// Payload for notifying the business server of a bank payment event. This is generally used to let the
+/// business server know to create a chain payment for the corresponding bank payment
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde_with::skip_serializing_none]
+pub struct BankPaymentEventPayload {
+    pub transaction_id: String,
+    pub status: String,
+    pub reference: String,
+    pub message: Option<String>
+}
+
+impl BankPaymentEventPayload {
+    pub fn new(
+        transaction_id: String,
+        status: String,
+        reference: String,
+        message: Option<String>,
+    ) -> Result<Self, ValidationError> {
+        let payload = Self {
+            transaction_id: transaction_id.clone(),
+            status: status.clone(),
+            reference: reference.clone(),
+            message: message.clone(),
+        };
+
+        payload.validate()?;
+        Ok(payload)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(
+            &[
+                ("transaction_id", &self.transaction_id),
+                ("status", &self.status),
+                ("reference", &self.reference),
+            ],
+            "BankPaymentEventPayload",
+        )
+    }
+}
+
+impl From<String> for BankPaymentEventPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize BankPaymentEventPayload from String")
+    }
+}
+
+impl From<BankPaymentEventPayload> for String {
+    fn from(val: BankPaymentEventPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize BankPaymentEventPayload to String")
     }
 }
 
@@ -540,8 +595,7 @@ mod tests {
         let original = TransactionStatusEventPayload::new(
             "TXN123".to_string(),
             "COMPLETED".to_string(),
-            None,
-            None,
+            None
         )
         .unwrap();
 
@@ -708,5 +762,92 @@ mod tests {
         assert_eq!(payload, deserialized);
         assert_eq!(deserialized.to, "user+test@example.com");
         assert_eq!(deserialized.subject, "Reset: \"Your\" Password & Account");
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_valid() {
+        let payload = BankPaymentEventPayload::new(
+            "TX12345".to_string(),
+            "COMPLETED".to_string(),
+            "REF789".to_string(),
+            Some("Payment processed successfully".to_string()),
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_valid_without_message() {
+        let payload = BankPaymentEventPayload::new(
+            "TX12345".to_string(),
+            "PENDING".to_string(),
+            "REF789".to_string(),
+            None,
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_invalid_empty_transaction_id() {
+        let payload = BankPaymentEventPayload::new(
+            "".to_string(),
+            "COMPLETED".to_string(),
+            "REF789".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_from_string() {
+        let json = r#"{
+            "transaction_id": "TX99999",
+            "status": "FAILED",
+            "reference": "REF001",
+            "message": "Insufficient funds"
+        }"#;
+
+        let payload: BankPaymentEventPayload = json.to_string().into();
+        assert_eq!(payload.transaction_id, "TX99999");
+        assert_eq!(payload.status, "FAILED");
+        assert_eq!(payload.reference, "REF001");
+        assert_eq!(payload.message, Some("Insufficient funds".to_string()));
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_serialization_roundtrip() {
+        let original = BankPaymentEventPayload::new(
+            "TX54321".to_string(),
+            "PROCESSING".to_string(),
+            "REF456".to_string(),
+            Some("Transaction in progress".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: BankPaymentEventPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_bank_payment_event_payload_serialization_without_optionals() {
+        let payload = BankPaymentEventPayload::new(
+            "TX11111".to_string(),
+            "SUCCESS".to_string(),
+            "REF222".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Verify serialization works
+        assert!(serialized.contains("\"transaction_id\":\"TX11111\""));
+        assert!(serialized.contains("\"status\":\"SUCCESS\""));
+        assert!(serialized.contains("\"reference\":\"REF222\""));
+
+        let deserialized: BankPaymentEventPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+        assert_eq!(deserialized.message, None);
     }
 }

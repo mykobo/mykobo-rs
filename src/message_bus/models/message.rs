@@ -107,6 +107,7 @@ pub enum Payload {
     NewTransaction(NewTransactionEventPayload),
     TransactionStatus(TransactionStatusEventPayload),
     PaymentEvent(PaymentEventPayload),
+    BankPayment(BankPaymentEventPayload),
     Profile(ProfileEventPayload),
     NewUser(NewUserEventPayload),
     Kyc(KycEventPayload),
@@ -171,6 +172,7 @@ impl MessageBusMessage {
                 (EventType::NewTransaction, Payload::NewTransaction(_)) => Ok(()),
                 (EventType::TransactionStatusUpdate, Payload::TransactionStatus(_)) => Ok(()),
                 (EventType::Payment, Payload::PaymentEvent(_)) => Ok(()),
+                (EventType::BankPayment, Payload::BankPayment(_)) => Ok(()),
                 (EventType::NewProfile, Payload::Profile(_)) => Ok(()),
                 (EventType::NewUser, Payload::NewUser(_)) => Ok(()),
                 (EventType::KycEvent, Payload::Kyc(_)) => Ok(()),
@@ -572,5 +574,54 @@ mod tests {
         assert!(message.is_ok());
         let msg = message.unwrap();
         assert_eq!(msg.meta_data.event, Some(EventType::NewUser));
+    }
+
+    #[test]
+    fn test_message_with_bank_payment_event() {
+        let payload = BankPaymentEventPayload::new(
+            "TX12345".to_string(),
+            "COMPLETED".to_string(),
+            "REF789".to_string(),
+            Some("Payment processed".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "BANK_SERVICE".to_string(),
+            Payload::BankPayment(payload),
+            "test.token.here".to_string(),
+            None,
+            Some(EventType::BankPayment),
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.event, Some(EventType::BankPayment));
+    }
+
+    #[test]
+    fn test_bank_payment_event_validation_fails_with_wrong_type() {
+        let payload = BankPaymentEventPayload::new(
+            "TX12345".to_string(),
+            "COMPLETED".to_string(),
+            "REF789".to_string(),
+            None,
+        )
+        .unwrap();
+
+        // Try to use wrong event type
+        let metadata = MetaData::new(
+            "BANK_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-123".to_string(),
+            None,
+            Some(EventType::Payment), // Wrong event type
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::new(metadata, Payload::BankPayment(payload));
+        assert!(message.is_err());
     }
 }

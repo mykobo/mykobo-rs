@@ -55,6 +55,7 @@ pub enum EventType {
     NewTransaction,
     TransactionStatusUpdate,
     Payment,
+    BankPayment,
     NewProfile,
     NewUser,
     VerificationRequested,
