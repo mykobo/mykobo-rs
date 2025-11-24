@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.8] - 2025-11-24
+
+### 🐛 Bug Fixes
+
+- New payload for bank payment updates
+- New payload for bank payment updates
+
 ## [1.0.7] - 2025-11-24
 
 ### 🐛 Bug Fixes
@@ -9,6 +16,10 @@ All notable changes to this project will be documented in this file.
 - Use updated mykobo-ext sdk to exclude tx_id
 - Use updated mykobo-ext sdk to exclude tx_id
 - Use updated mykobo-ext sdk to exclude tx_id
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.7
 
 ## [1.0.4] - 2025-11-24
 
