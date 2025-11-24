@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Use updated mykobo-ext sdk to include transaction id
 - Use updated mykobo-ext sdk to exclude tx_id
 
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.5
+
 ## [1.0.3] - 2025-11-23
 
 ### 🐛 Bug Fixes
