@@ -67,7 +67,7 @@ impl TransactionStatusEventPayload {
     pub fn new(
         reference: String,
         status: String,
-        external_reference: Option<String>
+        external_reference: Option<String>,
     ) -> Result<Self, ValidationError> {
         let payload = Self {
             external_reference: external_reference.clone(),
@@ -101,7 +101,6 @@ impl From<TransactionStatusEventPayload> for String {
     }
 }
 
-
 /// Payload for notifying the business server of a bank payment event. This is generally used to let the
 /// business server know to create a chain payment for the corresponding bank payment
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -110,7 +109,7 @@ pub struct BankPaymentEventPayload {
     pub transaction_id: String,
     pub status: String,
     pub reference: String,
-    pub message: Option<String>
+    pub message: Option<String>,
 }
 
 impl BankPaymentEventPayload {
@@ -152,8 +151,7 @@ impl From<String> for BankPaymentEventPayload {
 
 impl From<BankPaymentEventPayload> for String {
     fn from(val: BankPaymentEventPayload) -> Self {
-        serde_json::to_string(&val)
-            .expect("Failed to serialize BankPaymentEventPayload to String")
+        serde_json::to_string(&val).expect("Failed to serialize BankPaymentEventPayload to String")
     }
 }
 
@@ -592,12 +590,9 @@ mod tests {
 
     #[test]
     fn test_transaction_status_event_payload_serialization_roundtrip() {
-        let original = TransactionStatusEventPayload::new(
-            "TXN123".to_string(),
-            "COMPLETED".to_string(),
-            None
-        )
-        .unwrap();
+        let original =
+            TransactionStatusEventPayload::new("TXN123".to_string(), "COMPLETED".to_string(), None)
+                .unwrap();
 
         let serialized: String = original.clone().into();
         let deserialized: TransactionStatusEventPayload = serialized.into();
