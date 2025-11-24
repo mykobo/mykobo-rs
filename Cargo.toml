@@ -1,6 +1,6 @@
 [package]
 name = "mykobo-rs"
-version = "1.0.6"
+version = "1.0.7"
 edition = "2021"
 repository = "https://github.com/mykobo/mykobo-rs"
 description = "A MYKOBO API client written in Rust, to interact with the MYKOBO suite of services."
