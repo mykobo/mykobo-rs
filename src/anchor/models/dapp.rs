@@ -16,6 +16,7 @@ pub enum TransactionType {
 pub enum TransactionStatus {
     PendingPayer,
     PendingPayee,
+    PendingAnchor,
     Completed,
     Failed,
     Cancelled,

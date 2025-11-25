@@ -129,3 +129,67 @@ fn test_deserialization() {
         .message_id
         .is_some_and(|id| id == "b2e5f8a1-c3d4-5678-90ab-def123456789"));
 }
+
+#[test]
+fn test_solana_deposit_deserialization() {
+    let payload = r#"
+        {
+            "created_at": "2025-11-17T20:10:29.815872+00:00",
+            "fee": "0.250000",
+            "first_name": "Kwabena",
+            "id": "29147822-396e-4817-9b64-931c92a05f46",
+            "idempotency_key": "e1d3bdea-77e0-4f18-9c30-a7569b1e3c6f",
+            "incoming_currency": "EUR",
+            "last_name": "Aning",
+            "message_id": "888ce30a-b5b1-4aff-9ff1-5be91c2e5f07",
+            "outgoing_currency": "EURC",
+            "payee_id": null,
+            "payer_id": "urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc",
+            "queue_sent_at": "2025-11-17T20:10:29.960538+00:00",
+            "reference": "MYK1763410229",
+            "source": "ANCHOR_SOLANA",
+            "status": "PENDING_ANCHOR",
+            "transaction_type": "DEPOSIT",
+            "tx_hash": null,
+            "updated_at": "2025-11-17T20:10:29.962143+00:00",
+            "value": "20.000000",
+            "wallet_address": "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J"
+        }
+        "#;
+
+    let transaction: Transaction = serde_json::from_str(payload).unwrap();
+
+    // Verify basic transaction details
+    assert_eq!(transaction.id, "29147822-396e-4817-9b64-931c92a05f46");
+    assert_eq!(transaction.reference, "MYK1763410229");
+    assert_eq!(transaction.idempotency_key, "e1d3bdea-77e0-4f18-9c30-a7569b1e3c6f");
+
+    // Verify transaction type and status
+    assert_eq!(transaction.transaction_type, TransactionType::Deposit);
+    assert_eq!(transaction.status, TransactionStatus::PendingAnchor);
+
+    // Verify currency and amounts
+    assert_eq!(transaction.incoming_currency, "EUR");
+    assert_eq!(transaction.outgoing_currency, "EURC");
+    assert_eq!(transaction.value, "20.000000");
+    assert_eq!(transaction.fee, "0.250000");
+
+    // Verify user information
+    assert_eq!(transaction.payer_id, Some("urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc".to_string()));
+    assert_eq!(transaction.payee_id, None);
+    assert_eq!(transaction.first_name, Some("Kwabena".to_string()));
+    assert_eq!(transaction.last_name, Some("Aning".to_string()));
+
+    // Verify Solana-specific fields
+    assert_eq!(transaction.wallet_address, "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J");
+    assert_eq!(transaction.source, TransactionSource::AnchorSolana);
+    assert_eq!(transaction.tx_hash, None);
+
+    // Verify message queue tracking
+    assert_eq!(transaction.message_id, Some("888ce30a-b5b1-4aff-9ff1-5be91c2e5f07".to_string()));
+    assert!(transaction.queue_sent_at.is_some());
+
+    // Verify timestamps
+    assert!(transaction.created_at.to_string().starts_with("2025-11-17"));
+    assert!(transaction.updated_at.to_string().starts_with("2025-11-17"));
+}
