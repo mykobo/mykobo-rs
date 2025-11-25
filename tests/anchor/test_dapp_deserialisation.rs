@@ -162,7 +162,10 @@ fn test_solana_deposit_deserialization() {
     // Verify basic transaction details
     assert_eq!(transaction.id, "29147822-396e-4817-9b64-931c92a05f46");
     assert_eq!(transaction.reference, "MYK1763410229");
-    assert_eq!(transaction.idempotency_key, "e1d3bdea-77e0-4f18-9c30-a7569b1e3c6f");
+    assert_eq!(
+        transaction.idempotency_key,
+        "e1d3bdea-77e0-4f18-9c30-a7569b1e3c6f"
+    );
 
     // Verify transaction type and status
     assert_eq!(transaction.transaction_type, TransactionType::Deposit);
@@ -175,18 +178,27 @@ fn test_solana_deposit_deserialization() {
     assert_eq!(transaction.fee, "0.250000");
 
     // Verify user information
-    assert_eq!(transaction.payer_id, Some("urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc".to_string()));
+    assert_eq!(
+        transaction.payer_id,
+        Some("urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc".to_string())
+    );
     assert_eq!(transaction.payee_id, None);
     assert_eq!(transaction.first_name, Some("Kwabena".to_string()));
     assert_eq!(transaction.last_name, Some("Aning".to_string()));
 
     // Verify Solana-specific fields
-    assert_eq!(transaction.wallet_address, "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J");
+    assert_eq!(
+        transaction.wallet_address,
+        "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J"
+    );
     assert_eq!(transaction.source, TransactionSource::AnchorSolana);
     assert_eq!(transaction.tx_hash, None);
 
     // Verify message queue tracking
-    assert_eq!(transaction.message_id, Some("888ce30a-b5b1-4aff-9ff1-5be91c2e5f07".to_string()));
+    assert_eq!(
+        transaction.message_id,
+        Some("888ce30a-b5b1-4aff-9ff1-5be91c2e5f07".to_string())
+    );
     assert!(transaction.queue_sent_at.is_some());
 
     // Verify timestamps
