@@ -2,12 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9] - 2025-11-25
+
+### 🐛 Bug Fixes
+
+- Deserialisation issues
+- Deserialisation issues
+
 ## [1.0.8] - 2025-11-24
 
 ### 🐛 Bug Fixes
 
 - New payload for bank payment updates
 - New payload for bank payment updates
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.8
 
 ## [1.0.7] - 2025-11-24
 
