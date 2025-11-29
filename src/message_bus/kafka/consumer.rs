@@ -26,6 +26,7 @@ where
     pub fn new(
         brokers: &str,
         group_id: &str,
+        client_id: &str,
         max_retries: u32,
         topics: &[&str],
         channel: Sender<IncomingMessage<T>>,
@@ -36,6 +37,7 @@ where
             env::var("KAFKA_API_SECRET").expect("Missing KAFKA_API_SECRET environment variable");
 
         let consumer: StreamConsumer = ClientConfig::new()
+            .set("client.id", client_id)
             .set("group.id", group_id)
             .set("bootstrap.servers", brokers)
             .set("enable.partition.eof", "false")
