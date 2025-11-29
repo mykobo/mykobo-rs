@@ -2,12 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2025-11-29
+
+### ⚙️ Miscellaneous Tasks
+
+- Add client id to kafka client
+- Add client id to kafka client
+
 ## [1.0.11] - 2025-11-29
 
 ### 🐛 Bug Fixes
 
 - Use custom deserialiser
 - Use custom deserialiser
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.11
 
 ## [1.0.10] - 2025-11-29
 
