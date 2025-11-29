@@ -1,6 +1,6 @@
 use crate::message_bus::MetaData;
 use aws_sdk_sqs::Client;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 #[derive(Debug)]
@@ -26,12 +26,9 @@ pub struct ClientConfig {
     pub queue_endpoint: String,
 }
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde_with::skip_serializing_none]
-pub struct MessageEnvelope<T>
-where
-    T: Serialize,
-{
+pub struct MessageEnvelope<T> {
     pub meta_data: MetaData,
     pub payload: T,
 }

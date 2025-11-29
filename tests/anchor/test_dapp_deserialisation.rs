@@ -205,3 +205,34 @@ fn test_solana_deposit_deserialization() {
     assert!(transaction.created_at.to_string().starts_with("2025-11-17"));
     assert!(transaction.updated_at.to_string().starts_with("2025-11-17"));
 }
+
+#[test]
+fn test_solana_deposit_deserialization_2() {
+    let payload = r#"
+    {
+        "created_at": "2025-11-24T21:52:00.933793+00:00",
+        "fee": "0.030000",
+        "first_name": "Oluwaseyi",
+        "id": "1ad3e618-3d13-45d8-8e18-6b3afc873e7e",
+        "idempotency_key": "7db64034-4cc9-4475-94f2-f1b959ab6b20",
+        "incoming_currency": "EUR",
+        "last_name": "Akin-Olugbemi",
+        "message_id": "3c609b0e-1559-4791-8fb6-54f60ed8726f",
+        "outgoing_currency": "EURC",
+        "payee_id": null,
+        "payer_id": "urn:usrp:47ec816445fd46f6b1958b949165be10",
+        "queue_sent_at": "2025-11-24T21:52:01.151659+00:00",
+        "reference": "MYK1764021120",
+        "source": "ANCHOR_SOLANA",
+        "status": "PENDING_ANCHOR",
+        "transaction_type": "DEPOSIT",
+        "tx_hash": null,
+        "updated_at": "2025-11-24T21:55:29.112397+00:00",
+        "value": "2.000000",
+        "wallet_address": "9w1bUHubdN2sgjRQ8djLhXdxG462BeipruzD4H8FDHgT"
+        }
+    "#;
+
+    let transaction: Transaction = serde_json::from_str(payload).unwrap();
+    println!("{:?}", transaction);
+}

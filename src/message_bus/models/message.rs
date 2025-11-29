@@ -16,6 +16,7 @@ pub struct MetaData {
     pub idempotency_key: String,
     pub instruction_type: Option<InstructionType>,
     pub event: Option<EventType>,
+    pub ip_address: Option<String>,
 }
 
 impl MetaData {
@@ -26,6 +27,7 @@ impl MetaData {
         idempotency_key: String,
         instruction_type: Option<InstructionType>,
         event: Option<EventType>,
+        ip_address: Option<String>,
     ) -> Result<Self, ValidationError> {
         let metadata = Self {
             source: source.clone(),
@@ -34,6 +36,7 @@ impl MetaData {
             idempotency_key: idempotency_key.clone(),
             instruction_type,
             event,
+            ip_address,
         };
 
         metadata.validate()?;
@@ -204,6 +207,7 @@ impl MessageBusMessage {
         instruction_type: Option<InstructionType>,
         event: Option<EventType>,
         idempotency_key: Option<String>,
+        ip_address: Option<String>,
     ) -> Result<Self, ValidationError> {
         let idempotency_key = idempotency_key.unwrap_or_else(|| Uuid::new_v4().to_string());
         let created_at = Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
@@ -216,6 +220,7 @@ impl MessageBusMessage {
             idempotency_key,
             instruction_type,
             event,
+            ip_address,
         )?;
 
         MessageBusMessage::new(meta_data, payload)
@@ -241,6 +246,7 @@ mod tests {
             "unique-key-123".to_string(),
             Some(InstructionType::Payment),
             None,
+            None,
         );
         assert!(metadata.is_ok());
     }
@@ -254,6 +260,7 @@ mod tests {
             "unique-key-123".to_string(),
             None,
             None,
+            Some("127.0.0.1".to_string()),
         );
         assert!(metadata.is_err());
     }
@@ -267,6 +274,7 @@ mod tests {
             "unique-key-123".to_string(),
             Some(InstructionType::Payment),
             Some(EventType::NewTransaction),
+            Some("127.0.0.1".to_string()),
         );
         assert!(metadata.is_err());
         if let Err(e) = metadata {
@@ -296,6 +304,7 @@ mod tests {
             Some(InstructionType::Payment),
             None,
             None,
+            Some("127.0.0.1".to_string()),
         );
 
         assert!(message.is_ok());
@@ -324,6 +333,7 @@ mod tests {
             None,
             Some(EventType::NewTransaction),
             None,
+            None,
         );
 
         assert!(message.is_ok());
@@ -349,6 +359,7 @@ mod tests {
             Some(InstructionType::Payment),
             Some(EventType::NewTransaction),
             None,
+            None,
         );
 
         assert!(message.is_err());
@@ -371,6 +382,7 @@ mod tests {
             "test.token".to_string(),
             "key-123".to_string(),
             Some(InstructionType::Payment),
+            None,
             None,
         )
         .unwrap();
@@ -431,6 +443,7 @@ mod tests {
             Some(InstructionType::Payment),
             None,
             None,
+            None,
         );
 
         assert!(message.is_ok());
@@ -452,6 +465,7 @@ mod tests {
             None,
             Some(EventType::NewTransaction),
             None,
+            None,
         );
 
         assert!(message.is_ok());
@@ -471,6 +485,7 @@ mod tests {
             "test.token".to_string(),
             "key-123".to_string(),
             Some(InstructionType::Payment),
+            None,
             None,
         )
         .unwrap();
@@ -496,6 +511,7 @@ mod tests {
             Payload::BankPaymentRequest(payload),
             "test.token.here".to_string(),
             Some(InstructionType::BankPaymentRequest),
+            None,
             None,
             None,
         );
@@ -526,6 +542,7 @@ mod tests {
             Some(InstructionType::ChainPayment),
             None,
             None,
+            Some("127.0.0.1".to_string()),
         );
 
         assert!(message.is_ok());
@@ -550,6 +567,7 @@ mod tests {
             "key-123".to_string(),
             Some(InstructionType::Payment), // Wrong instruction type
             None,
+            None,
         )
         .unwrap();
 
@@ -569,6 +587,7 @@ mod tests {
             None,
             Some(EventType::NewUser),
             None,
+            Some("127.0.0.1".to_string()),
         );
 
         assert!(message.is_ok());
@@ -593,6 +612,7 @@ mod tests {
             None,
             Some(EventType::BankPayment),
             None,
+            Some("127.0.0.1".to_string()),
         );
 
         assert!(message.is_ok());
@@ -618,10 +638,215 @@ mod tests {
             "key-123".to_string(),
             None,
             Some(EventType::Payment), // Wrong event type
+            Some("127.0.0.1".to_string()),
         )
         .unwrap();
 
         let message = MessageBusMessage::new(metadata, Payload::BankPayment(payload));
         assert!(message.is_err());
+    }
+
+    // Tests for ip_address field
+    #[test]
+    fn test_metadata_with_ip_address() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            Some("192.168.1.1".to_string()),
+        );
+        assert!(metadata.is_ok());
+        let meta = metadata.unwrap();
+        assert_eq!(meta.ip_address, Some("192.168.1.1".to_string()));
+    }
+
+    #[test]
+    fn test_metadata_with_ipv6_address() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            Some("2001:0db8:85a3:0000:0000:8a2e:0370:7334".to_string()),
+        );
+        assert!(metadata.is_ok());
+        let meta = metadata.unwrap();
+        assert_eq!(
+            meta.ip_address,
+            Some("2001:0db8:85a3:0000:0000:8a2e:0370:7334".to_string())
+        );
+    }
+
+    #[test]
+    fn test_metadata_without_ip_address() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            None,
+        );
+        assert!(metadata.is_ok());
+        let meta = metadata.unwrap();
+        assert_eq!(meta.ip_address, None);
+    }
+
+    #[test]
+    fn test_message_create_with_ip_address() {
+        let payload = PaymentPayload::new(
+            "P763763453G".to_string(),
+            "EUR".to_string(),
+            "123.00".to_string(),
+            "BANK_MODULR".to_string(),
+            "MYK123344545".to_string(),
+            Some("John Doe".to_string()),
+            Some("GB123266734836738787454".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "BANKING_SERVICE".to_string(),
+            Payload::Payment(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            None,
+            Some("203.0.113.45".to_string()),
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.ip_address, Some("203.0.113.45".to_string()));
+    }
+
+    #[test]
+    fn test_message_create_without_ip_address() {
+        let payload = PaymentPayload::new(
+            "P763763453G".to_string(),
+            "EUR".to_string(),
+            "123.00".to_string(),
+            "BANK_MODULR".to_string(),
+            "MYK123344545".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "BANKING_SERVICE".to_string(),
+            Payload::Payment(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.ip_address, None);
+    }
+
+    #[test]
+    fn test_ip_address_with_localhost() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            None,
+            Some(EventType::Payment),
+            Some("localhost".to_string()),
+        );
+        assert!(metadata.is_ok());
+        let meta = metadata.unwrap();
+        assert_eq!(meta.ip_address, Some("localhost".to_string()));
+    }
+
+    #[test]
+    fn test_ip_address_with_loopback() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            None,
+            Some(EventType::Payment),
+            Some("::1".to_string()),
+        );
+        assert!(metadata.is_ok());
+        let meta = metadata.unwrap();
+        assert_eq!(meta.ip_address, Some("::1".to_string()));
+    }
+
+    #[test]
+    fn test_ip_address_serialization() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            Some("10.0.0.1".to_string()),
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&metadata).unwrap();
+        assert!(serialized.contains("\"ip_address\":\"10.0.0.1\""));
+    }
+
+    #[test]
+    fn test_ip_address_omitted_when_none() {
+        let metadata = MetaData::new(
+            "BANKING_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token.here".to_string(),
+            "unique-key-123".to_string(),
+            Some(InstructionType::Payment),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&metadata).unwrap();
+        // Due to #[serde_with::skip_serializing_none], ip_address should not be in the JSON
+        assert!(!serialized.contains("ip_address"));
+    }
+
+    #[test]
+    fn test_ip_address_deserialization() {
+        let json = r#"{
+            "source": "BANKING_SERVICE",
+            "created_at": "2021-01-01T00:00:00Z",
+            "token": "test.token.here",
+            "idempotency_key": "unique-key-123",
+            "instruction_type": "PAYMENT",
+            "ip_address": "172.16.0.1"
+        }"#;
+
+        let metadata: MetaData = serde_json::from_str(json).unwrap();
+        assert_eq!(metadata.ip_address, Some("172.16.0.1".to_string()));
+    }
+
+    #[test]
+    fn test_ip_address_deserialization_missing_field() {
+        let json = r#"{
+            "source": "BANKING_SERVICE",
+            "created_at": "2021-01-01T00:00:00Z",
+            "token": "test.token.here",
+            "idempotency_key": "unique-key-123",
+            "instruction_type": "PAYMENT"
+        }"#;
+
+        let metadata: MetaData = serde_json::from_str(json).unwrap();
+        assert_eq!(metadata.ip_address, None);
     }
 }
