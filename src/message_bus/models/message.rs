@@ -246,14 +246,16 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
 
         // Extract metadata to determine payload type
         let meta_data: MetaData = serde_json::from_value(
-            value.get("meta_data")
+            value
+                .get("meta_data")
                 .ok_or_else(|| D::Error::missing_field("meta_data"))?
-                .clone()
+                .clone(),
         )
         .map_err(D::Error::custom)?;
 
         // Get the payload JSON value
-        let payload_value = value.get_mut("payload")
+        let payload_value = value
+            .get_mut("payload")
             .ok_or_else(|| D::Error::missing_field("payload"))?
             .take();
 
@@ -265,24 +267,24 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
             } else {
                 // Otherwise deserialize according to instruction type
                 match instruction_type {
-                    InstructionType::Payment => {
-                        Payload::Payment(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    InstructionType::StatusUpdate => {
-                        Payload::StatusUpdate(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    InstructionType::Correction => {
-                        Payload::Correction(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    InstructionType::Transaction => {
-                        Payload::Transaction(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    InstructionType::BankPaymentRequest => {
-                        Payload::BankPaymentRequest(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    InstructionType::ChainPayment => {
-                        Payload::ChainPayment(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
+                    InstructionType::Payment => Payload::Payment(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::StatusUpdate => Payload::StatusUpdate(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::Correction => Payload::Correction(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::Transaction => Payload::Transaction(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::BankPaymentRequest => Payload::BankPaymentRequest(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::ChainPayment => Payload::ChainPayment(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
                 }
             }
         } else if let Some(event) = &meta_data.event {
@@ -292,33 +294,33 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
             } else {
                 // Otherwise deserialize according to event type
                 match event {
-                    EventType::NewTransaction => {
-                        Payload::NewTransaction(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::TransactionStatusUpdate => {
-                        Payload::TransactionStatus(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::Payment => {
-                        Payload::PaymentEvent(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::BankPayment => {
-                        Payload::BankPayment(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::NewProfile => {
-                        Payload::Profile(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::NewUser => {
-                        Payload::NewUser(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::KycEvent => {
-                        Payload::Kyc(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::PasswordResetRequested => {
-                        Payload::PasswordReset(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
-                    EventType::VerificationRequested => {
-                        Payload::VerificationRequested(serde_json::from_value(payload_value).map_err(D::Error::custom)?)
-                    }
+                    EventType::NewTransaction => Payload::NewTransaction(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::TransactionStatusUpdate => Payload::TransactionStatus(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::Payment => Payload::PaymentEvent(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::BankPayment => Payload::BankPayment(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::NewProfile => Payload::Profile(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::NewUser => Payload::NewUser(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::KycEvent => Payload::Kyc(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::PasswordResetRequested => Payload::PasswordReset(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::VerificationRequested => Payload::VerificationRequested(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
                 }
             }
         } else {
@@ -331,10 +333,7 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
             }
         };
 
-        Ok(MessageBusMessage {
-            meta_data,
-            payload,
-        })
+        Ok(MessageBusMessage { meta_data, payload })
     }
 }
 

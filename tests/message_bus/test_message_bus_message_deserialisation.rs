@@ -1,8 +1,8 @@
+use mykobo_rs::message_bus::models::event::*;
+use mykobo_rs::message_bus::models::instruction::*;
 use mykobo_rs::message_bus::{
     EventType, InstructionType, MessageBusMessage, Payload, TransactionType,
 };
-use mykobo_rs::message_bus::models::event::*;
-use mykobo_rs::message_bus::models::instruction::*;
 use pretty_assertions::assert_eq;
 
 /// Test deserialization of MessageBusMessage with Payment payload
@@ -31,8 +31,14 @@ fn test_deserialize_payment_message() {
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
     assert_eq!(message.meta_data.source, "BANKING_SERVICE");
-    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::Payment));
-    assert_eq!(message.meta_data.ip_address, Some("192.168.1.1".to_string()));
+    assert_eq!(
+        message.meta_data.instruction_type,
+        Some(InstructionType::Payment)
+    );
+    assert_eq!(
+        message.meta_data.ip_address,
+        Some("192.168.1.1".to_string())
+    );
 
     match message.payload {
         Payload::Payment(payload) => {
@@ -99,13 +105,19 @@ fn test_deserialize_status_update_message() {
 
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
-    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::StatusUpdate));
+    assert_eq!(
+        message.meta_data.instruction_type,
+        Some(InstructionType::StatusUpdate)
+    );
 
     match message.payload {
         Payload::StatusUpdate(payload) => {
             assert_eq!(payload.reference, "REF123");
             assert_eq!(payload.status, "COMPLETED");
-            assert_eq!(payload.message, Some("Payment processed successfully".to_string()));
+            assert_eq!(
+                payload.message,
+                Some("Payment processed successfully".to_string())
+            );
             assert_eq!(payload.transaction_id, Some("TXN456".to_string()));
         }
         _ => panic!("Expected StatusUpdate payload"),
@@ -134,7 +146,10 @@ fn test_deserialize_correction_message() {
 
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
-    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::Correction));
+    assert_eq!(
+        message.meta_data.instruction_type,
+        Some(InstructionType::Correction)
+    );
 
     match message.payload {
         Payload::Correction(payload) => {
@@ -182,7 +197,10 @@ fn test_roundtrip_transaction_message() {
     let json = serde_json::to_string(&message).unwrap();
     let deserialized: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
-    assert_eq!(deserialized.meta_data.instruction_type, Some(InstructionType::Transaction));
+    assert_eq!(
+        deserialized.meta_data.instruction_type,
+        Some(InstructionType::Transaction)
+    );
 
     match deserialized.payload {
         Payload::Transaction(payload) => {
@@ -218,7 +236,10 @@ fn test_deserialize_bank_payment_request_message() {
 
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
-    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::BankPaymentRequest));
+    assert_eq!(
+        message.meta_data.instruction_type,
+        Some(InstructionType::BankPaymentRequest)
+    );
 
     match message.payload {
         Payload::BankPaymentRequest(payload) => {
@@ -259,8 +280,14 @@ fn test_roundtrip_chain_payment_message() {
     let json = serde_json::to_string(&message).unwrap();
     let deserialized: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
-    assert_eq!(deserialized.meta_data.instruction_type, Some(InstructionType::ChainPayment));
-    assert_eq!(deserialized.meta_data.ip_address, Some("10.0.0.1".to_string()));
+    assert_eq!(
+        deserialized.meta_data.instruction_type,
+        Some(InstructionType::ChainPayment)
+    );
+    assert_eq!(
+        deserialized.meta_data.ip_address,
+        Some("10.0.0.1".to_string())
+    );
 
     match deserialized.payload {
         Payload::ChainPayment(payload) => {
@@ -332,7 +359,10 @@ fn test_roundtrip_transaction_status_event_message() {
     let json = serde_json::to_string(&message).unwrap();
     let deserialized: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
-    assert_eq!(deserialized.meta_data.event, Some(EventType::TransactionStatusUpdate));
+    assert_eq!(
+        deserialized.meta_data.event,
+        Some(EventType::TransactionStatusUpdate)
+    );
 
     match deserialized.payload {
         Payload::TransactionStatus(payload) => {
@@ -403,14 +433,20 @@ fn test_roundtrip_bank_payment_event_message() {
     let deserialized: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
     assert_eq!(deserialized.meta_data.event, Some(EventType::BankPayment));
-    assert_eq!(deserialized.meta_data.ip_address, Some("172.16.0.1".to_string()));
+    assert_eq!(
+        deserialized.meta_data.ip_address,
+        Some("172.16.0.1".to_string())
+    );
 
     match deserialized.payload {
         Payload::BankPayment(payload) => {
             assert_eq!(payload.transaction_id, "TX12345");
             assert_eq!(payload.status, "COMPLETED");
             assert_eq!(payload.reference, "REF789");
-            assert_eq!(payload.message, Some("Payment processed successfully".to_string()));
+            assert_eq!(
+                payload.message,
+                Some("Payment processed successfully".to_string())
+            );
         }
         _ => panic!("Expected BankPayment payload"),
     }
@@ -449,7 +485,9 @@ fn test_deserialize_profile_event_message() {
 /// Test roundtrip serialization/deserialization with NewUser event payload
 #[test]
 fn test_roundtrip_new_user_event_message() {
-    let payload = NewUserEventPayload::new("New User Registration".to_string(), "USER456".to_string()).unwrap();
+    let payload =
+        NewUserEventPayload::new("New User Registration".to_string(), "USER456".to_string())
+            .unwrap();
 
     let message = MessageBusMessage::create(
         "USER_SERVICE".to_string(),
@@ -535,7 +573,10 @@ fn test_deserialize_password_reset_event_message() {
 
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
-    assert_eq!(message.meta_data.event, Some(EventType::PasswordResetRequested));
+    assert_eq!(
+        message.meta_data.event,
+        Some(EventType::PasswordResetRequested)
+    );
 
     match message.payload {
         Payload::PasswordReset(payload) => {
@@ -570,7 +611,10 @@ fn test_roundtrip_verification_requested_event_message() {
     let json = serde_json::to_string(&message).unwrap();
     let deserialized: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
-    assert_eq!(deserialized.meta_data.event, Some(EventType::VerificationRequested));
+    assert_eq!(
+        deserialized.meta_data.event,
+        Some(EventType::VerificationRequested)
+    );
 
     match deserialized.payload {
         Payload::VerificationRequested(payload) => {
@@ -597,7 +641,10 @@ fn test_deserialize_raw_payload_message() {
 
     let message: MessageBusMessage = serde_json::from_str(json).unwrap();
 
-    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::Payment));
+    assert_eq!(
+        message.meta_data.instruction_type,
+        Some(InstructionType::Payment)
+    );
 
     match message.payload {
         Payload::Raw(data) => {
@@ -845,7 +892,10 @@ fn test_roundtrip_complex_transaction_message() {
     let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
 
     assert_eq!(deserialized.meta_data.source, "COMPLEX_SERVICE");
-    assert_eq!(deserialized.meta_data.ip_address, Some("192.168.100.200".to_string()));
+    assert_eq!(
+        deserialized.meta_data.ip_address,
+        Some("192.168.100.200".to_string())
+    );
 
     match deserialized.payload {
         Payload::Transaction(payload) => {
@@ -853,7 +903,10 @@ fn test_roundtrip_complex_transaction_message() {
             assert_eq!(payload.last_name, "García-Rodríguez");
             assert_eq!(payload.transaction_type, TransactionType::Withdraw);
             assert_eq!(payload.value, "1234.56");
-            assert_eq!(payload.payee, Some("IBAN:GB29NWBK60161331926819".to_string()));
+            assert_eq!(
+                payload.payee,
+                Some("IBAN:GB29NWBK60161331926819".to_string())
+            );
         }
         _ => panic!("Expected Transaction payload"),
     }
@@ -887,7 +940,8 @@ fn test_all_instruction_payloads_roundtrip() {
     let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
     // StatusUpdate
-    let status = StatusUpdatePayload::new("REF".to_string(), "COMPLETED".to_string(), None, None).unwrap();
+    let status =
+        StatusUpdatePayload::new("REF".to_string(), "COMPLETED".to_string(), None, None).unwrap();
     let msg = MessageBusMessage::create(
         "SRC".to_string(),
         Payload::StatusUpdate(status),
