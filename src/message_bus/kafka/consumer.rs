@@ -1,7 +1,7 @@
 use crate::message_bus::kafka::models::IncomingMessage;
 use crate::models::error::{KafkaError, KafkaResult};
 use futures::StreamExt;
-use log::{debug, error, warn};
+use log::{debug, error, info, warn};
 use rdkafka::config::RDKafkaLogLevel;
 use rdkafka::consumer::stream_consumer::StreamConsumer;
 use rdkafka::consumer::{CommitMode, Consumer};
@@ -74,7 +74,7 @@ where
                         .await
                     {
                         Ok(_) => {
-                            debug!("Message processed successfully, committing offset");
+                            info!("Message processed successfully, committing offset [{}]", message.offset());
                             self.consumer
                                 .commit_message(&message, CommitMode::Async)
                                 .map_err(|e| KafkaError::MessageDelivery(e.to_string()))?;
