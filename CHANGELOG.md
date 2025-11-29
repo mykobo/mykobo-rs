@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2025-11-29
+
+### ⛰️  Features
+
+- Support ip address in metadata
+
 ## [1.0.9] - 2025-11-25
 
 ### 🐛 Bug Fixes
 
 - Deserialisation issues
 - Deserialisation issues
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.9
 
 ## [1.0.8] - 2025-11-24
 
