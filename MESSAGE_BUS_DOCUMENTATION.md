@@ -20,11 +20,12 @@ The MYKOBO message bus system provides a unified way to send instructions and ev
 ### Key Features
 
 - **Type-safe messaging**: Strict validation ensures instruction/event types match their payloads
+- **Intelligent deserialization**: Custom deserializer uses metadata type hints to correctly deserialize payloads, eliminating ambiguity
 - **Flexible deserialization**: All payloads support `From<String>` for easy JSON conversion
 - **Raw payload support**: Send arbitrary data without strict typing when needed
 - **Validation**: Required field validation at creation time
-- **Metadata tracking**: Built-in support for idempotency, timestamps, and source tracking
-- **Comprehensive coverage**: 6 instruction types and 8 event types fully supported
+- **Metadata tracking**: Built-in support for idempotency, timestamps, source tracking, and IP addresses
+- **Comprehensive coverage**: 6 instruction types and 9 event types fully supported
 
 ## Quick Reference
 
@@ -46,6 +47,7 @@ The MYKOBO message bus system provides a unified way to send instructions and ev
 | NewTransaction | `NEW_TRANSACTION` | `NewTransactionEventPayload` | Notify new transaction created |
 | TransactionStatusUpdate | `TRANSACTION_STATUS_UPDATE` | `TransactionStatusEventPayload` | Notify transaction status changed |
 | Payment | `PAYMENT` | `PaymentEventPayload` | Notify payment received (bank/chain) |
+| BankPayment | `BANK_PAYMENT` | `BankPaymentEventPayload` | Notify bank payment status changes |
 | NewProfile | `NEW_PROFILE` | `ProfileEventPayload` | Notify new profile created |
 | NewUser | `NEW_USER` | `NewUserEventPayload` | Notify new user account created |
 | KycEvent | `KYC_EVENT` | `KycEventPayload` | Notify KYC status changes |
@@ -66,12 +68,14 @@ pub struct MetaData {
     pub idempotency_key: String,     // Unique identifier for deduplication
     pub instruction_type: Option<InstructionType>,  // Set for instructions
     pub event: Option<EventType>,    // Set for events
+    pub ip_address: Option<String>,  // Optional IP address (IPv4 or IPv6)
 }
 ```
 
 **Validation Rules:**
 - Either `instruction_type` OR `event` must be set (not both, not neither)
 - All string fields must be non-empty
+- `ip_address` is optional and can contain IPv4 or IPv6 addresses
 - Automatically generated if using `MessageBusMessage::create()`
 
 ### Payload
@@ -92,6 +96,7 @@ pub enum Payload {
     NewTransaction(NewTransactionEventPayload),
     TransactionStatus(TransactionStatusEventPayload),
     PaymentEvent(PaymentEventPayload),
+    BankPayment(BankPaymentEventPayload),
     Profile(ProfileEventPayload),
     NewUser(NewUserEventPayload),
     Kyc(KycEventPayload),
@@ -101,6 +106,54 @@ pub enum Payload {
     // Generic payload
     Raw(String),
 }
+```
+
+### Deserialization
+
+**Type-Aware Deserialization:** `MessageBusMessage` uses a custom deserializer that reads the `instruction_type` or `event` field from metadata to determine which payload variant to deserialize into. This eliminates ambiguity when payloads have similar field structures.
+
+**How it works:**
+1. The deserializer first extracts and deserializes the `meta_data` field
+2. It reads the `instruction_type` or `event` from the metadata
+3. Based on this type hint, it deserializes the `payload` into the correct variant
+4. For raw string payloads, it checks if the payload is a plain string before attempting structured deserialization
+
+**Benefits:**
+- Reliable deserialization even when payload types have overlapping fields
+- No ambiguity between similar payloads (e.g., `TransactionPayload` vs `StatusUpdatePayload`)
+- Works seamlessly with both hand-written JSON and programmatically generated messages
+- Maintains backward compatibility with existing message formats
+
+**Example:**
+```rust
+// This JSON will correctly deserialize as a Transaction payload
+// because instruction_type="TRANSACTION" guides the deserializer
+let json = r#"{
+    "meta_data": {
+        "source": "SERVICE",
+        "created_at": "2021-01-01T00:00:00Z",
+        "token": "token",
+        "idempotency_key": "key-123",
+        "instruction_type": "TRANSACTION"
+    },
+    "payload": {
+        "external_reference": "EXT123",
+        "source": "BANKING",
+        "reference": "REF789",
+        "first_name": "John",
+        "last_name": "Doe",
+        "transaction_type": "DEPOSIT",
+        "status": "PENDING",
+        "incoming_currency": "EUR",
+        "outgoing_currency": "USD",
+        "value": "100.00",
+        "fee": "1.50",
+        "payer": "Account 123"
+    }
+}"#;
+
+let message: MessageBusMessage = serde_json::from_str(json)?;
+// Correctly deserialized as Payload::Transaction variant
 ```
 
 ## Instruction Types
@@ -1098,9 +1151,65 @@ mod tests {
             Some(InstructionType::Payment),
             None,
             None,
+            None,
         );
 
         assert!(message.is_ok());
+    }
+}
+```
+
+### Deserialization Testing
+
+The library includes comprehensive deserialization tests to ensure all payload types can be correctly serialized and deserialized. Tests are located in `tests/message_bus/test_message_bus_message_deserialisation.rs`.
+
+**Test Coverage:**
+- ✅ All 6 instruction payload types
+- ✅ All 9 event payload types
+- ✅ Raw string payloads
+- ✅ Optional fields (ip_address, payer_name, etc.)
+- ✅ Edge cases (IPv6 addresses, Unicode characters, special characters)
+- ✅ Error cases (malformed JSON, missing fields, validation failures)
+- ✅ Roundtrip serialization/deserialization for all types
+
+**Example Deserialization Test:**
+```rust
+#[test]
+fn test_deserialize_transaction_message() {
+    let json = r#"{
+        "meta_data": {
+            "source": "TRANSACTION_SERVICE",
+            "created_at": "2021-04-01T00:00:00Z",
+            "token": "txn.token",
+            "idempotency_key": "txn-key-111",
+            "instruction_type": "TRANSACTION"
+        },
+        "payload": {
+            "external_reference": "EXT123",
+            "source": "BANKING_SERVICE",
+            "reference": "REF789",
+            "first_name": "John",
+            "last_name": "Doe",
+            "transaction_type": "DEPOSIT",
+            "status": "PENDING",
+            "incoming_currency": "EUR",
+            "outgoing_currency": "USD",
+            "value": "100.00",
+            "fee": "1.50",
+            "payer": "Bank Account 123"
+        }
+    }"#;
+
+    let message: MessageBusMessage = serde_json::from_str(json).unwrap();
+
+    // Verify correct deserialization
+    assert_eq!(message.meta_data.instruction_type, Some(InstructionType::Transaction));
+    match message.payload {
+        Payload::Transaction(payload) => {
+            assert_eq!(payload.first_name, "John");
+            assert_eq!(payload.transaction_type, TransactionType::Deposit);
+        }
+        _ => panic!("Expected Transaction payload"),
     }
 }
 ```
@@ -1131,6 +1240,7 @@ The following table shows which payload types are valid for each instruction/eve
 | `NewTransaction` | `Payload::NewTransaction(NewTransactionEventPayload)` | created_at, kind, reference, source |
 | `TransactionStatusUpdate` | `Payload::TransactionStatus(TransactionStatusEventPayload)` | reference, status |
 | `Payment` | `Payload::PaymentEvent(PaymentEventPayload)` | external_reference, source |
+| `BankPayment` | `Payload::BankPayment(BankPaymentEventPayload)` | transaction_id, status, reference |
 | `NewProfile` | `Payload::Profile(ProfileEventPayload)` | title, identifier |
 | `NewUser` | `Payload::NewUser(NewUserEventPayload)` | title, identifier |
 | `KycEvent` | `Payload::Kyc(KycEventPayload)` | title, identifier (review_result required if review_status="completed") |
@@ -1148,7 +1258,8 @@ The following table shows which payload types are valid for each instruction/eve
 
 For issues, questions, or contributions, please refer to the main project repository.
 
-**Version:** 0.1.0
-**Last Updated:** 2025-11-16
-**Total Message Types:** 6 Instructions + 8 Events = 14 Types
-**Total Payload Variants:** 15 (14 typed + 1 raw)
+**Version:** 1.0.10
+**Last Updated:** 2025-12-01
+**Total Message Types:** 6 Instructions + 9 Events = 15 Types
+**Total Payload Variants:** 16 (15 typed + 1 raw)
+**Test Coverage:** 156 tests (93 unit + 62 integration + 27 deserialization)
