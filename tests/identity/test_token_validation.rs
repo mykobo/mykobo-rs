@@ -1,8 +1,11 @@
-use jsonwebtoken::{encode, EncodingKey, Header, dangerous::insecure_decode};
+use jsonwebtoken::{dangerous::insecure_decode, encode, EncodingKey, Header};
 use mykobo_rs::identity::{models::ServiceToken, IdentityServiceClient};
 use serde_json::json;
 use serial_test::serial;
-use std::{env, time::{SystemTime, UNIX_EPOCH}};
+use std::{
+    env,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 /// Helper function to generate a JWT token with a specific expiration time
 fn generate_test_token(exp_offset_seconds: i64) -> String {
@@ -149,7 +152,10 @@ fn test_token_validation_with_token_expiring_soon() {
         .as_secs() as usize;
 
     assert!(exp > current_time, "Token should still be valid");
-    assert!(exp - current_time <= 30, "Token should expire within 30 seconds");
+    assert!(
+        exp - current_time <= 30,
+        "Token should expire within 30 seconds"
+    );
 }
 
 #[test]

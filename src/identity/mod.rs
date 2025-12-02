@@ -79,7 +79,10 @@ impl IdentityServiceClient {
                         .as_secs() as usize;
 
                     if token_data.claims.exp <= current_time {
-                        warn!("Token has expired. Expiration: {}, Current: {}", token_data.claims.exp, current_time);
+                        warn!(
+                            "Token has expired. Expiration: {}, Current: {}",
+                            token_data.claims.exp, current_time
+                        );
                         false
                     } else {
                         true

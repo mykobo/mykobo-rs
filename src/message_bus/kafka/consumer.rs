@@ -74,7 +74,10 @@ where
                         .await
                     {
                         Ok(_) => {
-                            info!("Message processed successfully, committing offset [{}]", message.offset());
+                            info!(
+                                "Message processed successfully, committing offset [{}]",
+                                message.offset()
+                            );
                             self.consumer
                                 .commit_message(&message, CommitMode::Async)
                                 .map_err(|e| KafkaError::MessageDelivery(e.to_string()))?;
