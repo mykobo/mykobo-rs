@@ -57,7 +57,7 @@ impl IdentityServiceClient {
         &self.credentials
     }
 
-    fn set_token(&mut self, token: Option<ServiceToken>) {
+    pub fn set_token(&mut self, token: Option<ServiceToken>) {
         self.token = token;
     }
 
@@ -72,7 +72,19 @@ impl IdentityServiceClient {
     fn token_is_valid(&self) -> bool {
         if let Some(service_token) = &self.get_token() {
             match insecure_decode::<TokenClaims>(service_token.token.as_str()) {
-                Ok(_) => true,
+                Ok(token_data) => {
+                    let current_time = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs() as usize;
+
+                    if token_data.claims.exp <= current_time {
+                        warn!("Token has expired. Expiration: {}, Current: {}", token_data.claims.exp, current_time);
+                        false
+                    } else {
+                        true
+                    }
+                }
                 Err(e) => {
                     warn!("Token is invalid {e:?}");
                     false
