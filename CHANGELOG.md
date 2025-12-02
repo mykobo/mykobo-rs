@@ -2,12 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2025-12-02
+
+### 🐛 Bug Fixes
+
+- Check token expiry properly
+- Make sure we check token expiry
+
+### ⚙️ Miscellaneous Tasks
+
+- Improve documentation for metadata et al
+
 ## [1.0.12] - 2025-11-29
 
 ### ⚙️ Miscellaneous Tasks
 
 - Add client id to kafka client
 - Add client id to kafka client
+- Release mykobo-rs version 1.0.12
 
 ## [1.0.11] - 2025-11-29
 
