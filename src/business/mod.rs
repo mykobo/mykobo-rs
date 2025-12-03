@@ -41,6 +41,51 @@ pub fn whitelisted_countries() -> HashMap<&'static str, &'static str> {
     map
 }
 
+pub fn whitelisted_countries_risk() -> HashMap<&'static str, (&'static str, &'static str)> {
+    let mut map = HashMap::new();
+    map.insert("AU", ("Australia", "LOW"));
+    map.insert("AR", ("Argentina", "LOW"));
+    map.insert("AT", ("Austria", "LOW"));
+    map.insert("BE", ("Belgium", "LOW"));
+    map.insert("BG", ("Bulgaria", "MEDIUM"));
+    map.insert("CA", ("Canada", "LOW"));
+    map.insert("HR", ("Croatia", "MEDIUM"));
+    map.insert("CZ", ("Czech Republic", "MEDIUM"));
+    map.insert("DK", ("Denmark", "LOW"));
+    map.insert("EE", ("Estonia", "LOW"));
+    map.insert("FI", ("Finland", "LOW"));
+    map.insert("FR", ("France", "LOW"));
+    map.insert("DE", ("Germany", "LOW"));
+    map.insert("GR", ("Greece", "LOW"));
+    map.insert("GI", ("Gibraltar", "LOW"));
+    map.insert("HU", ("Hungary", "MEDIUM"));
+    map.insert("IS", ("Iceland", "LOW"));
+    map.insert("IE", ("Ireland", "LOW"));
+    map.insert("IT", ("Italy", "LOW"));
+    map.insert("LV", ("Latvia", "LOW"));
+    map.insert("LI", ("Liechtenstein", "LOW"));
+    map.insert("LT", ("Lithuania", "LOW"));
+    map.insert("LU", ("Luxembourg", "LOW"));
+    map.insert("ME", ("Montenegro", "LOW"));
+    map.insert("NL", ("Netherlands", "LOW"));
+    map.insert("NZ", ("New Zealand", "LOW"));
+    map.insert("NO", ("Norway", "LOW"));
+    map.insert("PL", ("Poland", "LOW"));
+    map.insert("PT", ("Portugal", "LOW"));
+    map.insert("RO", ("Romania", "MEDIUM"));
+    map.insert("SK", ("Slovakia", "MEDIUM"));
+    map.insert("SI", ("Slovenia", "MEDIUM"));
+    map.insert("ES", ("Spain", "LOW"));
+    map.insert("SE", ("Sweden", "LOW"));
+    map.insert("CH", ("Switzerland", "LOW"));
+    map.insert("US", ("United States", "LOW"));
+    map
+}
+
+pub fn get_risk_jurisdiction(country_code: &str) -> Option<String> {
+    whitelisted_countries_risk().get(country_code).map(|(_, risk)| risk.to_string())
+}
+
 pub fn blacklisted_countries() -> HashMap<&'static str, &'static str> {
     let mut map = HashMap::new();
     map.insert("AF", "Afghanistan");
