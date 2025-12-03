@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.14] - 2025-12-03
+
+### ⛰️  Features
+
+- Add risk jurisdictions to whitelist
+
 ## [1.0.13] - 2025-12-02
 
 ### 🐛 Bug Fixes
@@ -12,6 +18,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Improve documentation for metadata et al
+- Release mykobo-rs version 1.0.13
 
 ## [1.0.12] - 2025-11-29
 
