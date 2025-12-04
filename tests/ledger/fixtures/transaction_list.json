@@ -1,0 +1,50 @@
+{
+  "transactions": [
+    {
+      "id": "urn:tx:366a0c79997641a59d6298e29bfcec17",
+      "external_reference": "770e1636-bf8e-4bf6-bf02-850b827da63a",
+      "source": "ANCHOR_MYKOBO",
+      "reference": "MYK1724666903",
+      "transaction_type": "DEPOSIT",
+      "status": "PENDING_CHAIN",
+      "incoming_currency": "EUR",
+      "outgoing_currency": "EURC",
+      "requested_amount": 20,
+      "expected_amount_in": 20,
+      "amount_out": 17.65,
+      "amount_in": 20,
+      "fee": 2.35,
+      "payer": "urn:usrp:b26734fce23e450b87368b22cf56e091",
+      "payee": null,
+      "created_at": "2024-08-26T13:08:23",
+      "updated_at": "2025-08-17T17:54:27.685363",
+      "requester_first_name": "UNKNOWN",
+      "requester_last_name": "UNKNOWN",
+      "originating_ip_address": null
+    },
+    {
+      "id": "urn:tx:477b1d8aaa8752b6ae7399f3acfded28",
+      "external_reference": null,
+      "source": "WALLET_SERVICE",
+      "reference": "MYK1724666904",
+      "transaction_type": "WITHDRAWAL",
+      "status": "COMPLETED",
+      "incoming_currency": "EURC",
+      "outgoing_currency": "EUR",
+      "requested_amount": 50.5,
+      "expected_amount_in": 50.5,
+      "amount_out": 48.15,
+      "amount_in": 50.5,
+      "fee": 2.35,
+      "payer": null,
+      "payee": "urn:usrp:c37845gdf34f561c98479c33dg67f192",
+      "created_at": "2024-08-27T10:15:45",
+      "updated_at": "2024-08-27T10:20:12.123456",
+      "requester_first_name": "John",
+      "requester_last_name": "Doe",
+      "originating_ip_address": "192.168.1.100"
+    }
+  ],
+  "page": 1,
+  "limit": 10
+}

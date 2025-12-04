@@ -1,0 +1,56 @@
+{
+  "transaction": {
+    "id": "urn:tx:366a0c79997641a59d6298e29bfcec17",
+    "external_reference": "770e1636-bf8e-4bf6-bf02-850b827da63a",
+    "source": "ANCHOR_MYKOBO",
+    "reference": "MYK1724666903",
+    "transaction_type": "DEPOSIT",
+    "status": "PENDING_CHAIN",
+    "incoming_currency": "EUR",
+    "outgoing_currency": "EURC",
+    "requested_amount": 20,
+    "expected_amount_in": 20,
+    "amount_out": 17.65,
+    "amount_in": 20,
+    "fee": 2.35,
+    "payer": "urn:usrp:b26734fce23e450b87368b22cf56e091",
+    "payee": null,
+    "created_at": "2024-08-26T13:08:23",
+    "updated_at": "2025-08-17T17:54:27.685363",
+    "requester_first_name": "UNKNOWN",
+    "requester_last_name": "UNKNOWN",
+    "originating_ip_address": null
+  },
+  "events": [
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu:95e658e95d864afc991a0f574fe08b15",
+        "reference": "MYK1724666903",
+        "status": "READY_TO_FULFILL",
+        "message": "TX ready to fulfill",
+        "created_at": "2025-08-17T18:38:50",
+        "applied_at": "2025-08-17T17:43:32.014020"
+      }
+    },
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu:d54c26d79f2a4469b86727fed6f96e31",
+        "reference": "MYK1724666903",
+        "status": "APPROVED",
+        "message": "Transaction has passed all compliance checks",
+        "created_at": "2025-08-17T17:43:37.216778",
+        "applied_at": "2025-08-17T17:54:17.800926"
+      }
+    },
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu:33605448d7444b78a350800f20ad4582",
+        "reference": "MYK1724666903",
+        "status": "PENDING_CHAIN",
+        "message": "Message sent to chain services for fulfillment",
+        "created_at": "2025-08-17T17:54:17.823209",
+        "applied_at": "2025-08-18T17:26:30"
+      }
+    }
+  ]
+}

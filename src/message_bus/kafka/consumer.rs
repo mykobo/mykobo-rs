@@ -47,7 +47,6 @@ where
             .set("sasl.mechanisms", "PLAIN")
             .set("sasl.username", sasl_username)
             .set("sasl.password", sasl_password)
-            .set("retries", "3")
             .set_log_level(RDKafkaLogLevel::Info)
             .create()
             .map_err(|e| KafkaError::ClientCreation(e.to_string()))?;

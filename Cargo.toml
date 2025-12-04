@@ -22,6 +22,7 @@ tokio = { version = "1.48.0" }
 uuid = { version = "1.18.1", features = ["v4"] }
 thiserror = "2.0.17"
 serde_with = "3.15.1"
+bigdecimal = { version = "0.4.9" , features = ["serde", "serde-json"]}
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"
