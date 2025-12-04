@@ -145,7 +145,10 @@ fn test_deserialise_transaction_compliance_events() {
     // Verify all compliance checks are present and true
     assert_eq!(compliance_events.len(), 6);
     assert_eq!(compliance_events.get("NAME_VERIFIER"), Some(&true));
-    assert_eq!(compliance_events.get("FINAL_APPROVAL_VERIFIER"), Some(&true));
+    assert_eq!(
+        compliance_events.get("FINAL_APPROVAL_VERIFIER"),
+        Some(&true)
+    );
     assert_eq!(compliance_events.get("GEOLOCATION_VERIFIER"), Some(&true));
     assert_eq!(
         compliance_events.get("ADDRESS_SCREENING_VERIFIER"),

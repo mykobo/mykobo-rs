@@ -83,7 +83,9 @@ pub fn whitelisted_countries_risk() -> HashMap<&'static str, (&'static str, &'st
 }
 
 pub fn get_risk_jurisdiction(country_code: &str) -> Option<String> {
-    whitelisted_countries_risk().get(country_code).map(|(_, risk)| risk.to_string())
+    whitelisted_countries_risk()
+        .get(country_code)
+        .map(|(_, risk)| risk.to_string())
 }
 
 pub fn blacklisted_countries() -> HashMap<&'static str, &'static str> {

@@ -1,11 +1,11 @@
 mod anchor;
 mod business;
 mod identity;
+mod ledger;
 mod message_bus;
 mod models;
 mod sumsub;
 mod wallets;
-mod ledger;
 
 use std::fs;
 
