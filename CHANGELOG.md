@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.15] - 2025-12-04
+
+### ⛰️  Features
+
+- Add ledger support
+
 ## [1.0.14] - 2025-12-03
 
 ### ⛰️  Features
 
 - Add risk jurisdictions to whitelist
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.14
 
 ## [1.0.13] - 2025-12-02
 
