@@ -1,5 +1,6 @@
 pub mod models;
 
+use crate::identity::models::response::UserRiskProfileResponse;
 use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use jsonwebtoken::dangerous::insecure_decode;
@@ -332,5 +333,17 @@ impl IdentityServiceClient {
             .await;
 
         parse_response::<NewDocumentResponse>(response).await
+    }
+
+    pub async fn get_risk_score(
+        &mut self,
+        id: &str,
+        token: &str,
+    ) -> Result<UserRiskProfileResponse, ServiceError> {
+        let mut h = generate_headers(None, None);
+        h.insert(AUTHORIZATION, format!("Bearer {token}").parse().unwrap());
+        let url = format!("{}/user/profile/{id}/risk_profile", self.host);
+        let response = self.client.get(url).headers(h).send().await;
+        parse_response::<UserRiskProfileResponse>(response).await
     }
 }

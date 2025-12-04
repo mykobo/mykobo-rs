@@ -152,3 +152,32 @@ pub struct NewDocumentResponse {
     pub reject_reason: Option<String>,
     pub id: String,
 }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct GroupedIndicator {
+    pub score: f64,
+    pub breakdown: std::collections::HashMap<String, f64>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct RiskScoreBreakdown {
+    pub total_score: f64,
+    pub verification: std::collections::HashMap<String, f64>,
+    pub source_of_funds: Option<GroupedIndicator>,
+    pub country_risk_jurisdiction: Option<GroupedIndicator>,
+    pub expected_volume: Option<GroupedIndicator>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct UserRiskScoreHistory {
+    pub id: String,
+    pub profile_id: String,
+    pub score: f64,
+    pub created_at: NaiveDateTime,
+}
+#[derive(Debug, Deserialize)]
+pub struct UserRiskProfileResponse {
+    pub risk_score: f64,
+    pub break_down: RiskScoreBreakdown,
+    pub latest_score_history: Option<UserRiskScoreHistory>,
+}

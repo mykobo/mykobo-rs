@@ -1,6 +1,7 @@
 use crate::read_file;
 use mykobo_rs::identity::models::{CustomerResponse, ServiceToken, UserKycStatusResponse};
 use pretty_assertions::assert_eq;
+use mykobo_rs::identity::models::response::UserRiskProfileResponse;
 
 #[test]
 fn test_deserialise_new_customer_response() {
@@ -60,4 +61,15 @@ fn test_deserialise_identity_response() {
     assert!(completed.kyc_status.is_some_and(|k| {
         k.review_status == *"completed" && k.review_result == Some("GREEN".to_string())
     }))
+}
+
+#[test]
+fn test_deserialise_identity_risk_response() {
+    let risk_score_file = read_file("tests/stubs/identity_user_risk_score.json");
+    let user_risk_score = serde_json::from_str(&risk_score_file);
+    assert!(user_risk_score.is_ok());
+    let profile: UserRiskProfileResponse = user_risk_score.unwrap();
+    assert!(profile
+        .latest_score_history
+        .is_some_and(|k| k.score == 10.5));
 }
