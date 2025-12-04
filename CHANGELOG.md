@@ -2,11 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.16] - 2025-12-04
+
+### ⛰️  Features
+
+- Add ledger support
+- Add ledger support
+
 ## [1.0.15] - 2025-12-04
 
 ### ⛰️  Features
 
 - Add ledger support
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.15
 
 ## [1.0.14] - 2025-12-03
 
