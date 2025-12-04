@@ -1,7 +1,7 @@
 use crate::read_file;
+use mykobo_rs::identity::models::response::UserRiskProfileResponse;
 use mykobo_rs::identity::models::{CustomerResponse, ServiceToken, UserKycStatusResponse};
 use pretty_assertions::assert_eq;
-use mykobo_rs::identity::models::response::UserRiskProfileResponse;
 
 #[test]
 fn test_deserialise_new_customer_response() {
