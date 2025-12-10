@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.18] - 2025-12-10
+
+### 🐛 Bug Fixes
+
+- Increase timeouts for producer
+
 ## [1.0.17] - 2025-12-04
 
 ### ⛰️  Features
 
 - Add risk score endpoint to identity
 - Add risk score endpoint to identity
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.17
 
 ## [1.0.16] - 2025-12-04
 
