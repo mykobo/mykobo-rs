@@ -22,6 +22,8 @@ impl EventProducer {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", brokers)
             .set("message.timeout.ms", timeout_in_secs.to_string())
+            .set("request.timeout.ms", 30000.to_string())
+            .set("request.timeout.ms", 60000.to_string())
             .set("compression.type", "gzip")
             .set("retries", "3")
             .set("retry.backoff.ms", "500")
