@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.19] - 2025-12-10
+
+### 🐛 Bug Fixes
+
+- Increase all timeouts
+
 ## [1.0.18] - 2025-12-10
 
 ### 🐛 Bug Fixes
 
 - Increase timeouts for producer
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.18
 
 ## [1.0.17] - 2025-12-04
 
