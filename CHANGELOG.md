@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.20] - 2025-12-13
+
+### ⛰️  Features
+
+- Add transaction details to ledger sdk
+
 ## [1.0.19] - 2025-12-10
 
 ### 🐛 Bug Fixes
 
 - Increase all timeouts
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.19
 
 ## [1.0.18] - 2025-12-10
 
