@@ -12,9 +12,10 @@ use crate::{
 };
 
 use models::{
-    ComplianceEventsResponse, TransactionDetailsResponse, TransactionFilterRequest,
+    ComplianceEventsResponse, TransactionResponse, TransactionFilterRequest,
     TransactionListResponse, TransactionStatusesResponse,
 };
+use crate::ledger::models::response::TransactionDetailsResponse;
 
 #[derive(Clone)]
 pub struct LedgerServiceClient {
@@ -36,13 +37,12 @@ impl LedgerServiceClient {
         }
     }
 
-    /**
-    Get a list of transactions with a set of filter options
-    # Arguments
-    * `token` - Authentication token
-    * `params` - Transaction filter parameters including sources, transaction_types,
-    *            statuses, currencies, date ranges, payee, payer, and pagination
-    **/
+    /// Get a list of transactions with a set of filter options
+    ///
+    /// # Arguments
+    /// * `token` - Authentication token
+    /// * `params` - Transaction filter parameters including sources, transaction_types,
+    ///              statuses, currencies, date ranges, payee, payer, and pagination
     pub async fn transaction_list(
         &self,
         token: Option<ServiceToken>,
@@ -87,12 +87,37 @@ impl LedgerServiceClient {
         parse_response::<TransactionStatusesResponse>(response).await
     }
 
-    /// Get transaction details by reference
+    /// Get a single standalone transaction by reference
     ///
     /// # Arguments
     /// * `token` - Authentication token
     /// * `reference` - Transaction reference
     pub async fn get_transaction_by_reference(
+        &self,
+        token: Option<ServiceToken>,
+        reference: &str,
+    ) -> Result<TransactionResponse, ServiceError> {
+        let response = self
+            .client
+            .get(format!(
+                "{}/transactions/reference/{}",
+                self.host, reference
+            ))
+            .headers(generate_headers(token, self.client_identifier.clone()))
+            .send()
+            .await;
+
+        parse_response::<TransactionResponse>(response).await
+    }
+
+
+    /// Get transaction details by reference, this will return the full transaction details including
+    /// payment events and transaction statuses.
+    ///
+    /// # Arguments
+    /// * `token` - Authentication token
+    /// * `reference` - Transaction reference
+    pub async fn get_transaction_details_by_reference(
         &self,
         token: Option<ServiceToken>,
         reference: &str,
@@ -119,7 +144,7 @@ impl LedgerServiceClient {
         &self,
         token: Option<ServiceToken>,
         external_id: &str,
-    ) -> Result<TransactionDetailsResponse, ServiceError> {
+    ) -> Result<TransactionResponse, ServiceError> {
         let response = self
             .client
             .get(format!(
@@ -130,7 +155,7 @@ impl LedgerServiceClient {
             .send()
             .await;
 
-        parse_response::<TransactionDetailsResponse>(response).await
+        parse_response::<TransactionResponse>(response).await
     }
 
     /// Get compliance events for a transaction by reference

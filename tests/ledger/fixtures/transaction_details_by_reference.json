@@ -1,55 +1,79 @@
 {
   "transaction": {
-    "id": "urn:tx:366a0c79997641a59d6298e29bfcec17",
-    "external_reference": "770e1636-bf8e-4bf6-bf02-850b827da63a",
-    "source": "ANCHOR_MYKOBO",
-    "reference": "MYK1724666903",
-    "transaction_type": "DEPOSIT",
-    "status": "PENDING_CHAIN",
-    "incoming_currency": "EUR",
-    "outgoing_currency": "EURC",
-    "requested_amount": 20,
-    "expected_amount_in": 20,
-    "amount_out": 17.65,
-    "amount_in": 20,
-    "fee": 2.35,
-    "payer": "urn:usrp:b26734fce23e450b87368b22cf56e091",
-    "payee": null,
-    "created_at": "2024-08-26T13:08:23",
-    "updated_at": "2025-08-17T17:54:27.685363",
-    "requester_first_name": "UNKNOWN",
-    "requester_last_name": "UNKNOWN",
-    "originating_ip_address": null
+    "id": "urn:tx:963214b4d55d47cdb8b0fc1e4d9c9641",
+    "external_reference": "b664d1a2-ae8d-4329-816c-79f99ed0670e",
+    "source": "ANCHOR_SOLANA",
+    "reference": "MYK1765630966",
+    "transaction_type": "WITHDRAW",
+    "status": "APPROVED",
+    "incoming_currency": "EURC",
+    "outgoing_currency": "EUR",
+    "requested_amount": 2.00000000,
+    "expected_amount_in": 2.00000000,
+    "amount_out": 1.97000000,
+    "amount_in": 2.00000000,
+    "fee": 0.03000000,
+    "payer": null,
+    "payee": "urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc",
+    "created_at": "2025-12-13T13:02:46",
+    "updated_at": "2025-12-13T13:06:37.950167",
+    "requester_first_name": "Kwabena",
+    "requester_last_name": "Aning",
+    "originating_ip_address": "127.0.0.1"
   },
   "events": [
     {
-      "StatusUpdate": {
-        "id": "urn:txsu:95e658e95d864afc991a0f574fe08b15",
-        "reference": "MYK1724666903",
-        "status": "READY_TO_FULFILL",
-        "message": "TX ready to fulfill",
-        "created_at": "2025-08-17T18:38:50",
-        "applied_at": "2025-08-17T17:43:32.014020"
+      "Payment": {
+        "id": "urn:pay:bd7dbd41717142d3b6c6e8c298b02035",
+        "external_reference": "PNmxaCAPX9HgcvubiBuf9s47ERxMjumNQrKYbzeFVfpgXDW5KVRQHB9Z82dnFpLtkCfrj3oqmQzDmCSr1WrHp1z",
+        "source": "CHAIN_SOLANA",
+        "reference": "MYK1765630966",
+        "payer_name": "Kwabena Aning",
+        "currency": "EURC",
+        "value": "2.00000000",
+        "bank_account_number": "DE75512108001245126199",
+        "created_at": "2025-12-13T13:03:20",
+        "applied_at": "2025-12-13T13:03:27.966425"
       }
     },
     {
       "StatusUpdate": {
-        "id": "urn:txsu:d54c26d79f2a4469b86727fed6f96e31",
-        "reference": "MYK1724666903",
+        "id": "urn:txsu:cb7ab30fcff544018694bf2eae856490",
+        "reference": "MYK1765630966",
+        "status": "HELD",
+        "message": "Transitioned status from FUNDS_RECEIVED to HELD: IP address 127.0.0.1 is either from a blacklisted country UNKNOWN or behind a proxy server [false]",
+        "created_at": "2025-12-13T13:03:31.696547",
+        "applied_at": "2025-12-13T13:03:37.957376"
+      }
+    },
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu::d19ca7def5bd477793b7f91d3a0026ae",
+        "reference": "MYK1765630966",
+        "status": "HOLD_RELEASED",
+        "message": "It is me",
+        "created_at": "2025-12-13T13:03:53",
+        "applied_at": "2025-12-13T13:03:57.957184"
+      }
+    },
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu::4f513ae5a45348329125073aef96c5dd",
+        "reference": "MYK1765630966",
+        "status": "READY_TO_FULFILL",
+        "message": "Ready to pay",
+        "created_at": "2025-12-13T13:06:20",
+        "applied_at": "2025-12-13T13:06:27.951545"
+      }
+    },
+    {
+      "StatusUpdate": {
+        "id": "urn:txsu:8513864c07e3474f82fda369649958bf",
+        "reference": "MYK1765630966",
         "status": "APPROVED",
         "message": "Transaction has passed all compliance checks",
-        "created_at": "2025-08-17T17:43:37.216778",
-        "applied_at": "2025-08-17T17:54:17.800926"
-      }
-    },
-    {
-      "StatusUpdate": {
-        "id": "urn:txsu:33605448d7444b78a350800f20ad4582",
-        "reference": "MYK1724666903",
-        "status": "PENDING_CHAIN",
-        "message": "Message sent to chain services for fulfillment",
-        "created_at": "2025-08-17T17:54:17.823209",
-        "applied_at": "2025-08-18T17:26:30"
+        "created_at": "2025-12-13T13:06:36.565663",
+        "applied_at": "2025-12-13T13:06:37.950122"
       }
     }
   ]

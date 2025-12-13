@@ -1,11 +1,12 @@
 use crate::read_file;
 use bigdecimal::BigDecimal;
 use mykobo_rs::ledger::models::{
-    ComplianceEventsResponse, TransactionDetailsResponse, TransactionListResponse,
+    ComplianceEventsResponse, TransactionResponse, TransactionListResponse,
     TransactionStatusesResponse,
 };
 use pretty_assertions::assert_eq;
 use std::str::FromStr;
+use mykobo_rs::ledger::models::response::TransactionDetailsResponse;
 
 #[test]
 fn test_deserialise_transaction_list() {
@@ -88,7 +89,7 @@ fn test_deserialise_transaction_list() {
 #[test]
 fn test_deserialise_transaction_by_external_id() {
     let content = read_file("tests/ledger/fixtures/transaction_by_external_id.json");
-    let result = serde_json::from_str::<TransactionDetailsResponse>(&content);
+    let result = serde_json::from_str::<TransactionResponse>(&content);
 
     assert!(result.is_ok());
     let transaction = result.unwrap();
@@ -201,7 +202,7 @@ fn test_deserialise_transaction_with_null_values() {
         "originating_ip_address": null
     }"#;
 
-    let result = serde_json::from_str::<TransactionDetailsResponse>(json);
+    let result = serde_json::from_str::<TransactionResponse>(json);
     assert!(result.is_ok());
 
     let transaction = result.unwrap();
@@ -228,4 +229,15 @@ fn test_deserialise_empty_transaction_statuses() {
     assert!(result.is_ok());
     let statuses = result.unwrap();
     assert_eq!(statuses.len(), 0);
+}
+
+
+#[test]
+fn test_deserialise_transaction_details() {
+    let content = read_file("tests/ledger/fixtures/transaction_details_by_reference.json");
+    let result = serde_json::from_str::<TransactionDetailsResponse>(&content);
+
+    let details = result.unwrap();
+    assert_eq!(details.transaction.id, "urn:tx:963214b4d55d47cdb8b0fc1e4d9c9641".to_string());
+    assert_eq!(details.events.len(), 5);
 }

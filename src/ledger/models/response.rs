@@ -5,13 +5,13 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionListResponse {
-    pub transactions: Vec<TransactionDetailsResponse>,
+    pub transactions: Vec<TransactionResponse>,
     pub page: u8,
     pub limit: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TransactionDetailsResponse {
+pub struct TransactionResponse {
     pub id: String,
     pub external_reference: Option<String>,
     pub source: String,
@@ -37,6 +37,45 @@ pub struct TransactionDetailsResponse {
     pub requester_first_name: String,
     pub requester_last_name: String,
     pub originating_ip_address: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum TransactionEvent {
+    Payment {
+        id: String,
+        external_reference: String,
+        source: String,
+        reference: String,
+        payer_name: String,
+        currency: String,
+        value: String,
+        bank_account_number: String,
+        created_at: NaiveDateTime,
+        applied_at: Option<NaiveDateTime>,
+    },
+    StatusUpdate {
+        id: String,
+        reference: String,
+        status: String,
+        message: String,
+        created_at: NaiveDateTime,
+        applied_at: Option<NaiveDateTime>,
+    },
+    Correction {
+        id: String,
+        reference: String,
+        value: BigDecimal,
+        message: String,
+        currency: String,
+        source: String,
+        created_at: NaiveDateTime,
+        applied_at: Option<NaiveDateTime>,
+    },
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionDetailsResponse {
+    pub transaction: TransactionResponse,
+    pub events: Vec<TransactionEvent>,
 }
 
 pub type ComplianceEventsResponse = HashMap<String, bool>;
