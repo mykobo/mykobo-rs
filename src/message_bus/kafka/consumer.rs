@@ -37,6 +37,7 @@ where
             env::var("KAFKA_API_SECRET").expect("Missing KAFKA_API_SECRET environment variable");
 
         let consumer: StreamConsumer = ClientConfig::new()
+            .set("auto.offset.reset", "earliest")
             .set("client.id", client_id)
             .set("group.id", group_id)
             .set("bootstrap.servers", brokers)

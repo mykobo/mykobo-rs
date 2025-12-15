@@ -11,11 +11,11 @@ use crate::{
     util::{generate_headers, parse_response},
 };
 
-use models::{
-    ComplianceEventsResponse, TransactionResponse, TransactionFilterRequest,
-    TransactionListResponse, TransactionStatusesResponse,
-};
 use crate::ledger::models::response::TransactionDetailsResponse;
+use models::{
+    ComplianceEventsResponse, TransactionFilterRequest, TransactionListResponse,
+    TransactionResponse, TransactionStatusesResponse,
+};
 
 #[derive(Clone)]
 pub struct LedgerServiceClient {
@@ -109,7 +109,6 @@ impl LedgerServiceClient {
 
         parse_response::<TransactionResponse>(response).await
     }
-
 
     /// Get transaction details by reference, this will return the full transaction details including
     /// payment events and transaction statuses.
