@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.22] - 2025-12-31
+
+### 🐛 Bug Fixes
+
+- New dapp statuses and source deserialisation
+- New dapp statuses and source deserialisation
+
+## [1.0.21] - 2025-12-15
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.21
+
 ## [1.0.20] - 2025-12-13
 
 ### ⛰️  Features
