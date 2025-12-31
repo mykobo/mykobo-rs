@@ -240,6 +240,9 @@ fn test_solana_deposit_deserialization_2() {
 
     let transaction: Transaction = serde_json::from_str(payload).unwrap();
     assert_eq!(transaction.source, TransactionSource::AnchorDapp);
-    assert_eq!(transaction.client_domain, Some("stellar.mykobo.app".to_string()));
+    assert_eq!(
+        transaction.client_domain,
+        Some("stellar.mykobo.app".to_string())
+    );
     assert_eq!(transaction.comment, None);
 }
