@@ -17,6 +17,8 @@ pub enum TransactionStatus {
     PendingPayer,
     PendingPayee,
     PendingAnchor,
+    PendingRamp,
+    PendingUser,
     Completed,
     Failed,
     Cancelled,
@@ -26,7 +28,7 @@ pub enum TransactionStatus {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TransactionSource {
-    AnchorSolana,
+    AnchorDapp,
     AnchorStellar,
 }
 
@@ -80,6 +82,8 @@ pub struct Transaction {
     /// Timestamps
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub client_domain: Option<String>,
+    pub comment: Option<String>,
 }
 
 impl Transaction {
@@ -119,6 +123,8 @@ impl Transaction {
             tx_hash: None,
             created_at: now,
             updated_at: now,
+            client_domain: None,
+            comment: None,
         }
     }
 
@@ -185,13 +191,15 @@ impl Default for Transaction {
             first_name: None,
             last_name: None,
             wallet_address: String::new(),
-            source: TransactionSource::AnchorSolana,
+            source: TransactionSource::AnchorDapp,
             ip_address: None,
             message_id: None,
             queue_sent_at: None,
             tx_hash: None,
             created_at: now,
             updated_at: now,
+            client_domain: None,
+            comment: None,
         }
     }
 }

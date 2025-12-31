@@ -14,7 +14,7 @@ fn test_new_transaction() {
         "100.50".to_string(),
         "0.25".to_string(),
         "wallet-address-123".to_string(),
-        TransactionSource::AnchorSolana,
+        TransactionSource::AnchorDapp,
     );
 
     assert_eq!(tx.reference, "REF-123");
@@ -99,7 +99,7 @@ fn test_deserialization() {
             "first_name": "John",
             "last_name": "Doe",
             "wallet_address": "7xKWv8QRt9YZN3pM5cD2jFqH4sX6wL8aB1vN9mT5rP3k",
-            "source": "ANCHOR_SOLANA",
+            "source": "ANCHOR_DAPP",
             "tx_hash": "5wHzKFxC2jL9mN8pQ3rT6vX4bY1cD7eF9gH2iJ5kM8nP0qR3sT6vW9xY1zA4bC7dE",
             "created_at": "2024-03-15T10:30:45.123456Z",
             "updated_at": "2024-03-15T10:32:18.654321Z",
@@ -113,7 +113,7 @@ fn test_deserialization() {
         transaction.wallet_address,
         "7xKWv8QRt9YZN3pM5cD2jFqH4sX6wL8aB1vN9mT5rP3k"
     );
-    assert_eq!(transaction.source, TransactionSource::AnchorSolana);
+    assert_eq!(transaction.source, TransactionSource::AnchorDapp);
     assert_eq!(transaction.status, TransactionStatus::Completed);
     assert_eq!(transaction.transaction_type, TransactionType::Withdraw);
     assert_eq!(transaction.incoming_currency, "USDC");
@@ -147,7 +147,7 @@ fn test_solana_deposit_deserialization() {
             "payer_id": "urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc",
             "queue_sent_at": "2025-11-17T20:10:29.960538+00:00",
             "reference": "MYK1763410229",
-            "source": "ANCHOR_SOLANA",
+            "source": "ANCHOR_DAPP",
             "status": "PENDING_ANCHOR",
             "transaction_type": "DEPOSIT",
             "tx_hash": null,
@@ -191,7 +191,7 @@ fn test_solana_deposit_deserialization() {
         transaction.wallet_address,
         "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J"
     );
-    assert_eq!(transaction.source, TransactionSource::AnchorSolana);
+    assert_eq!(transaction.source, TransactionSource::AnchorDapp);
     assert_eq!(transaction.tx_hash, None);
 
     // Verify message queue tracking
@@ -210,29 +210,36 @@ fn test_solana_deposit_deserialization() {
 fn test_solana_deposit_deserialization_2() {
     let payload = r#"
     {
-        "created_at": "2025-11-24T21:52:00.933793+00:00",
-        "fee": "0.030000",
-        "first_name": "Oluwaseyi",
-        "id": "1ad3e618-3d13-45d8-8e18-6b3afc873e7e",
-        "idempotency_key": "7db64034-4cc9-4475-94f2-f1b959ab6b20",
-        "incoming_currency": "EUR",
-        "last_name": "Akin-Olugbemi",
-        "message_id": "3c609b0e-1559-4791-8fb6-54f60ed8726f",
-        "outgoing_currency": "EURC",
-        "payee_id": null,
-        "payer_id": "urn:usrp:47ec816445fd46f6b1958b949165be10",
-        "queue_sent_at": "2025-11-24T21:52:01.151659+00:00",
-        "reference": "MYK1764021120",
-        "source": "ANCHOR_SOLANA",
-        "status": "PENDING_ANCHOR",
-        "transaction_type": "DEPOSIT",
-        "tx_hash": null,
-        "updated_at": "2025-11-24T21:55:29.112397+00:00",
-        "value": "2.000000",
-        "wallet_address": "9w1bUHubdN2sgjRQ8djLhXdxG462BeipruzD4H8FDHgT"
-        }
+      "client_domain": "stellar.mykobo.app",
+      "comment": null,
+      "created_at": "2025-12-21T23:33:33.122548+00:00",
+      "fee": "0.030000",
+      "first_name": "Kwabena",
+      "id": "3b40bc2a-9cc9-420b-a595-1b4d89ae169c",
+      "idempotency_key": "8472a472-0727-4159-a8f5-b25ec7216bb5",
+      "incoming_currency": "EURC",
+      "instruction_type": "TRANSACTION",
+      "ip_address": "127.0.0.1",
+      "last_name": "Aning",
+      "message_id": "LEDGER_TRANSACTION2:48",
+      "network": "stellar",
+      "outgoing_currency": "EUR",
+      "payee_id": "urn:usrp:a891c5585c604b7aa2fd77410d5dc8dc",
+      "payer_id": null,
+      "queue_sent_at": "2025-12-21T23:33:33.794990+00:00",
+      "reference": "MYK1766360012",
+      "source": "ANCHOR_DAPP",
+      "status": "PENDING_RAMP",
+      "transaction_type": "WITHDRAW",
+      "tx_hash": "2c87dfe7387c3156c988215dbc0a10ddc8cc97f4c9bd1a430a5aeb6335645a02",
+      "updated_at": "2025-12-22T00:38:52.143581+00:00",
+      "value": "2.000000",
+      "wallet_address": "GDFDQ6QNTNUQK2NPLM3QLW73LAZ7FX6WXKWHQTLL47IKFTT3T7PRY34T"
+    }
     "#;
 
     let transaction: Transaction = serde_json::from_str(payload).unwrap();
-    println!("{:?}", transaction);
+    assert_eq!(transaction.source, TransactionSource::AnchorDapp);
+    assert_eq!(transaction.client_domain, Some("stellar.mykobo.app".to_string()));
+    assert_eq!(transaction.comment, None);
 }
