@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.23] - 2026-01-12
+
+### ⛰️  Features
+
+- Model direction for payment payloads
+
 ## [1.0.22] - 2025-12-31
 
 ### 🐛 Bug Fixes
 
 - New dapp statuses and source deserialisation
 - New dapp statuses and source deserialisation
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.22
 
 ## [1.0.21] - 2025-12-15
 
