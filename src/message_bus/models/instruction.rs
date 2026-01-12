@@ -1,4 +1,4 @@
-use super::base::{validate_required_fields, TransactionType, ValidationError};
+use super::base::{validate_required_fields, PaymentDirection, TransactionType, ValidationError};
 use serde::{Deserialize, Serialize};
 
 /// Payload for payment instructions
@@ -10,16 +10,19 @@ pub struct PaymentPayload {
     pub currency: String,
     pub value: String,
     pub source: String,
+    pub direction: PaymentDirection,
     pub reference: String,
     pub bank_account_number: Option<String>,
 }
 
 impl PaymentPayload {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         external_reference: String,
         currency: String,
         value: String,
         source: String,
+        direction: PaymentDirection,
         reference: String,
         payer_name: Option<String>,
         bank_account_number: Option<String>,
@@ -30,6 +33,7 @@ impl PaymentPayload {
             currency: currency.clone(),
             value: value.clone(),
             source: source.clone(),
+            direction,
             reference: reference.clone(),
             bank_account_number,
         };
@@ -395,6 +399,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
             "MYK123344545".to_string(),
             Some("John Doe".to_string()),
             Some("GB123266734836738787454".to_string()),
@@ -409,6 +414,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
             "MYK123344545".to_string(),
             None,
             None,
@@ -463,6 +469,7 @@ mod tests {
             "currency": "EUR",
             "value": "123.00",
             "source": "BANK_MODULR",
+            "direction": "INBOUND",
             "reference": "MYK123344545",
             "payer_name": "John Doe",
             "bank_account_number": "GB123266734836738787454"
@@ -473,6 +480,7 @@ mod tests {
         assert_eq!(payload.currency, "EUR");
         assert_eq!(payload.value, "123.00");
         assert_eq!(payload.source, "BANK_MODULR");
+        assert_eq!(payload.direction, PaymentDirection::Inbound);
         assert_eq!(payload.reference, "MYK123344545");
     }
 
@@ -613,6 +621,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
             "MYK123344545".to_string(),
             Some("John Doe".to_string()),
             Some("GB123266734836738787454".to_string()),
@@ -632,6 +641,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Outbound,
             "MYK123344545".to_string(),
             None,
             None,
@@ -851,6 +861,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Both,
             "MYK123344545".to_string(),
             Some("José María García 日本語 🚀".to_string()),
             None,
@@ -865,5 +876,99 @@ mod tests {
             deserialized.payer_name,
             Some("José María García 日本語 🚀".to_string())
         );
+    }
+
+    #[test]
+    fn test_payment_payload_direction_field() {
+        // Test Inbound direction
+        let inbound_payload = PaymentPayload::new(
+            "P123".to_string(),
+            "EUR".to_string(),
+            "100.00".to_string(),
+            "BANK_TEST".to_string(),
+            PaymentDirection::Inbound,
+            "REF123".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+        assert_eq!(inbound_payload.direction, PaymentDirection::Inbound);
+
+        // Test Outbound direction
+        let outbound_payload = PaymentPayload::new(
+            "P456".to_string(),
+            "USD".to_string(),
+            "200.00".to_string(),
+            "CHAIN_ETH".to_string(),
+            PaymentDirection::Outbound,
+            "REF456".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+        assert_eq!(outbound_payload.direction, PaymentDirection::Outbound);
+
+        // Test Both direction
+        let both_payload = PaymentPayload::new(
+            "P789".to_string(),
+            "GBP".to_string(),
+            "300.00".to_string(),
+            "OTC_CIRCLE".to_string(),
+            PaymentDirection::Both,
+            "REF789".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+        assert_eq!(both_payload.direction, PaymentDirection::Both);
+    }
+
+    #[test]
+    fn test_payment_payload_direction_serialization() {
+        let payload = PaymentPayload::new(
+            "P999".to_string(),
+            "EUR".to_string(),
+            "50.00".to_string(),
+            "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
+            "REF999".to_string(),
+            Some("Test User".to_string()),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Direction should be serialized as INBOUND
+        assert!(serialized.contains("\"direction\":\"INBOUND\""));
+
+        let deserialized: PaymentPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(deserialized.direction, PaymentDirection::Inbound);
+    }
+
+    #[test]
+    fn test_payment_payload_all_directions_roundtrip() {
+        for direction in [
+            PaymentDirection::Inbound,
+            PaymentDirection::Outbound,
+            PaymentDirection::Both,
+        ] {
+            let payload = PaymentPayload::new(
+                "P001".to_string(),
+                "EUR".to_string(),
+                "75.00".to_string(),
+                "BANK_TEST".to_string(),
+                direction,
+                "REF001".to_string(),
+                None,
+                None,
+            )
+            .unwrap();
+
+            let serialized: String = payload.clone().into();
+            let deserialized: PaymentPayload = serialized.into();
+
+            assert_eq!(payload.direction, deserialized.direction);
+        }
     }
 }

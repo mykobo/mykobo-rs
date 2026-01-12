@@ -1,3 +1,4 @@
+use mykobo_rs::message_bus::models::base::PaymentDirection;
 use mykobo_rs::message_bus::models::event::*;
 use mykobo_rs::message_bus::models::instruction::*;
 use mykobo_rs::message_bus::{
@@ -22,6 +23,7 @@ fn test_deserialize_payment_message() {
             "currency": "EUR",
             "value": "123.00",
             "source": "BANK_MODULR",
+            "direction": "INBOUND",
             "reference": "MYK123344545",
             "payer_name": "John Doe",
             "bank_account_number": "GB123266734836738787454"
@@ -67,6 +69,7 @@ fn test_deserialize_payment_message_without_optionals() {
             "currency": "USD",
             "value": "50.00",
             "source": "BANK_ABC",
+            "direction": "INBOUND",
             "reference": "REF999"
         }
     }"#;
@@ -662,6 +665,7 @@ fn test_payment_message_roundtrip() {
         "EUR".to_string(),
         "999.99".to_string(),
         "BANK_TEST".to_string(),
+        PaymentDirection::Inbound,
         "REF888".to_string(),
         None,
         None,
@@ -706,6 +710,7 @@ fn test_deserialize_message_with_ipv6() {
             "currency": "USD",
             "value": "10.00",
             "source": "TEST",
+            "direction": "INBOUND",
             "reference": "REF123"
         }
     }"#;
@@ -763,6 +768,7 @@ fn test_deserialize_message_with_unicode() {
             "currency": "EUR",
             "value": "123.00",
             "source": "BANK",
+            "direction": "INBOUND",
             "reference": "REF123",
             "payer_name": "José María García 日本語 🚀"
         }
@@ -845,6 +851,7 @@ fn test_deserialize_message_with_both_instruction_and_event() {
             "currency": "USD",
             "value": "10.00",
             "source": "TEST",
+            "direction": "INBOUND",
             "reference": "REF123"
         }
     }"#;
@@ -921,6 +928,7 @@ fn test_all_instruction_payloads_roundtrip() {
         "EUR".to_string(),
         "100.00".to_string(),
         "BANK".to_string(),
+        PaymentDirection::Inbound,
         "REF123".to_string(),
         None,
         None,

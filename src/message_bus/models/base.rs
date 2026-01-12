@@ -48,6 +48,30 @@ impl fmt::Display for TransactionType {
     }
 }
 
+/// Enum for payment direction
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Default)]
+pub enum PaymentDirection {
+    #[default]
+    Inbound,
+    Outbound,
+    Both,
+}
+
+impl fmt::Display for PaymentDirection {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_value(self)
+                .ok()
+                .and_then(|v| v.as_str().map(String::from))
+                .unwrap_or_default()
+        )
+    }
+}
+
 /// Enum for event types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -129,6 +153,19 @@ mod tests {
     fn test_transaction_type_display() {
         assert_eq!(TransactionType::Deposit.to_string(), "DEPOSIT");
         assert_eq!(TransactionType::Withdraw.to_string(), "WITHDRAW");
+    }
+
+    #[test]
+    fn test_payment_direction_display() {
+        assert_eq!(PaymentDirection::Inbound.to_string(), "INBOUND");
+        assert_eq!(PaymentDirection::Outbound.to_string(), "OUTBOUND");
+        assert_eq!(PaymentDirection::Both.to_string(), "BOTH");
+    }
+
+    #[test]
+    fn test_payment_direction_default() {
+        let direction: PaymentDirection = Default::default();
+        assert_eq!(direction, PaymentDirection::Inbound);
     }
 
     #[test]

@@ -89,6 +89,7 @@ impl MetaData {
 ///     "currency": "EUR",
 ///     "value": "100.00",
 ///     "source": "BANK",
+///     "direction": "INBOUND",
 ///     "reference": "REF123"
 /// }"#;
 ///
@@ -340,6 +341,7 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::message_bus::models::base::PaymentDirection;
 
     #[test]
     fn test_metadata_valid() {
@@ -395,6 +397,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
             "MYK123344545".to_string(),
             Some("John Doe".to_string()),
             Some("GB123266734836738787454".to_string()),
@@ -450,6 +453,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Outbound,
             "MYK123344545".to_string(),
             None,
             None,
@@ -809,6 +813,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Both,
             "MYK123344545".to_string(),
             Some("John Doe".to_string()),
             Some("GB123266734836738787454".to_string()),
@@ -837,6 +842,7 @@ mod tests {
             "EUR".to_string(),
             "123.00".to_string(),
             "BANK_MODULR".to_string(),
+            PaymentDirection::Inbound,
             "MYK123344545".to_string(),
             None,
             None,

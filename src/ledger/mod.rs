@@ -42,7 +42,7 @@ impl LedgerServiceClient {
     /// # Arguments
     /// * `token` - Authentication token
     /// * `params` - Transaction filter parameters including sources, transaction_types,
-    ///              statuses, currencies, date ranges, payee, payer, and pagination
+    ///   statuses, currencies, date ranges, payee, payer, and pagination
     pub async fn transaction_list(
         &self,
         token: Option<ServiceToken>,

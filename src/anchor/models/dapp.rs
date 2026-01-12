@@ -88,6 +88,7 @@ pub struct Transaction {
 
 impl Transaction {
     /// Creates a new Transaction with default values
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         reference: String,
         idempotency_key: String,
