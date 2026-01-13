@@ -74,7 +74,8 @@ impl fmt::Display for PaymentDirection {
 
 impl From<String> for PaymentDirection {
     fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Failed to deserialize PaymentDirection from String")
+        let normalized = format!("\"{}\"", value.trim_matches('"').to_uppercase());
+        serde_json::from_str(&normalized).expect("Failed to deserialize PaymentDirection from String")
     }
 }
 
@@ -172,6 +173,51 @@ mod tests {
     fn test_payment_direction_default() {
         let direction: PaymentDirection = Default::default();
         assert_eq!(direction, PaymentDirection::Inbound);
+    }
+
+    #[test]
+    fn test_payment_direction_from_string_inbound() {
+        let direction: PaymentDirection = "\"INBOUND\"".to_string().into();
+        assert_eq!(direction, PaymentDirection::Inbound);
+    }
+
+    #[test]
+    fn test_payment_direction_from_string_outbound() {
+        let direction: PaymentDirection = "\"OUTBOUND\"".to_string().into();
+        assert_eq!(direction, PaymentDirection::Outbound);
+    }
+
+    #[test]
+    fn test_payment_direction_from_string_both() {
+        let direction: PaymentDirection = "\"BOTH\"".to_string().into();
+        assert_eq!(direction, PaymentDirection::Both);
+    }
+
+    #[test]
+    fn test_payment_direction_from_string_lowercase() {
+        let direction: PaymentDirection = "\"inbound\"".to_string().into();
+        assert_eq!(direction, PaymentDirection::Inbound);
+
+        let direction: PaymentDirection = "outbound".to_string().into();
+        assert_eq!(direction, PaymentDirection::Outbound);
+    }
+
+    #[test]
+    fn test_payment_direction_from_string_mixed_case() {
+        let direction: PaymentDirection = "Inbound".to_string().into();
+        assert_eq!(direction, PaymentDirection::Inbound);
+
+        let direction: PaymentDirection = "\"OutBound\"".to_string().into();
+        assert_eq!(direction, PaymentDirection::Outbound);
+
+        let direction: PaymentDirection = "bOtH".to_string().into();
+        assert_eq!(direction, PaymentDirection::Both);
+    }
+
+    #[test]
+    #[should_panic(expected = "Failed to deserialize PaymentDirection from String")]
+    fn test_payment_direction_from_string_invalid() {
+        let _direction: PaymentDirection = "\"INVALID\"".to_string().into();
     }
 
     #[test]
