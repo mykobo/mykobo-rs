@@ -2,11 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.25] - 2026-01-13
+
+### 🐛 Bug Fixes
+
+- Add a from string deserialiser for payment direction
+- Add a from string deserialiser for payment direction
+- Add a from string deserialiser for payment direction
+
 ## [1.0.24] - 2026-01-13
 
 ### ⚙️ Miscellaneous Tasks
 
 - Housekeeping
+- Release mykobo-rs version 1.0.24
 
 ## [1.0.23] - 2026-01-12
 
