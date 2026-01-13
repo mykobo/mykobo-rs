@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.24] - 2026-01-13
+
+### ⚙️ Miscellaneous Tasks
+
+- Housekeeping
+
 ## [1.0.23] - 2026-01-12
 
 ### ⛰️  Features
 
 - Model direction for payment payloads
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.23
 
 ## [1.0.22] - 2025-12-31
 
