@@ -8,26 +8,26 @@ license-file = "LICENSE"
 publish = false
 
 [dependencies]
-aws-config = { version = "1.8.2", features = ["behavior-version-latest"] }
-aws-sdk-sqs = { version = "1.76.0" }
-chrono = { version = "0.4.41", features = ["serde"] }
+aws-config = { version = "1.8.12", features = ["behavior-version-latest"] }
+aws-sdk-sqs = { version = "1.91.0" }
+chrono = { version = "0.4.42", features = ["serde"] }
 futures = "0.3.31"
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"]}
-log = "0.4.28"
+log = "0.4.29"
 rdkafka = { version = "0.38.0", features = ["cmake-build", "ssl-vendored"] }
-reqwest = { version = "0.12.23", features = ["json"] }
+reqwest = { version = "0.13.1", features = ["json"] }
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
-tokio = { version = "1.48.0" }
-uuid = { version = "1.18.1", features = ["v4"] }
+serde_json = "1.0.149"
+tokio = { version = "1.49.0" }
+uuid = { version = "1.19.0", features = ["v4"] }
 thiserror = "2.0.17"
-serde_with = "3.15.1"
-bigdecimal = { version = "0.4.9" , features = ["serde", "serde-json"]}
+serde_with = "3.16.1"
+bigdecimal = { version = "0.4.10" , features = ["serde", "serde-json"]}
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"
 tokio = { version = "1.47.0", features = ["test-util"] }
-wiremock = "0.6.4"
-reqwest = { version = "0.12.22", features = ["json"] }
-fake = { version = "4.3.0", features = ["ulid"] }
-serial_test = "3.2.0"
+wiremock = "0.6.5"
+reqwest = { version = "0.13.1", features = ["json"] }
+fake = { version = "4.4.0", features = ["ulid"] }
+serial_test = "3.3.1"
