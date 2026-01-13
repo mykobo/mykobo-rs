@@ -75,7 +75,8 @@ impl fmt::Display for PaymentDirection {
 impl From<String> for PaymentDirection {
     fn from(value: String) -> Self {
         let normalized = format!("\"{}\"", value.trim_matches('"').to_uppercase());
-        serde_json::from_str(&normalized).expect("Failed to deserialize PaymentDirection from String")
+        serde_json::from_str(&normalized)
+            .expect("Failed to deserialize PaymentDirection from String")
     }
 }
 
