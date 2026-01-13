@@ -72,6 +72,12 @@ impl fmt::Display for PaymentDirection {
     }
 }
 
+impl From<String> for PaymentDirection {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize PaymentDirection from String")
+    }
+}
+
 /// Enum for event types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
