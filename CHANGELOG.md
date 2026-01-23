@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.26] - 2026-01-23
+
+### 🐛 Bug Fixes
+
+- Provide token claim extraction function
+
 ## [1.0.25] - 2026-01-13
 
 ### 🐛 Bug Fixes
@@ -9,6 +15,10 @@ All notable changes to this project will be documented in this file.
 - Add a from string deserialiser for payment direction
 - Add a from string deserialiser for payment direction
 - Add a from string deserialiser for payment direction
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.25
 
 ## [1.0.24] - 2026-01-13
 
