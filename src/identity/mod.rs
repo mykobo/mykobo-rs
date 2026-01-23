@@ -27,6 +27,17 @@ pub struct IdentityServiceClient {
     pub client_identifier: Option<String>,
 }
 
+pub fn extract_token_claims(token: &str) -> Result<TokenClaims, ServiceError> {
+    insecure_decode::<TokenClaims>(token)
+        .map(|td| td.claims)
+        .map_err(|e| ServiceError {
+            error: Some(format!("Could not extract token claim {e}")),
+            message: None,
+            description: None,
+            status: Default::default(),
+        })
+}
+
 impl IdentityServiceClient {
     pub fn new(max_retries: i8) -> Self {
         let identity_service_host =
@@ -72,17 +83,17 @@ impl IdentityServiceClient {
 
     fn token_is_valid(&self) -> bool {
         if let Some(service_token) = &self.get_token() {
-            match insecure_decode::<TokenClaims>(service_token.token.as_str()) {
-                Ok(token_data) => {
+            match extract_token_claims(service_token.token.as_str()) {
+                Ok(claims) => {
                     let current_time = std::time::SystemTime::now()
                         .duration_since(std::time::UNIX_EPOCH)
                         .unwrap()
                         .as_secs() as usize;
 
-                    if token_data.claims.exp <= current_time {
+                    if claims.exp <= current_time {
                         warn!(
                             "Token has expired. Expiration: {}, Current: {}",
-                            token_data.claims.exp, current_time
+                            claims.exp, current_time
                         );
                         false
                     } else {
