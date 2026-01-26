@@ -106,6 +106,7 @@ pub enum Payload {
     Transaction(TransactionPayload),
     BankPaymentRequest(BankPaymentRequestPayload),
     ChainPayment(ChainPaymentPayload),
+    UpdateProfile(UpdateProfilePayload),
 
     // Event payloads
     NewTransaction(NewTransactionEventPayload),
@@ -163,6 +164,7 @@ impl MessageBusMessage {
                 (InstructionType::Transaction, Payload::Transaction(_)) => Ok(()),
                 (InstructionType::BankPaymentRequest, Payload::BankPaymentRequest(_)) => Ok(()),
                 (InstructionType::ChainPayment, Payload::ChainPayment(_)) => Ok(()),
+                (InstructionType::UpdateProfile, Payload::UpdateProfile(_)) => Ok(()),
                 _ => Err(ValidationError {
                     class_name: "MessageBusMessage".to_string(),
                     fields: vec![format!(
@@ -284,6 +286,9 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                     InstructionType::ChainPayment => Payload::ChainPayment(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::UpdateProfile => Payload::UpdateProfile(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
@@ -958,5 +963,67 @@ mod tests {
 
         let metadata: MetaData = serde_json::from_str(json).unwrap();
         assert_eq!(metadata.ip_address, None);
+    }
+
+    #[test]
+    fn test_message_with_update_profile() {
+        let payload = UpdateProfilePayload::new(
+            Some("123 Main Street".to_string()),
+            Some("Apt 4B".to_string()),
+            Some("GB12345678901234".to_string()),
+            Some("123456".to_string()),
+            None,
+            None,
+            Some("GB".to_string()),
+            None,
+            None,
+        );
+
+        let message = MessageBusMessage::create(
+            "IDENTITY_SERVICE".to_string(),
+            Payload::UpdateProfile(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::UpdateProfile),
+            None,
+            None,
+            Some("127.0.0.1".to_string()),
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(
+            msg.meta_data.instruction_type,
+            Some(InstructionType::UpdateProfile)
+        );
+    }
+
+    #[test]
+    fn test_message_update_profile_validates_payload_type() {
+        let payload = UpdateProfilePayload::new(
+            Some("123 Main Street".to_string()),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        );
+
+        // Wrong instruction type for UpdateProfile payload
+        let metadata = MetaData::new(
+            "IDENTITY_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-123".to_string(),
+            Some(InstructionType::Payment), // Wrong instruction type
+            None,
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::new(metadata, Payload::UpdateProfile(payload));
+        assert!(message.is_err());
     }
 }

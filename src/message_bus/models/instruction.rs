@@ -388,6 +388,61 @@ impl From<BankPaymentRequestPayload> for String {
     }
 }
 
+/// Payload for profile update instructions
+#[serde_with::skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct UpdateProfilePayload {
+    pub address_line_1: Option<String>,
+    pub address_line_2: Option<String>,
+    pub bank_account_number: Option<String>,
+    pub bank_number: Option<String>,
+    pub tax_id: Option<String>,
+    pub tax_id_name: Option<String>,
+    pub id_country_code: Option<String>,
+    pub suspended_at: Option<String>,
+    pub deleted_at: Option<String>,
+}
+
+impl UpdateProfilePayload {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        address_line_1: Option<String>,
+        address_line_2: Option<String>,
+        bank_account_number: Option<String>,
+        bank_number: Option<String>,
+        tax_id: Option<String>,
+        tax_id_name: Option<String>,
+        id_country_code: Option<String>,
+        suspended_at: Option<String>,
+        deleted_at: Option<String>,
+    ) -> Self {
+        Self {
+            address_line_1,
+            address_line_2,
+            bank_account_number,
+            bank_number,
+            tax_id,
+            tax_id_name,
+            id_country_code,
+            suspended_at,
+            deleted_at,
+        }
+    }
+}
+
+impl From<String> for UpdateProfilePayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize UpdateProfilePayload from String")
+    }
+}
+
+impl From<UpdateProfilePayload> for String {
+    fn from(val: UpdateProfilePayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize UpdateProfilePayload to String")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -970,5 +1025,178 @@ mod tests {
 
             assert_eq!(payload.direction, deserialized.direction);
         }
+    }
+
+    #[test]
+    fn test_update_profile_payload_with_all_fields() {
+        let payload = UpdateProfilePayload::new(
+            Some("123 Main Street".to_string()),
+            Some("Apt 4B".to_string()),
+            Some("GB12345678901234".to_string()),
+            Some("123456".to_string()),
+            Some("TAX123456".to_string()),
+            Some("VAT".to_string()),
+            Some("GB".to_string()),
+            Some("2024-01-15T10:00:00Z".to_string()),
+            Some("2024-01-20T10:00:00Z".to_string()),
+        );
+
+        assert_eq!(payload.address_line_1, Some("123 Main Street".to_string()));
+        assert_eq!(payload.address_line_2, Some("Apt 4B".to_string()));
+        assert_eq!(
+            payload.bank_account_number,
+            Some("GB12345678901234".to_string())
+        );
+        assert_eq!(payload.bank_number, Some("123456".to_string()));
+        assert_eq!(payload.tax_id, Some("TAX123456".to_string()));
+        assert_eq!(payload.tax_id_name, Some("VAT".to_string()));
+        assert_eq!(payload.id_country_code, Some("GB".to_string()));
+        assert_eq!(
+            payload.suspended_at,
+            Some("2024-01-15T10:00:00Z".to_string())
+        );
+        assert_eq!(payload.deleted_at, Some("2024-01-20T10:00:00Z".to_string()));
+    }
+
+    #[test]
+    fn test_update_profile_payload_with_no_fields() {
+        let payload =
+            UpdateProfilePayload::new(None, None, None, None, None, None, None, None, None);
+
+        assert_eq!(payload.address_line_1, None);
+        assert_eq!(payload.address_line_2, None);
+        assert_eq!(payload.bank_account_number, None);
+        assert_eq!(payload.bank_number, None);
+        assert_eq!(payload.tax_id, None);
+        assert_eq!(payload.tax_id_name, None);
+        assert_eq!(payload.id_country_code, None);
+        assert_eq!(payload.suspended_at, None);
+        assert_eq!(payload.deleted_at, None);
+    }
+
+    #[test]
+    fn test_update_profile_payload_with_partial_fields() {
+        let payload = UpdateProfilePayload::new(
+            Some("456 Oak Avenue".to_string()),
+            None,
+            Some("DE89370400440532013000".to_string()),
+            None,
+            None,
+            None,
+            Some("DE".to_string()),
+            None,
+            None,
+        );
+
+        assert_eq!(payload.address_line_1, Some("456 Oak Avenue".to_string()));
+        assert_eq!(payload.address_line_2, None);
+        assert_eq!(
+            payload.bank_account_number,
+            Some("DE89370400440532013000".to_string())
+        );
+        assert_eq!(payload.id_country_code, Some("DE".to_string()));
+    }
+
+    #[test]
+    fn test_update_profile_payload_from_string() {
+        let json = r#"{
+            "address_line_1": "789 Elm Road",
+            "address_line_2": "Suite 100",
+            "bank_account_number": "FR7630006000011234567890189",
+            "bank_number": "30006",
+            "tax_id": "FR12345678901",
+            "tax_id_name": "SIRET",
+            "id_country_code": "FR"
+        }"#;
+
+        let payload: UpdateProfilePayload = json.to_string().into();
+        assert_eq!(payload.address_line_1, Some("789 Elm Road".to_string()));
+        assert_eq!(payload.address_line_2, Some("Suite 100".to_string()));
+        assert_eq!(
+            payload.bank_account_number,
+            Some("FR7630006000011234567890189".to_string())
+        );
+        assert_eq!(payload.bank_number, Some("30006".to_string()));
+        assert_eq!(payload.tax_id, Some("FR12345678901".to_string()));
+        assert_eq!(payload.tax_id_name, Some("SIRET".to_string()));
+        assert_eq!(payload.id_country_code, Some("FR".to_string()));
+        assert_eq!(payload.suspended_at, None);
+        assert_eq!(payload.deleted_at, None);
+    }
+
+    #[test]
+    fn test_update_profile_payload_serialization_roundtrip() {
+        let original = UpdateProfilePayload::new(
+            Some("123 Test Street".to_string()),
+            Some("Floor 2".to_string()),
+            Some("GB82WEST12345698765432".to_string()),
+            Some("WEST12".to_string()),
+            Some("GB123456789".to_string()),
+            Some("UTR".to_string()),
+            Some("GB".to_string()),
+            Some("2024-06-01T00:00:00Z".to_string()),
+            None,
+        );
+
+        let serialized: String = original.clone().into();
+        let deserialized: UpdateProfilePayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_update_profile_payload_serialization_skips_none() {
+        let payload = UpdateProfilePayload::new(
+            Some("Only Address".to_string()),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        );
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        // Only address_line_1 should appear in JSON
+        assert!(serialized.contains("address_line_1"));
+        assert!(!serialized.contains("address_line_2"));
+        assert!(!serialized.contains("bank_account_number"));
+        assert!(!serialized.contains("bank_number"));
+        assert!(!serialized.contains("tax_id"));
+        assert!(!serialized.contains("tax_id_name"));
+        assert!(!serialized.contains("id_country_code"));
+        assert!(!serialized.contains("suspended_at"));
+        assert!(!serialized.contains("deleted_at"));
+
+        let deserialized: UpdateProfilePayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    #[test]
+    fn test_update_profile_payload_with_special_characters() {
+        let payload = UpdateProfilePayload::new(
+            Some("123 Müller-Straße".to_string()),
+            Some("Bürö & Co.".to_string()),
+            None,
+            None,
+            None,
+            None,
+            Some("DE".to_string()),
+            None,
+            None,
+        );
+
+        let serialized: String = payload.clone().into();
+        let deserialized: UpdateProfilePayload = serialized.into();
+
+        assert_eq!(payload, deserialized);
+        assert_eq!(
+            deserialized.address_line_1,
+            Some("123 Müller-Straße".to_string())
+        );
+        assert_eq!(deserialized.address_line_2, Some("Bürö & Co.".to_string()));
     }
 }

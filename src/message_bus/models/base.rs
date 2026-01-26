@@ -11,6 +11,7 @@ pub enum InstructionType {
     Transaction,
     BankPaymentRequest, // banking gateway payment request instruction
     ChainPayment,       // this is for anchors that require an update from the chain
+    UpdateProfile,      // profile update instruction
 }
 
 impl fmt::Display for InstructionType {
