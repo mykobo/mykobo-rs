@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.27] - 2026-01-26
+
+### ⛰️  Features
+
+- Add profile update payloads
+
 ## [1.0.26] - 2026-01-23
 
 ### 🐛 Bug Fixes
 
 - Provide token claim extraction function
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.26
 
 ## [1.0.25] - 2026-01-13
 
