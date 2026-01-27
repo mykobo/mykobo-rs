@@ -392,6 +392,7 @@ impl From<BankPaymentRequestPayload> for String {
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct UpdateProfilePayload {
+    pub profile_id: String,
     pub address_line_1: Option<String>,
     pub address_line_2: Option<String>,
     pub bank_account_number: Option<String>,
@@ -406,6 +407,7 @@ pub struct UpdateProfilePayload {
 impl UpdateProfilePayload {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
+        profile_id: String,
         address_line_1: Option<String>,
         address_line_2: Option<String>,
         bank_account_number: Option<String>,
@@ -417,6 +419,7 @@ impl UpdateProfilePayload {
         deleted_at: Option<String>,
     ) -> Self {
         Self {
+            profile_id,
             address_line_1,
             address_line_2,
             bank_account_number,
@@ -1030,6 +1033,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_with_all_fields() {
         let payload = UpdateProfilePayload::new(
+            "PROF123".to_string(),
             Some("123 Main Street".to_string()),
             Some("Apt 4B".to_string()),
             Some("GB12345678901234".to_string()),
@@ -1041,6 +1045,7 @@ mod tests {
             Some("2024-01-20T10:00:00Z".to_string()),
         );
 
+        assert_eq!(payload.profile_id, "PROF123".to_string());
         assert_eq!(payload.address_line_1, Some("123 Main Street".to_string()));
         assert_eq!(payload.address_line_2, Some("Apt 4B".to_string()));
         assert_eq!(
@@ -1059,10 +1064,21 @@ mod tests {
     }
 
     #[test]
-    fn test_update_profile_payload_with_no_fields() {
-        let payload =
-            UpdateProfilePayload::new(None, None, None, None, None, None, None, None, None);
+    fn test_update_profile_payload_with_no_optional_fields() {
+        let payload = UpdateProfilePayload::new(
+            "PROF456".to_string(),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        );
 
+        assert_eq!(payload.profile_id, "PROF456".to_string());
         assert_eq!(payload.address_line_1, None);
         assert_eq!(payload.address_line_2, None);
         assert_eq!(payload.bank_account_number, None);
@@ -1077,6 +1093,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_with_partial_fields() {
         let payload = UpdateProfilePayload::new(
+            "PROF789".to_string(),
             Some("456 Oak Avenue".to_string()),
             None,
             Some("DE89370400440532013000".to_string()),
@@ -1088,6 +1105,7 @@ mod tests {
             None,
         );
 
+        assert_eq!(payload.profile_id, "PROF789".to_string());
         assert_eq!(payload.address_line_1, Some("456 Oak Avenue".to_string()));
         assert_eq!(payload.address_line_2, None);
         assert_eq!(
@@ -1100,6 +1118,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_from_string() {
         let json = r#"{
+            "profile_id": "PROF_FR123",
             "address_line_1": "789 Elm Road",
             "address_line_2": "Suite 100",
             "bank_account_number": "FR7630006000011234567890189",
@@ -1110,6 +1129,7 @@ mod tests {
         }"#;
 
         let payload: UpdateProfilePayload = json.to_string().into();
+        assert_eq!(payload.profile_id, "PROF_FR123".to_string());
         assert_eq!(payload.address_line_1, Some("789 Elm Road".to_string()));
         assert_eq!(payload.address_line_2, Some("Suite 100".to_string()));
         assert_eq!(
@@ -1127,6 +1147,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_serialization_roundtrip() {
         let original = UpdateProfilePayload::new(
+            "PROF_ROUND".to_string(),
             Some("123 Test Street".to_string()),
             Some("Floor 2".to_string()),
             Some("GB82WEST12345698765432".to_string()),
@@ -1147,6 +1168,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_serialization_skips_none() {
         let payload = UpdateProfilePayload::new(
+            "PROF_SKIP".to_string(),
             Some("Only Address".to_string()),
             None,
             None,
@@ -1160,7 +1182,8 @@ mod tests {
 
         let serialized = serde_json::to_string(&payload).unwrap();
 
-        // Only address_line_1 should appear in JSON
+        // profile_id and address_line_1 should appear in JSON
+        assert!(serialized.contains("profile_id"));
         assert!(serialized.contains("address_line_1"));
         assert!(!serialized.contains("address_line_2"));
         assert!(!serialized.contains("bank_account_number"));
@@ -1178,6 +1201,7 @@ mod tests {
     #[test]
     fn test_update_profile_payload_with_special_characters() {
         let payload = UpdateProfilePayload::new(
+            "PROF_SPECIAL".to_string(),
             Some("123 Müller-Straße".to_string()),
             Some("Bürö & Co.".to_string()),
             None,

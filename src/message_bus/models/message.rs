@@ -968,6 +968,7 @@ mod tests {
     #[test]
     fn test_message_with_update_profile() {
         let payload = UpdateProfilePayload::new(
+            "PROF123".to_string(),
             Some("123 Main Street".to_string()),
             Some("Apt 4B".to_string()),
             Some("GB12345678901234".to_string()),
@@ -1000,6 +1001,7 @@ mod tests {
     #[test]
     fn test_message_update_profile_validates_payload_type() {
         let payload = UpdateProfilePayload::new(
+            "PROF456".to_string(),
             Some("123 Main Street".to_string()),
             None,
             None,
