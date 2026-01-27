@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.28] - 2026-01-27
+
+### 🐛 Bug Fixes
+
+- Enforce profile id in update profile payload
+
 ## [1.0.27] - 2026-01-26
 
 ### ⛰️  Features
 
 - Add profile update payloads
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.27
 
 ## [1.0.26] - 2026-01-23
 
