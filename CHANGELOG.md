@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.29] - 2026-02-05
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove SQS and sumsub from libraries
+
 ## [1.0.28] - 2026-01-27
 
 ### 🐛 Bug Fixes
 
 - Enforce profile id in update profile payload
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.28
 
 ## [1.0.27] - 2026-01-26
 
