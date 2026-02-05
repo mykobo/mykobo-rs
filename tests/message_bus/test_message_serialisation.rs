@@ -1,6 +1,14 @@
-use mykobo_rs::message_bus::sqs::models::{MessageEnvelope, SQSMessage};
 use mykobo_rs::message_bus::{EventType, InstructionType, MetaData};
 use pretty_assertions::assert_eq;
+use serde::{Deserialize, Serialize};
+
+/// A simple message envelope for testing MetaData serialization
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde_with::skip_serializing_none]
+struct MessageEnvelope<T> {
+    pub meta_data: MetaData,
+    pub payload: T,
+}
 
 #[test]
 fn test_message_serialisation() {
@@ -20,14 +28,11 @@ fn test_message_serialisation() {
         payload: "Test Payload".to_string(),
     };
 
-    let sqs_message = SQSMessage {
-        body: message.to_string(),
-        group: None,
-    };
+    let serialized = serde_json::to_string(&message).unwrap();
 
     // Parse both as JSON to compare semantically rather than string comparison
     // (field order in JSON doesn't matter semantically)
-    let actual: serde_json::Value = serde_json::from_str(&sqs_message.body).unwrap();
+    let actual: serde_json::Value = serde_json::from_str(&serialized).unwrap();
     let expected: serde_json::Value = serde_json::from_str(
         r#"{"meta_data":{"source":"TestFunction","created_at":"2025-07-26T18:16:52Z","token":"eyw83485yh9wehf89wr9gbsdfgksfg","idempotency_key":"02fb1ad1-103e-49a3-bdcc-4fba95f0f573","instruction_type":"PAYMENT","ip_address":"127.0.0.1"},"payload":"Test Payload"}"#,
     )
@@ -54,7 +59,7 @@ fn test_message_serialisation_with_ipv4() {
         payload: r#"{"status":"completed"}"#.to_string(),
     };
 
-    let serialized = message.to_string();
+    let serialized = serde_json::to_string(&message).unwrap();
     let deserialized: MessageEnvelope<String> = serde_json::from_str(&serialized).unwrap();
 
     assert_eq!(
@@ -81,7 +86,7 @@ fn test_message_serialisation_with_ipv6() {
         payload: r#"{"user_id":"USER123"}"#.to_string(),
     };
 
-    let serialized = message.to_string();
+    let serialized = serde_json::to_string(&message).unwrap();
     let deserialized: MessageEnvelope<String> = serde_json::from_str(&serialized).unwrap();
 
     assert_eq!(
@@ -108,13 +113,10 @@ fn test_message_serialisation_without_ip_address() {
         payload: "Test Payload".to_string(),
     };
 
-    let sqs_message = SQSMessage {
-        body: message.to_string(),
-        group: None,
-    };
+    let serialized = serde_json::to_string(&message).unwrap();
 
     // When ip_address is None, it should be omitted from serialization
-    let actual: serde_json::Value = serde_json::from_str(&sqs_message.body).unwrap();
+    let actual: serde_json::Value = serde_json::from_str(&serialized).unwrap();
 
     // Verify ip_address field is not present in the JSON
     assert!(!actual["meta_data"]

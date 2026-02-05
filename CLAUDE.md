@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`mykobo-rs` is a Rust client library for interacting with the MYKOBO suite of services. It provides HTTP clients for various MYKOBO services and supports message bus communication via both Kafka and AWS SQS.
+`mykobo-rs` is a Rust client library for interacting with the MYKOBO suite of services. It provides HTTP clients for various MYKOBO services and supports message bus communication via Kafka.
 
 ## Build and Test Commands
 
@@ -38,24 +38,18 @@ The library is organized around service-specific HTTP clients that handle authen
 
 - **WalletServiceClient** (`src/wallets/mod.rs`): Handles wallet profile retrieval and wallet registration for users.
 
-- **SumSubClient** (`src/sumsub/mod.rs`): Integrates with SumSub for KYC verification.
-
 - **AnchorClients** (`src/anchor/`):
   - Stellar anchor integration (`stellar/mod.rs`)
   - Dapp anchor integration (`dapp/mod.rs`)
 
 ### Message Bus Architecture
 
-The message bus module (`src/message_bus/`) supports two backends with a unified message model:
+The message bus module (`src/message_bus/`) provides Kafka-based messaging:
 
 **Kafka** (`message_bus/kafka/`):
 - `consumer.rs`: EventConsumer with automatic retry, backoff, and channel-based message forwarding
 - `producer.rs`: EventProducer with SASL_SSL authentication and compression
 - Both use KAFKA_API_KEY and KAFKA_API_SECRET environment variables
-
-**SQS** (`message_bus/sqs/`):
-- `mod.rs`: Functions for send_message, receive, delete_message, and client configuration
-- Uses AWS SDK with QUEUE_ENDPOINT and AWS_REGION environment variables
 
 **Unified Message Models** (`message_bus/models/`):
 - `MessageBusMessage`: Core message structure with metadata and payload
@@ -65,9 +59,9 @@ The message bus module (`src/message_bus/`) supports two backends with a unified
 ### Model Organization
 
 Models are split between request and response types in `src/models/`:
-- `request/`: Request DTOs for identity, wallets, sumsub
+- `request/`: Request DTOs for identity, wallets
 - `response/`: Response DTOs including auth, identity, wallets, anchor (stellar/dapp)
-- `error.rs`: ServiceError and message bus error types (KafkaError, SQSError)
+- `error.rs`: ServiceError and message bus error types (KafkaError)
 
 ### Authentication Pattern
 
@@ -90,7 +84,6 @@ Tests are in `tests/` directory mirroring the src structure. Test files use:
 Required environment variables by service:
 - Identity: `IDENTITY_SERVICE_HOST`, `IDENTITY_ACCESS_KEY`, `IDENTITY_SECRET_KEY`
 - Wallets: `WALLET_HOST`
-- SQS: `QUEUE_ENDPOINT`, `AWS_REGION` (optional, defaults to eu-west-1)
 - Kafka: `KAFKA_API_KEY`, `KAFKA_API_SECRET`
 
 ## Key Patterns
@@ -99,7 +92,7 @@ Required environment variables by service:
 All service clients use `new(max_retries: i8)` and read configuration from environment variables.
 
 ### Error Handling
-All service operations return `Result<T, ServiceError>` or `Result<T, KafkaError/SQSError>`. Use the `parse_response` utility for consistent HTTP response parsing.
+All service operations return `Result<T, ServiceError>` or `Result<T, KafkaError>`. Use the `parse_response` utility for consistent HTTP response parsing.
 
 ### Message Bus Migration
 When working with message bus code, note that as of v0.0.28:
