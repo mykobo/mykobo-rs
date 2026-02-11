@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Remove SQS and sumsub from libraries
+- Release mykobo-rs version 1.0.29
 
 ## [1.0.28] - 2026-01-27
 
