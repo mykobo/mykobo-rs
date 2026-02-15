@@ -12,6 +12,8 @@ pub enum InstructionType {
     BankPaymentRequest, // banking gateway payment request instruction
     ChainPayment,       // this is for anchors that require an update from the chain
     UpdateProfile,      // profile update instruction
+    Mint,               // mint instruction - to convert FIAT to Crypto asset
+    Burn,               // burn instruction - to convert Crypto asset to FIAT
 }
 
 impl fmt::Display for InstructionType {

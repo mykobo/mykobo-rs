@@ -446,6 +446,110 @@ impl From<UpdateProfilePayload> for String {
     }
 }
 
+/// Payload for mint instructions
+#[serde_with::skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct MintPayload {
+    pub value: String,
+    pub currency: String,
+    pub reference: String,
+    pub message: Option<String>,
+}
+
+impl MintPayload {
+    pub fn new(
+        value: String,
+        currency: String,
+        reference: String,
+        message: Option<String>,
+    ) -> Result<Self, ValidationError> {
+        let payload = Self {
+            value,
+            currency,
+            reference,
+            message,
+        };
+
+        payload.validate()?;
+        Ok(payload)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(
+            &[
+                ("value", &self.value),
+                ("currency", &self.currency),
+                ("reference", &self.reference),
+            ],
+            "MintPayload",
+        )
+    }
+}
+
+impl From<String> for MintPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize MintPayload from String")
+    }
+}
+
+impl From<MintPayload> for String {
+    fn from(val: MintPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize MintPayload to String")
+    }
+}
+
+/// Payload for burn instructions
+#[serde_with::skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct BurnPayload {
+    pub value: String,
+    pub currency: String,
+    pub reference: String,
+    pub message: Option<String>,
+}
+
+impl BurnPayload {
+    pub fn new(
+        value: String,
+        currency: String,
+        reference: String,
+        message: Option<String>,
+    ) -> Result<Self, ValidationError> {
+        let payload = Self {
+            value,
+            currency,
+            reference,
+            message,
+        };
+
+        payload.validate()?;
+        Ok(payload)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(
+            &[
+                ("value", &self.value),
+                ("currency", &self.currency),
+                ("reference", &self.reference),
+            ],
+            "BurnPayload",
+        )
+    }
+}
+
+impl From<String> for BurnPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).expect("Failed to deserialize BurnPayload from String")
+    }
+}
+
+impl From<BurnPayload> for String {
+    fn from(val: BurnPayload) -> Self {
+        serde_json::to_string(&val).expect("Failed to serialize BurnPayload to String")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1222,5 +1326,225 @@ mod tests {
             Some("123 Müller-Straße".to_string())
         );
         assert_eq!(deserialized.address_line_2, Some("Bürö & Co.".to_string()));
+    }
+
+    // Mint payload tests
+
+    #[test]
+    fn test_mint_payload_valid() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK123456".to_string(),
+            Some("Mint for deposit".to_string()),
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_mint_payload_valid_without_message() {
+        let payload = MintPayload::new(
+            "50.00".to_string(),
+            "USD".to_string(),
+            "MYK789012".to_string(),
+            None,
+        );
+        assert!(payload.is_ok());
+        let p = payload.unwrap();
+        assert_eq!(p.value, "50.00");
+        assert_eq!(p.currency, "USD");
+        assert_eq!(p.reference, "MYK789012");
+        assert_eq!(p.message, None);
+    }
+
+    #[test]
+    fn test_mint_payload_missing_value() {
+        let payload = MintPayload::new(
+            "".to_string(),
+            "EUR".to_string(),
+            "MYK123456".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_mint_payload_missing_currency() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "".to_string(),
+            "MYK123456".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_mint_payload_missing_reference() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_mint_payload_from_string() {
+        let json = r#"{
+            "value": "250.00",
+            "currency": "GBP",
+            "reference": "MYK_MINT_001",
+            "message": "Minting tokens"
+        }"#;
+
+        let payload: MintPayload = json.to_string().into();
+        assert_eq!(payload.value, "250.00");
+        assert_eq!(payload.currency, "GBP");
+        assert_eq!(payload.reference, "MYK_MINT_001");
+        assert_eq!(payload.message, Some("Minting tokens".to_string()));
+    }
+
+    #[test]
+    fn test_mint_payload_serialization_roundtrip() {
+        let original = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK123456".to_string(),
+            Some("Mint for deposit".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: MintPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_mint_payload_serialization_without_optionals() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK123456".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        assert!(!serialized.contains("message"));
+
+        let deserialized: MintPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
+    }
+
+    // Burn payload tests
+
+    #[test]
+    fn test_burn_payload_valid() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK654321".to_string(),
+            Some("Burn for withdrawal".to_string()),
+        );
+        assert!(payload.is_ok());
+    }
+
+    #[test]
+    fn test_burn_payload_valid_without_message() {
+        let payload = BurnPayload::new(
+            "200.00".to_string(),
+            "USD".to_string(),
+            "MYK111222".to_string(),
+            None,
+        );
+        assert!(payload.is_ok());
+        let p = payload.unwrap();
+        assert_eq!(p.value, "200.00");
+        assert_eq!(p.currency, "USD");
+        assert_eq!(p.reference, "MYK111222");
+        assert_eq!(p.message, None);
+    }
+
+    #[test]
+    fn test_burn_payload_missing_value() {
+        let payload = BurnPayload::new(
+            "".to_string(),
+            "EUR".to_string(),
+            "MYK654321".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_burn_payload_missing_currency() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "".to_string(),
+            "MYK654321".to_string(),
+            None,
+        );
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_burn_payload_missing_reference() {
+        let payload =
+            BurnPayload::new("75.00".to_string(), "EUR".to_string(), "".to_string(), None);
+        assert!(payload.is_err());
+    }
+
+    #[test]
+    fn test_burn_payload_from_string() {
+        let json = r#"{
+            "value": "500.00",
+            "currency": "USD",
+            "reference": "MYK_BURN_001",
+            "message": "Burning tokens"
+        }"#;
+
+        let payload: BurnPayload = json.to_string().into();
+        assert_eq!(payload.value, "500.00");
+        assert_eq!(payload.currency, "USD");
+        assert_eq!(payload.reference, "MYK_BURN_001");
+        assert_eq!(payload.message, Some("Burning tokens".to_string()));
+    }
+
+    #[test]
+    fn test_burn_payload_serialization_roundtrip() {
+        let original = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK654321".to_string(),
+            Some("Burn for withdrawal".to_string()),
+        )
+        .unwrap();
+
+        let serialized: String = original.clone().into();
+        let deserialized: BurnPayload = serialized.into();
+
+        assert_eq!(original, deserialized);
+    }
+
+    #[test]
+    fn test_burn_payload_serialization_without_optionals() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK654321".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let serialized = serde_json::to_string(&payload).unwrap();
+
+        assert!(!serialized.contains("message"));
+
+        let deserialized: BurnPayload = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(payload, deserialized);
     }
 }

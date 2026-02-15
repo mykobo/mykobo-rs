@@ -107,6 +107,8 @@ pub enum Payload {
     BankPaymentRequest(BankPaymentRequestPayload),
     ChainPayment(ChainPaymentPayload),
     UpdateProfile(UpdateProfilePayload),
+    Mint(MintPayload),
+    Burn(BurnPayload),
 
     // Event payloads
     NewTransaction(NewTransactionEventPayload),
@@ -165,6 +167,8 @@ impl MessageBusMessage {
                 (InstructionType::BankPaymentRequest, Payload::BankPaymentRequest(_)) => Ok(()),
                 (InstructionType::ChainPayment, Payload::ChainPayment(_)) => Ok(()),
                 (InstructionType::UpdateProfile, Payload::UpdateProfile(_)) => Ok(()),
+                (InstructionType::Mint, Payload::Mint(_)) => Ok(()),
+                (InstructionType::Burn, Payload::Burn(_)) => Ok(()),
                 _ => Err(ValidationError {
                     class_name: "MessageBusMessage".to_string(),
                     fields: vec![format!(
@@ -289,6 +293,12 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                     InstructionType::UpdateProfile => Payload::UpdateProfile(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::Mint => Payload::Mint(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    InstructionType::Burn => Payload::Burn(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
@@ -1027,5 +1037,161 @@ mod tests {
 
         let message = MessageBusMessage::new(metadata, Payload::UpdateProfile(payload));
         assert!(message.is_err());
+    }
+
+    #[test]
+    fn test_message_with_mint_instruction() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK_MINT_001".to_string(),
+            Some("Mint for deposit".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "LEDGER_SERVICE".to_string(),
+            Payload::Mint(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Mint),
+            None,
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.instruction_type, Some(InstructionType::Mint));
+    }
+
+    #[test]
+    fn test_message_with_burn_instruction() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK_BURN_001".to_string(),
+            Some("Burn for withdrawal".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "LEDGER_SERVICE".to_string(),
+            Payload::Burn(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Burn),
+            None,
+            None,
+            None,
+        );
+
+        assert!(message.is_ok());
+        let msg = message.unwrap();
+        assert_eq!(msg.meta_data.instruction_type, Some(InstructionType::Burn));
+    }
+
+    #[test]
+    fn test_message_mint_validates_payload_type() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK123".to_string(),
+            None,
+        )
+        .unwrap();
+
+        // Wrong instruction type for Mint payload
+        let metadata = MetaData::new(
+            "LEDGER_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-123".to_string(),
+            Some(InstructionType::Payment), // Wrong instruction type
+            None,
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::new(metadata, Payload::Mint(payload));
+        assert!(message.is_err());
+    }
+
+    #[test]
+    fn test_message_burn_validates_payload_type() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK456".to_string(),
+            None,
+        )
+        .unwrap();
+
+        // Wrong instruction type for Burn payload
+        let metadata = MetaData::new(
+            "LEDGER_SERVICE".to_string(),
+            "2021-01-01T00:00:00Z".to_string(),
+            "test.token".to_string(),
+            "key-456".to_string(),
+            Some(InstructionType::Payment), // Wrong instruction type
+            None,
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::new(metadata, Payload::Burn(payload));
+        assert!(message.is_err());
+    }
+
+    #[test]
+    fn test_message_mint_serialization_roundtrip() {
+        let payload = MintPayload::new(
+            "100.00".to_string(),
+            "EUR".to_string(),
+            "MYK_MINT_RT".to_string(),
+            Some("Roundtrip test".to_string()),
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "LEDGER_SERVICE".to_string(),
+            Payload::Mint(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Mint),
+            None,
+            Some("idem-key-mint".to_string()),
+            None,
+        )
+        .unwrap();
+
+        let serialized: String = message.clone().into();
+        let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(message, deserialized);
+    }
+
+    #[test]
+    fn test_message_burn_serialization_roundtrip() {
+        let payload = BurnPayload::new(
+            "75.00".to_string(),
+            "EUR".to_string(),
+            "MYK_BURN_RT".to_string(),
+            None,
+        )
+        .unwrap();
+
+        let message = MessageBusMessage::create(
+            "LEDGER_SERVICE".to_string(),
+            Payload::Burn(payload),
+            "test.token.here".to_string(),
+            Some(InstructionType::Burn),
+            None,
+            Some("idem-key-burn".to_string()),
+            None,
+        )
+        .unwrap();
+
+        let serialized: String = message.clone().into();
+        let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(message, deserialized);
     }
 }

@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `mykobo-rs` is a Rust client library for interacting with the MYKOBO suite of services. It provides HTTP clients for various MYKOBO services and supports message bus communication via Kafka.
 
+**Sibling project**: `../mykobo-py` is the Python counterpart. Message bus models (InstructionType, EventType, payloads) must stay in sync between both libraries.
+
 ## Build and Test Commands
 
 ### Build
@@ -99,3 +101,10 @@ When working with message bus code, note that as of v0.0.28:
 - Use `models::MetaData` instead of deprecated `Metadata`
 - Use `MessageBusMessage::create()` for new message construction
 - Legacy `generate_meta_data()` function is deprecated
+
+### Keeping in Sync with mykobo-py
+When modifying message bus models, ensure changes are mirrored in `../mykobo-py/mykobo_py/message_bus/models/`. Key files to keep aligned:
+- `base.rs` ↔ `base.py` (enums: InstructionType, EventType, TransactionType, PaymentDirection/Direction)
+- `instruction.rs` ↔ `instruction.py` (instruction payloads)
+- `event.rs` ↔ `event.py` (event payloads)
+- `message.rs` ↔ `message.py` (MetaData, Payload enum, MessageBusMessage)
