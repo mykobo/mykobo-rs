@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.30] - 2026-02-15
+
+### ⛰️  Features
+
+- Add mint and burn messagebus support
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.29
+
 ## [1.0.29] - 2026-02-05
 
 ### ⚙️ Miscellaneous Tasks
