@@ -31,12 +31,13 @@ where
         topics: &[&str],
         channel: Sender<IncomingMessage<T>>,
     ) -> KafkaResult<Self> {
-        let sasl_username =
-            env::var("KAFKA_API_KEY").expect("Missing KAFKA_API_KEY environment variable");
-        let sasl_password =
-            env::var("KAFKA_API_SECRET").expect("Missing KAFKA_API_SECRET environment variable");
+        let sasl_username = env::var("KAFKA_API_KEY").ok();
+        let sasl_password = env::var("KAFKA_API_SECRET").ok();
+        let protocol = env::var("KAFKA_API_PROTOCOL").unwrap_or("SASL_SSL".to_string());
+        let mechanism = env::var("KAFKA_API_SASL_MECHANISM").unwrap_or("PLAIN".to_string());
 
-        let consumer: StreamConsumer = ClientConfig::new()
+        let mut config = ClientConfig::new();
+        config
             .set("auto.offset.reset", "earliest")
             .set("client.id", client_id)
             .set("group.id", group_id)
@@ -48,20 +49,32 @@ where
             .set("socket.keepalive.enable", "true")
             .set("socket.connection.setup.timeout.ms", "10000")
             .set("connections.max.idle.ms", "540000")
-            .set("security.protocol", "SASL_SSL")
-            .set("sasl.mechanisms", "PLAIN")
-            .set("sasl.username", sasl_username)
-            .set("sasl.password", sasl_password)
+            .set("security.protocol", &protocol)
+            .set("sasl.mechanisms", mechanism);
+
+        if protocol == "SASL_SSL" {
+            let username = sasl_username.ok_or_else(|| {
+                KafkaError::ClientCreation("KAFKA_API_KEY is required when protocol is SASL_SSL".into())
+            })?;
+            let password = sasl_password.ok_or_else(|| {
+                KafkaError::ClientCreation("KAFKA_API_SECRET is required when protocol is SASL_SSL".into())
+            })?;
+            config
+                .set("sasl.username", username)
+                .set("sasl.password", password);
+        }
+
+        let stream_consumer: StreamConsumer = config
             .set_log_level(RDKafkaLogLevel::Info)
             .create()
             .map_err(|e| KafkaError::ClientCreation(e.to_string()))?;
 
-        consumer
+        stream_consumer
             .subscribe(topics)
             .expect("Can't subscribe to specified topics");
 
         Ok(EventConsumer {
-            consumer,
+            consumer: stream_consumer,
             max_retries,
             channel,
         })
