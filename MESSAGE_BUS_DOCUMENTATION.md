@@ -5,6 +5,7 @@ This document provides comprehensive documentation for the MYKOBO message bus sy
 ## Table of Contents
 
 - [Overview](#overview)
+- [Kafka Consumer and Producer](#kafka-consumer-and-producer)
 - [Quick Reference](#quick-reference)
 - [Message Structure](#message-structure)
 - [Instruction Types](#instruction-types)
@@ -26,6 +27,227 @@ The MYKOBO message bus system provides a unified way to send instructions and ev
 - **Validation**: Required field validation at creation time
 - **Metadata tracking**: Built-in support for idempotency, timestamps, source tracking, and IP addresses
 - **Comprehensive coverage**: 6 instruction types and 9 event types fully supported
+
+## Kafka Consumer and Producer
+
+The library provides `EventConsumer` and `EventProducer` for Kafka-based messaging. Both require a running Kafka broker and authenticate via environment variables.
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `KAFKA_API_KEY` | Yes (SASL_SSL) | — | SASL username for broker authentication |
+| `KAFKA_API_SECRET` | Yes (SASL_SSL) | — | SASL password for broker authentication |
+| `KAFKA_API_PROTOCOL` | No | `SASL_SSL` | Security protocol (e.g., `SASL_SSL`, `PLAINTEXT`) |
+| `KAFKA_API_SASL_MECHANISM` | No | `PLAIN` | SASL mechanism |
+
+### EventProducer
+
+The `EventProducer` sends serializable messages to a single Kafka topic.
+
+```rust
+use mykobo_rs::message_bus::kafka::producer::EventProducer;
+use mykobo_rs::message_bus::models::{
+    MessageBusMessage, InstructionType, Payload, PaymentPayload,
+};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create a producer bound to a topic
+    let producer = EventProducer::new(
+        "broker1:9092,broker2:9092",  // Kafka broker addresses
+        30000,                         // Message timeout in seconds
+        "mykobo.instructions",         // Target topic
+    )?;
+
+    // Build a message
+    let payload = PaymentPayload::new(
+        "EXT001".to_string(),
+        "EUR".to_string(),
+        "250.00".to_string(),
+        "BANK_MODULR".to_string(),
+        "REF001".to_string(),
+        Some("Jane Doe".to_string()),
+        None,
+    )?;
+
+    let message = MessageBusMessage::create(
+        "PAYMENT_SERVICE".to_string(),
+        Payload::Payment(payload),
+        "service.token".to_string(),
+        Some(InstructionType::Payment),
+        None,
+        None,
+    )?;
+
+    // Send with a routing key
+    producer.send_event("payment-key".to_string(), message).await?;
+
+    Ok(())
+}
+```
+
+**Key details:**
+- The producer uses gzip compression and `acks=all` for reliable delivery.
+- Built-in retries (3 attempts with 500ms backoff) are configured at the Kafka client level.
+- Each `send_event` call serializes the payload to JSON and attaches a `source` header.
+
+### EventConsumer
+
+The `EventConsumer` subscribes to one or more Kafka topics and forwards deserialized messages through a `tokio::sync::mpsc` channel.
+
+```rust
+use mykobo_rs::message_bus::kafka::consumer::EventConsumer;
+use mykobo_rs::message_bus::kafka::models::IncomingMessage;
+use mykobo_rs::message_bus::models::MessageBusMessage;
+use tokio::sync::mpsc;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create a channel to receive messages
+    let (tx, mut rx) = mpsc::channel::<IncomingMessage<MessageBusMessage>>(100);
+
+    // Create the consumer
+    let consumer = EventConsumer::new(
+        "broker1:9092,broker2:9092",   // Kafka broker addresses
+        "my-consumer-group",            // Consumer group ID
+        "my-service-client",            // Client ID
+        3,                              // Max retries per message
+        &["mykobo.instructions", "mykobo.events"],  // Topics to subscribe to
+        tx,                             // Channel sender
+    )?;
+
+    // Spawn the consumer loop in a background task
+    tokio::spawn(async move {
+        if let Err(e) = consumer.start().await {
+            eprintln!("Consumer error: {}", e);
+        }
+    });
+
+    // Process messages from the channel
+    while let Some(incoming) = rx.recv().await {
+        println!("Headers: {:?}", incoming.headers);
+
+        match incoming.payload.payload {
+            Payload::Payment(p) => {
+                println!("Payment received: {} {}", p.value, p.currency);
+            }
+            Payload::StatusUpdate(s) => {
+                println!("Status update: {} -> {}", s.reference, s.status);
+            }
+            _ => {
+                println!("Other message type received");
+            }
+        }
+    }
+
+    Ok(())
+}
+```
+
+**Key details:**
+- The consumer starts from the `earliest` offset for new consumer groups.
+- Messages are committed asynchronously after successful processing.
+- Failed message parsing is retried with exponential backoff (1s, 2s, 4s, ...) up to `max_retries`.
+- The generic type parameter `T` controls what the payload is deserialized into — use `MessageBusMessage` for standard MYKOBO messages, or any other `Deserialize` type for custom payloads.
+
+### IncomingMessage
+
+Each message received by the consumer is wrapped in an `IncomingMessage<T>`:
+
+```rust
+pub struct IncomingMessage<T> {
+    pub headers: HashMap<String, String>,  // Kafka message headers
+    pub payload: T,                         // Deserialized message body
+}
+```
+
+### Full Example: Producer and Consumer Together
+
+```rust
+use mykobo_rs::message_bus::kafka::consumer::EventConsumer;
+use mykobo_rs::message_bus::kafka::models::IncomingMessage;
+use mykobo_rs::message_bus::kafka::producer::EventProducer;
+use mykobo_rs::message_bus::models::*;
+use tokio::sync::mpsc;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let topic = "mykobo.instructions";
+    let brokers = "localhost:9092";
+
+    // --- Producer side ---
+    let producer = EventProducer::new(brokers, 30000, topic)?;
+
+    let payload = StatusUpdatePayload::new(
+        "REF-123".to_string(),
+        "COMPLETED".to_string(),
+        Some("Payment confirmed".to_string()),
+        None,
+    )?;
+
+    let message = MessageBusMessage::create(
+        "MY_SERVICE".to_string(),
+        Payload::StatusUpdate(payload),
+        "service.token".to_string(),
+        Some(InstructionType::StatusUpdate),
+        None,
+        None,
+    )?;
+
+    producer.send_event("status-update".to_string(), message).await?;
+
+    // --- Consumer side ---
+    let (tx, mut rx) = mpsc::channel::<IncomingMessage<MessageBusMessage>>(100);
+
+    let consumer = EventConsumer::new(
+        brokers,
+        "my-group",
+        "my-client",
+        3,
+        &[topic],
+        tx,
+    )?;
+
+    tokio::spawn(async move {
+        consumer.start().await.expect("Consumer failed");
+    });
+
+    // Process incoming messages
+    while let Some(msg) = rx.recv().await {
+        println!("Received: {}", msg);
+    }
+
+    Ok(())
+}
+```
+
+### Error Handling
+
+Both producer and consumer return `KafkaResult<T>`, which wraps `KafkaError`:
+
+```rust
+use mykobo_rs::models::error::{KafkaError, KafkaResult};
+
+match EventProducer::new(brokers, 30000, topic) {
+    Ok(producer) => { /* ready to send */ }
+    Err(KafkaError::ClientCreation(reason)) => {
+        eprintln!("Failed to create producer: {}", reason);
+    }
+    Err(e) => {
+        eprintln!("Unexpected error: {}", e);
+    }
+}
+```
+
+| Error Variant | When it occurs |
+|--------------|----------------|
+| `KafkaError::ClientCreation` | Missing env vars or invalid broker config |
+| `KafkaError::MessageSend` | Failed to serialize or deliver a message |
+| `KafkaError::MessageDelivery` | Max retries exceeded or commit failed |
+| `KafkaError::Deserialization` | Failed to deserialize an incoming message payload |
+
+---
 
 ## Quick Reference
 

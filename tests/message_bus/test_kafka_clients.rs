@@ -119,30 +119,57 @@ async fn test_consumer_creation_with_sasl_ssl_credentials() {
 
 #[test]
 #[serial]
-#[should_panic(expected = "Missing KAFKA_API_KEY")]
-fn test_producer_creation_panics_without_api_key() {
+fn test_producer_creation_fails_without_api_key_for_sasl_ssl() {
     clear_kafka_env();
+    // SASL_SSL is the default when KAFKA_API_PROTOCOL is not set
 
-    let _ = EventProducer::new("localhost:9092", 5000, "test-topic");
+    let result = EventProducer::new("localhost:9092", 5000, "test-topic");
+
+    match result {
+        Err(KafkaError::ClientCreation(msg)) => {
+            assert!(msg.contains("KAFKA_API_KEY"), "Error should mention KAFKA_API_KEY, got: {msg}");
+        }
+        Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
+        Ok(_) => panic!("Expected error but producer was created successfully"),
+    }
 }
 
 #[test]
 #[serial]
-#[should_panic(expected = "Missing KAFKA_API_SECRET")]
-fn test_producer_creation_panics_without_api_secret() {
+fn test_producer_creation_fails_without_api_secret_for_sasl_ssl() {
     clear_kafka_env();
     env::set_var("KAFKA_API_KEY", "test-key");
+    // KAFKA_API_SECRET is not set
 
-    let _ = EventProducer::new("localhost:9092", 5000, "test-topic");
+    let result = EventProducer::new("localhost:9092", 5000, "test-topic");
+
+    match result {
+        Err(KafkaError::ClientCreation(msg)) => {
+            assert!(msg.contains("KAFKA_API_SECRET"), "Error should mention KAFKA_API_SECRET, got: {msg}");
+        }
+        Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
+        Ok(_) => panic!("Expected error but producer was created successfully"),
+    }
 }
 
 #[test]
 #[serial]
-fn test_producer_creation_with_valid_credentials() {
+fn test_producer_creation_with_sasl_ssl_credentials() {
     clear_kafka_env();
     set_kafka_credentials();
 
     let producer = EventProducer::new("localhost:9092", 5000, "test-topic");
 
-    assert!(producer.is_ok(), "Producer should be created with valid credentials");
+    assert!(producer.is_ok(), "Producer should be created with valid SASL_SSL credentials");
+}
+
+#[test]
+#[serial]
+fn test_producer_creation_with_plaintext_protocol() {
+    clear_kafka_env();
+    env::set_var("KAFKA_API_PROTOCOL", "PLAINTEXT");
+
+    let producer = EventProducer::new("localhost:9092", 5000, "test-topic");
+
+    assert!(producer.is_ok(), "Producer should be created with PLAINTEXT protocol without credentials");
 }
