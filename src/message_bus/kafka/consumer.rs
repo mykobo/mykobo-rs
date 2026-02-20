@@ -54,10 +54,14 @@ where
 
         if protocol == "SASL_SSL" {
             let username = sasl_username.ok_or_else(|| {
-                KafkaError::ClientCreation("KAFKA_API_KEY is required when protocol is SASL_SSL".into())
+                KafkaError::ClientCreation(
+                    "KAFKA_API_KEY is required when protocol is SASL_SSL".into(),
+                )
             })?;
             let password = sasl_password.ok_or_else(|| {
-                KafkaError::ClientCreation("KAFKA_API_SECRET is required when protocol is SASL_SSL".into())
+                KafkaError::ClientCreation(
+                    "KAFKA_API_SECRET is required when protocol is SASL_SSL".into(),
+                )
             })?;
             config
                 .set("sasl.username", username)

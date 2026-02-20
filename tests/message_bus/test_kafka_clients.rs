@@ -39,7 +39,10 @@ async fn test_consumer_creation_with_plaintext_protocol() {
         tx,
     );
 
-    assert!(consumer.is_ok(), "Consumer should be created with PLAINTEXT protocol without credentials");
+    assert!(
+        consumer.is_ok(),
+        "Consumer should be created with PLAINTEXT protocol without credentials"
+    );
 }
 
 #[tokio::test]
@@ -61,7 +64,10 @@ async fn test_consumer_creation_fails_without_api_key_for_sasl_ssl() {
 
     match result {
         Err(KafkaError::ClientCreation(msg)) => {
-            assert!(msg.contains("KAFKA_API_KEY"), "Error should mention KAFKA_API_KEY, got: {msg}");
+            assert!(
+                msg.contains("KAFKA_API_KEY"),
+                "Error should mention KAFKA_API_KEY, got: {msg}"
+            );
         }
         Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
         Ok(_) => panic!("Expected error but consumer was created successfully"),
@@ -88,7 +94,10 @@ async fn test_consumer_creation_fails_without_api_secret_for_sasl_ssl() {
 
     match result {
         Err(KafkaError::ClientCreation(msg)) => {
-            assert!(msg.contains("KAFKA_API_SECRET"), "Error should mention KAFKA_API_SECRET, got: {msg}");
+            assert!(
+                msg.contains("KAFKA_API_SECRET"),
+                "Error should mention KAFKA_API_SECRET, got: {msg}"
+            );
         }
         Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
         Ok(_) => panic!("Expected error but consumer was created successfully"),
@@ -112,7 +121,10 @@ async fn test_consumer_creation_with_sasl_ssl_credentials() {
         tx,
     );
 
-    assert!(consumer.is_ok(), "Consumer should be created with valid SASL_SSL credentials");
+    assert!(
+        consumer.is_ok(),
+        "Consumer should be created with valid SASL_SSL credentials"
+    );
 }
 
 // ─── Producer tests ──────────────────────────────────────────────────────────
@@ -127,7 +139,10 @@ fn test_producer_creation_fails_without_api_key_for_sasl_ssl() {
 
     match result {
         Err(KafkaError::ClientCreation(msg)) => {
-            assert!(msg.contains("KAFKA_API_KEY"), "Error should mention KAFKA_API_KEY, got: {msg}");
+            assert!(
+                msg.contains("KAFKA_API_KEY"),
+                "Error should mention KAFKA_API_KEY, got: {msg}"
+            );
         }
         Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
         Ok(_) => panic!("Expected error but producer was created successfully"),
@@ -145,7 +160,10 @@ fn test_producer_creation_fails_without_api_secret_for_sasl_ssl() {
 
     match result {
         Err(KafkaError::ClientCreation(msg)) => {
-            assert!(msg.contains("KAFKA_API_SECRET"), "Error should mention KAFKA_API_SECRET, got: {msg}");
+            assert!(
+                msg.contains("KAFKA_API_SECRET"),
+                "Error should mention KAFKA_API_SECRET, got: {msg}"
+            );
         }
         Err(e) => panic!("Expected ClientCreation error, got: {e:?}"),
         Ok(_) => panic!("Expected error but producer was created successfully"),
@@ -160,7 +178,10 @@ fn test_producer_creation_with_sasl_ssl_credentials() {
 
     let producer = EventProducer::new("localhost:9092", 5000, "test-topic");
 
-    assert!(producer.is_ok(), "Producer should be created with valid SASL_SSL credentials");
+    assert!(
+        producer.is_ok(),
+        "Producer should be created with valid SASL_SSL credentials"
+    );
 }
 
 #[test]
@@ -171,5 +192,8 @@ fn test_producer_creation_with_plaintext_protocol() {
 
     let producer = EventProducer::new("localhost:9092", 5000, "test-topic");
 
-    assert!(producer.is_ok(), "Producer should be created with PLAINTEXT protocol without credentials");
+    assert!(
+        producer.is_ok(),
+        "Producer should be created with PLAINTEXT protocol without credentials"
+    );
 }
