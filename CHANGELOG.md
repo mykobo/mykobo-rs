@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.31] - 2026-02-20
+
+### 🐛 Bug Fixes
+
+- Allow other types of connection protocols
+- Allow other types of connection protocols
+- Allow other types of connection protocols
+
 ## [1.0.30] - 2026-02-15
 
 ### ⛰️  Features
@@ -11,6 +19,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Release mykobo-rs version 1.0.29
+- Release mykobo-rs version 1.0.30
 
 ## [1.0.29] - 2026-02-05
 
