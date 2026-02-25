@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.32] - 2026-02-25
+
+### ⛰️  Features
+
+- Add chain to mint and burn
+
 ## [1.0.31] - 2026-02-20
 
 ### 🐛 Bug Fixes
@@ -9,6 +15,10 @@ All notable changes to this project will be documented in this file.
 - Allow other types of connection protocols
 - Allow other types of connection protocols
 - Allow other types of connection protocols
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.31
 
 ## [1.0.30] - 2026-02-15
 
