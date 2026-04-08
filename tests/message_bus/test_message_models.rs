@@ -4,6 +4,7 @@ use mykobo_rs::message_bus::models::instruction::*;
 use mykobo_rs::message_bus::{
     EventType, InstructionType, MessageBusMessage, MetaData, Payload, TransactionType,
 };
+use std::collections::HashMap;
 
 #[test]
 fn test_metadata_valid() {
@@ -837,6 +838,252 @@ fn test_message_burn_serialization_roundtrip() {
         Some(InstructionType::Burn),
         None,
         Some("idem-key-burn".to_string()),
+        None,
+    )
+    .unwrap();
+
+    let serialized: String = message.clone().into();
+    let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+    assert_eq!(message, deserialized);
+}
+
+#[test]
+fn test_message_with_address_onboarded_event() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("address".to_string(), "0xabc123".to_string());
+
+    let payload = AddressOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::AddressOnboarded(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::AddressOnboarded),
+        None,
+        None,
+    );
+
+    assert!(message.is_ok());
+    let msg = message.unwrap();
+    assert_eq!(msg.meta_data.event, Some(EventType::AddressOnboarded));
+}
+
+#[test]
+fn test_message_with_relay_initiated_event() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+
+    let payload = RelayInitiatedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayInitiated(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayInitiated),
+        None,
+        None,
+    );
+
+    assert!(message.is_ok());
+    let msg = message.unwrap();
+    assert_eq!(msg.meta_data.event, Some(EventType::RelayInitiated));
+}
+
+#[test]
+fn test_message_with_relay_completed_event() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+    payload_data.insert("status".to_string(), "SUCCESS".to_string());
+
+    let payload = RelayCompletedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayCompleted(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayCompleted),
+        None,
+        None,
+    );
+
+    assert!(message.is_ok());
+    let msg = message.unwrap();
+    assert_eq!(msg.meta_data.event, Some(EventType::RelayCompleted));
+}
+
+#[test]
+fn test_address_onboarded_validates_payload_type() {
+    let payload = StatusUpdatePayload::new(
+        "REF123".to_string(),
+        "PENDING".to_string(),
+        None,
+        None,
+    )
+    .unwrap();
+
+    let metadata = MetaData::new(
+        "RELAY_SERVICE".to_string(),
+        "2021-01-01T00:00:00Z".to_string(),
+        "test.token".to_string(),
+        "key-123".to_string(),
+        None,
+        Some(EventType::AddressOnboarded),
+        None,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::new(metadata, Payload::StatusUpdate(payload));
+    assert!(message.is_err());
+}
+
+#[test]
+fn test_message_address_onboarded_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("address".to_string(), "0xabc123".to_string());
+    payload_data.insert("chain".to_string(), "stellar".to_string());
+
+    let payload = AddressOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::AddressOnboarded(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::AddressOnboarded),
+        Some("idem-key-addr".to_string()),
+        None,
+    )
+    .unwrap();
+
+    let serialized: String = message.clone().into();
+    let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+    assert_eq!(message, deserialized);
+}
+
+#[test]
+fn test_message_relay_initiated_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+
+    let payload = RelayInitiatedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayInitiated(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayInitiated),
+        Some("idem-key-relay-init".to_string()),
+        None,
+    )
+    .unwrap();
+
+    let serialized: String = message.clone().into();
+    let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+    assert_eq!(message, deserialized);
+}
+
+#[test]
+fn test_message_relay_completed_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+    payload_data.insert("status".to_string(), "SUCCESS".to_string());
+
+    let payload = RelayCompletedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayCompleted(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayCompleted),
+        Some("idem-key-relay-done".to_string()),
+        None,
+    )
+    .unwrap();
+
+    let serialized: String = message.clone().into();
+    let deserialized: MessageBusMessage = serde_json::from_str(&serialized).unwrap();
+
+    assert_eq!(message, deserialized);
+}
+
+#[test]
+fn test_message_with_relay_onboarded_event() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("wallet_id".to_string(), "W123".to_string());
+    payload_data.insert("chain".to_string(), "STELLAR".to_string());
+
+    let payload = RelayOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayOnboarded(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayOnboarded),
+        None,
+        None,
+    );
+
+    assert!(message.is_ok());
+    let msg = message.unwrap();
+    assert_eq!(msg.meta_data.event, Some(EventType::RelayOnboarded));
+}
+
+#[test]
+fn test_message_relay_onboarded_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("wallet_id".to_string(), "W123".to_string());
+    payload_data.insert("chain".to_string(), "STELLAR".to_string());
+
+    let payload = RelayOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let message = MessageBusMessage::create(
+        "RELAY_SERVICE".to_string(),
+        Payload::RelayOnboarded(payload),
+        "test.token.here".to_string(),
+        None,
+        Some(EventType::RelayOnboarded),
+        Some("idem-key-relay-onboarded".to_string()),
         None,
     )
     .unwrap();

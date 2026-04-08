@@ -5,6 +5,7 @@ use mykobo_rs::message_bus::{
     EventType, InstructionType, MessageBusMessage, Payload, TransactionType,
 };
 use pretty_assertions::assert_eq;
+use std::collections::HashMap;
 
 /// Test deserialization of MessageBusMessage with Payment payload
 #[test]
@@ -570,7 +571,8 @@ fn test_deserialize_password_reset_event_message() {
         },
         "payload": {
             "to": "user@example.com",
-            "subject": "Reset Your Password"
+            "subject": "Reset Your Password",
+            "password": "newSecurePass123"
         }
     }"#;
 
@@ -585,6 +587,7 @@ fn test_deserialize_password_reset_event_message() {
         Payload::PasswordReset(payload) => {
             assert_eq!(payload.to, "user@example.com");
             assert_eq!(payload.subject, "Reset Your Password");
+            assert_eq!(payload.password, "newSecurePass123");
         }
         _ => panic!("Expected PasswordReset payload"),
     }
@@ -1064,13 +1067,207 @@ fn test_all_event_payloads_roundtrip() {
 
     // PasswordReset
     let payload =
-        PasswordResetEventPayload::new("user@test.com".to_string(), "Reset".to_string()).unwrap();
+        PasswordResetEventPayload::new("user@test.com".to_string(), "Reset".to_string(), "pass123".to_string()).unwrap();
     let msg = MessageBusMessage::create(
         "SRC".to_string(),
         Payload::PasswordReset(payload),
         "token".to_string(),
         None,
         Some(EventType::PasswordResetRequested),
+        None,
+        None,
+    )
+    .unwrap();
+    let json = serde_json::to_string(&msg).unwrap();
+    let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
+}
+
+/// Test deserialization of MessageBusMessage with AddressOnboarded event payload
+#[test]
+fn test_deserialize_address_onboarded_event_message() {
+    let json = r#"{
+        "meta_data": {
+            "source": "RELAY_SERVICE",
+            "created_at": "2024-01-01T00:00:00Z",
+            "token": "relay.token",
+            "idempotency_key": "addr-key-111",
+            "event": "ADDRESS_ONBOARDED"
+        },
+        "payload": {
+            "email": "user@example.com",
+            "payload": {"address": "0xabc123", "chain": "stellar"}
+        }
+    }"#;
+
+    let message: MessageBusMessage = serde_json::from_str(json).unwrap();
+
+    assert_eq!(message.meta_data.event, Some(EventType::AddressOnboarded));
+
+    match message.payload {
+        Payload::AddressOnboarded(payload) => {
+            assert_eq!(payload.email, "user@example.com");
+            assert_eq!(payload.payload.get("address").unwrap(), "0xabc123");
+            assert_eq!(payload.payload.get("chain").unwrap(), "stellar");
+        }
+        _ => panic!("Expected AddressOnboarded payload"),
+    }
+}
+
+/// Test deserialization of MessageBusMessage with RelayInitiated event payload
+#[test]
+fn test_deserialize_relay_initiated_event_message() {
+    let json = r#"{
+        "meta_data": {
+            "source": "RELAY_SERVICE",
+            "created_at": "2024-01-01T00:00:00Z",
+            "token": "relay.token",
+            "idempotency_key": "relay-init-key-222",
+            "event": "RELAY_INITIATED"
+        },
+        "payload": {
+            "email": "user@example.com",
+            "payload": {"transaction_id": "TX123", "amount": "100.00"}
+        }
+    }"#;
+
+    let message: MessageBusMessage = serde_json::from_str(json).unwrap();
+
+    assert_eq!(message.meta_data.event, Some(EventType::RelayInitiated));
+
+    match message.payload {
+        Payload::RelayInitiated(payload) => {
+            assert_eq!(payload.email, "user@example.com");
+            assert_eq!(payload.payload.get("transaction_id").unwrap(), "TX123");
+            assert_eq!(payload.payload.get("amount").unwrap(), "100.00");
+        }
+        _ => panic!("Expected RelayInitiated payload"),
+    }
+}
+
+/// Test deserialization of MessageBusMessage with RelayCompleted event payload
+#[test]
+fn test_deserialize_relay_completed_event_message() {
+    let json = r#"{
+        "meta_data": {
+            "source": "RELAY_SERVICE",
+            "created_at": "2024-01-01T00:00:00Z",
+            "token": "relay.token",
+            "idempotency_key": "relay-done-key-333",
+            "event": "RELAY_COMPLETED"
+        },
+        "payload": {
+            "email": "user@example.com",
+            "payload": {"transaction_id": "TX123", "status": "SUCCESS"}
+        }
+    }"#;
+
+    let message: MessageBusMessage = serde_json::from_str(json).unwrap();
+
+    assert_eq!(message.meta_data.event, Some(EventType::RelayCompleted));
+
+    match message.payload {
+        Payload::RelayCompleted(payload) => {
+            assert_eq!(payload.email, "user@example.com");
+            assert_eq!(payload.payload.get("status").unwrap(), "SUCCESS");
+        }
+        _ => panic!("Expected RelayCompleted payload"),
+    }
+}
+
+/// Test deserialization of MessageBusMessage with RelayOnboarded event payload
+#[test]
+fn test_deserialize_relay_onboarded_event_message() {
+    let json = r#"{
+        "meta_data": {
+            "source": "RELAY_SERVICE",
+            "created_at": "2024-01-01T00:00:00Z",
+            "token": "relay.token",
+            "idempotency_key": "relay-onboarded-key-444",
+            "event": "RELAY_ONBOARDED"
+        },
+        "payload": {
+            "email": "user@example.com",
+            "payload": {"wallet_id": "W123", "chain": "STELLAR"}
+        }
+    }"#;
+
+    let message: MessageBusMessage = serde_json::from_str(json).unwrap();
+
+    assert_eq!(message.meta_data.event, Some(EventType::RelayOnboarded));
+
+    match message.payload {
+        Payload::RelayOnboarded(payload) => {
+            assert_eq!(payload.email, "user@example.com");
+            assert_eq!(payload.payload.get("chain").unwrap(), "STELLAR");
+        }
+        _ => panic!("Expected RelayOnboarded payload"),
+    }
+}
+
+/// Test roundtrip for all three new event payloads
+#[test]
+fn test_new_event_payloads_roundtrip() {
+    // AddressOnboarded
+    let mut data = HashMap::new();
+    data.insert("address".to_string(), "0xabc".to_string());
+    let payload = AddressOnboardedEventPayload::new("a@b.com".to_string(), data).unwrap();
+    let msg = MessageBusMessage::create(
+        "SRC".to_string(),
+        Payload::AddressOnboarded(payload),
+        "token".to_string(),
+        None,
+        Some(EventType::AddressOnboarded),
+        None,
+        None,
+    )
+    .unwrap();
+    let json = serde_json::to_string(&msg).unwrap();
+    let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
+
+    // RelayInitiated
+    let mut data = HashMap::new();
+    data.insert("tx".to_string(), "123".to_string());
+    let payload = RelayInitiatedEventPayload::new("a@b.com".to_string(), data).unwrap();
+    let msg = MessageBusMessage::create(
+        "SRC".to_string(),
+        Payload::RelayInitiated(payload),
+        "token".to_string(),
+        None,
+        Some(EventType::RelayInitiated),
+        None,
+        None,
+    )
+    .unwrap();
+    let json = serde_json::to_string(&msg).unwrap();
+    let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
+
+    // RelayCompleted
+    let mut data = HashMap::new();
+    data.insert("status".to_string(), "done".to_string());
+    let payload = RelayCompletedEventPayload::new("a@b.com".to_string(), data).unwrap();
+    let msg = MessageBusMessage::create(
+        "SRC".to_string(),
+        Payload::RelayCompleted(payload),
+        "token".to_string(),
+        None,
+        Some(EventType::RelayCompleted),
+        None,
+        None,
+    )
+    .unwrap();
+    let json = serde_json::to_string(&msg).unwrap();
+    let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
+
+    // RelayOnboarded
+    let mut data = HashMap::new();
+    data.insert("wallet_id".to_string(), "W123".to_string());
+    let payload = RelayOnboardedEventPayload::new("a@b.com".to_string(), data).unwrap();
+    let msg = MessageBusMessage::create(
+        "SRC".to_string(),
+        Payload::RelayOnboarded(payload),
+        "token".to_string(),
+        None,
+        Some(EventType::RelayOnboarded),
         None,
         None,
     )

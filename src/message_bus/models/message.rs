@@ -120,6 +120,10 @@ pub enum Payload {
     Kyc(KycEventPayload),
     PasswordReset(PasswordResetEventPayload),
     VerificationRequested(VerificationRequestedEventPayload),
+    AddressOnboarded(AddressOnboardedEventPayload),
+    RelayInitiated(RelayInitiatedEventPayload),
+    RelayCompleted(RelayCompletedEventPayload),
+    RelayOnboarded(RelayOnboardedEventPayload),
 
     // Generic payload
     Raw(String),
@@ -188,6 +192,10 @@ impl MessageBusMessage {
                 (EventType::KycEvent, Payload::Kyc(_)) => Ok(()),
                 (EventType::PasswordResetRequested, Payload::PasswordReset(_)) => Ok(()),
                 (EventType::VerificationRequested, Payload::VerificationRequested(_)) => Ok(()),
+                (EventType::AddressOnboarded, Payload::AddressOnboarded(_)) => Ok(()),
+                (EventType::RelayInitiated, Payload::RelayInitiated(_)) => Ok(()),
+                (EventType::RelayCompleted, Payload::RelayCompleted(_)) => Ok(()),
+                (EventType::RelayOnboarded, Payload::RelayOnboarded(_)) => Ok(()),
                 _ => Err(ValidationError {
                     class_name: "MessageBusMessage".to_string(),
                     fields: vec![format!(
@@ -335,6 +343,18 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                     EventType::VerificationRequested => Payload::VerificationRequested(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::AddressOnboarded => Payload::AddressOnboarded(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::RelayInitiated => Payload::RelayInitiated(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::RelayCompleted => Payload::RelayCompleted(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
+                    ),
+                    EventType::RelayOnboarded => Payload::RelayOnboarded(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }

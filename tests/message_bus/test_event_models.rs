@@ -1,5 +1,6 @@
 use mykobo_rs::message_bus::models::event::*;
 use mykobo_rs::message_bus::TransactionType;
+use std::collections::HashMap;
 
 #[test]
 fn test_new_transaction_event_payload_valid() {
@@ -126,12 +127,14 @@ fn test_kyc_event_payload_from_string() {
 fn test_password_reset_event_payload_from_string() {
     let json = r#"{
         "to": "user@example.com",
-        "subject": "Reset Your Password"
+        "subject": "Reset Your Password",
+        "password": "newSecurePass123"
     }"#;
 
     let payload: PasswordResetEventPayload = json.to_string().into();
     assert_eq!(payload.to, "user@example.com");
     assert_eq!(payload.subject, "Reset Your Password");
+    assert_eq!(payload.password, "newSecurePass123");
 }
 
 #[test]
@@ -263,6 +266,7 @@ fn test_password_reset_event_payload_serialization_roundtrip() {
     let original = PasswordResetEventPayload::new(
         "user@example.com".to_string(),
         "Reset Your Password".to_string(),
+        "newSecurePass123".to_string(),
     )
     .unwrap();
 
@@ -322,6 +326,7 @@ fn test_email_payload_with_special_characters() {
     let payload = PasswordResetEventPayload::new(
         "user+test@example.com".to_string(),
         "Reset: \"Your\" Password & Account".to_string(),
+        "p@ssw0rd!".to_string(),
     )
     .unwrap();
 
@@ -331,6 +336,229 @@ fn test_email_payload_with_special_characters() {
     assert_eq!(payload, deserialized);
     assert_eq!(deserialized.to, "user+test@example.com");
     assert_eq!(deserialized.subject, "Reset: \"Your\" Password & Account");
+}
+
+// AddressOnboardedEventPayload tests
+
+#[test]
+fn test_address_onboarded_event_payload_valid() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("address".to_string(), "0xabc123".to_string());
+    payload_data.insert("chain".to_string(), "stellar".to_string());
+
+    let payload = AddressOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data.clone(),
+    );
+    assert!(payload.is_ok());
+    let p = payload.unwrap();
+    assert_eq!(p.email, "user@example.com");
+    assert_eq!(p.payload, payload_data);
+}
+
+#[test]
+fn test_address_onboarded_event_payload_invalid_empty_email() {
+    let payload = AddressOnboardedEventPayload::new(
+        "".to_string(),
+        HashMap::new(),
+    );
+    assert!(payload.is_err());
+}
+
+#[test]
+fn test_address_onboarded_event_payload_from_string() {
+    let json = r#"{
+        "email": "user@example.com",
+        "payload": {"address": "0xabc123", "chain": "stellar"}
+    }"#;
+
+    let payload: AddressOnboardedEventPayload = json.to_string().into();
+    assert_eq!(payload.email, "user@example.com");
+    assert_eq!(payload.payload.get("address").unwrap(), "0xabc123");
+    assert_eq!(payload.payload.get("chain").unwrap(), "stellar");
+}
+
+#[test]
+fn test_address_onboarded_event_payload_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("address".to_string(), "0xabc123".to_string());
+
+    let original = AddressOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let serialized: String = original.clone().into();
+    let deserialized: AddressOnboardedEventPayload = serialized.into();
+    assert_eq!(original, deserialized);
+}
+
+// RelayInitiatedEventPayload tests
+
+#[test]
+fn test_relay_initiated_event_payload_valid() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+    payload_data.insert("amount".to_string(), "100.00".to_string());
+
+    let payload = RelayInitiatedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data.clone(),
+    );
+    assert!(payload.is_ok());
+    let p = payload.unwrap();
+    assert_eq!(p.email, "user@example.com");
+    assert_eq!(p.payload, payload_data);
+}
+
+#[test]
+fn test_relay_initiated_event_payload_invalid_empty_email() {
+    let payload = RelayInitiatedEventPayload::new(
+        "".to_string(),
+        HashMap::new(),
+    );
+    assert!(payload.is_err());
+}
+
+#[test]
+fn test_relay_initiated_event_payload_from_string() {
+    let json = r#"{
+        "email": "user@example.com",
+        "payload": {"transaction_id": "TX123"}
+    }"#;
+
+    let payload: RelayInitiatedEventPayload = json.to_string().into();
+    assert_eq!(payload.email, "user@example.com");
+    assert_eq!(payload.payload.get("transaction_id").unwrap(), "TX123");
+}
+
+#[test]
+fn test_relay_initiated_event_payload_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+
+    let original = RelayInitiatedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let serialized: String = original.clone().into();
+    let deserialized: RelayInitiatedEventPayload = serialized.into();
+    assert_eq!(original, deserialized);
+}
+
+// RelayCompletedEventPayload tests
+
+#[test]
+fn test_relay_completed_event_payload_valid() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+    payload_data.insert("status".to_string(), "SUCCESS".to_string());
+
+    let payload = RelayCompletedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data.clone(),
+    );
+    assert!(payload.is_ok());
+    let p = payload.unwrap();
+    assert_eq!(p.email, "user@example.com");
+    assert_eq!(p.payload, payload_data);
+}
+
+#[test]
+fn test_relay_completed_event_payload_invalid_empty_email() {
+    let payload = RelayCompletedEventPayload::new(
+        "".to_string(),
+        HashMap::new(),
+    );
+    assert!(payload.is_err());
+}
+
+#[test]
+fn test_relay_completed_event_payload_from_string() {
+    let json = r#"{
+        "email": "user@example.com",
+        "payload": {"transaction_id": "TX123", "status": "SUCCESS"}
+    }"#;
+
+    let payload: RelayCompletedEventPayload = json.to_string().into();
+    assert_eq!(payload.email, "user@example.com");
+    assert_eq!(payload.payload.get("status").unwrap(), "SUCCESS");
+}
+
+#[test]
+fn test_relay_completed_event_payload_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("transaction_id".to_string(), "TX123".to_string());
+    payload_data.insert("status".to_string(), "SUCCESS".to_string());
+
+    let original = RelayCompletedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let serialized: String = original.clone().into();
+    let deserialized: RelayCompletedEventPayload = serialized.into();
+    assert_eq!(original, deserialized);
+}
+
+// RelayOnboardedEventPayload tests
+
+#[test]
+fn test_relay_onboarded_event_payload_valid() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("wallet_id".to_string(), "W123".to_string());
+    payload_data.insert("chain".to_string(), "STELLAR".to_string());
+
+    let payload = RelayOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data.clone(),
+    );
+    assert!(payload.is_ok());
+    let p = payload.unwrap();
+    assert_eq!(p.email, "user@example.com");
+    assert_eq!(p.payload, payload_data);
+}
+
+#[test]
+fn test_relay_onboarded_event_payload_invalid_empty_email() {
+    let payload = RelayOnboardedEventPayload::new(
+        "".to_string(),
+        HashMap::new(),
+    );
+    assert!(payload.is_err());
+}
+
+#[test]
+fn test_relay_onboarded_event_payload_from_string() {
+    let json = r#"{
+        "email": "user@example.com",
+        "payload": {"wallet_id": "W123", "chain": "STELLAR"}
+    }"#;
+
+    let payload: RelayOnboardedEventPayload = json.to_string().into();
+    assert_eq!(payload.email, "user@example.com");
+    assert_eq!(payload.payload.get("chain").unwrap(), "STELLAR");
+}
+
+#[test]
+fn test_relay_onboarded_event_payload_serialization_roundtrip() {
+    let mut payload_data = HashMap::new();
+    payload_data.insert("wallet_id".to_string(), "W123".to_string());
+    payload_data.insert("chain".to_string(), "STELLAR".to_string());
+
+    let original = RelayOnboardedEventPayload::new(
+        "user@example.com".to_string(),
+        payload_data,
+    )
+    .unwrap();
+
+    let serialized: String = original.clone().into();
+    let deserialized: RelayOnboardedEventPayload = serialized.into();
+    assert_eq!(original, deserialized);
 }
 
 #[test]

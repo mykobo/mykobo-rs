@@ -1,5 +1,6 @@
 use super::base::{validate_required_fields, TransactionType, ValidationError};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Payload for a new transaction event mainly for notification purposes
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -346,13 +347,15 @@ impl From<KycEventPayload> for String {
 pub struct PasswordResetEventPayload {
     pub to: String,
     pub subject: String,
+    pub password: String,
 }
 
 impl PasswordResetEventPayload {
-    pub fn new(to: String, subject: String) -> Result<Self, ValidationError> {
+    pub fn new(to: String, subject: String, password: String) -> Result<Self, ValidationError> {
         let payload = Self {
             to: to.clone(),
             subject: subject.clone(),
+            password: password.clone(),
         };
 
         payload.validate()?;
@@ -361,7 +364,7 @@ impl PasswordResetEventPayload {
 
     pub fn validate(&self) -> Result<(), ValidationError> {
         validate_required_fields(
-            &[("to", &self.to), ("subject", &self.subject)],
+            &[("to", &self.to), ("subject", &self.subject), ("password", &self.password)],
             "PasswordResetEventPayload",
         )
     }
@@ -418,5 +421,161 @@ impl From<VerificationRequestedEventPayload> for String {
     fn from(val: VerificationRequestedEventPayload) -> Self {
         serde_json::to_string(&val)
             .expect("Failed to serialize VerificationRequestedEventPayload to String")
+    }
+}
+
+/// Payload for address onboarded event
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct AddressOnboardedEventPayload {
+    pub email: String,
+    pub payload: HashMap<String, String>,
+}
+
+impl AddressOnboardedEventPayload {
+    pub fn new(
+        email: String,
+        payload: HashMap<String, String>,
+    ) -> Result<Self, ValidationError> {
+        let event = Self {
+            email: email.clone(),
+            payload,
+        };
+        event.validate()?;
+        Ok(event)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(&[("email", &self.email)], "AddressOnboardedEventPayload")
+    }
+}
+
+impl From<String> for AddressOnboardedEventPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize AddressOnboardedEventPayload from String")
+    }
+}
+
+impl From<AddressOnboardedEventPayload> for String {
+    fn from(val: AddressOnboardedEventPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize AddressOnboardedEventPayload to String")
+    }
+}
+
+/// Payload for relay initiated event
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct RelayInitiatedEventPayload {
+    pub email: String,
+    pub payload: HashMap<String, String>,
+}
+
+impl RelayInitiatedEventPayload {
+    pub fn new(
+        email: String,
+        payload: HashMap<String, String>,
+    ) -> Result<Self, ValidationError> {
+        let event = Self {
+            email: email.clone(),
+            payload,
+        };
+        event.validate()?;
+        Ok(event)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(&[("email", &self.email)], "RelayInitiatedEventPayload")
+    }
+}
+
+impl From<String> for RelayInitiatedEventPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize RelayInitiatedEventPayload from String")
+    }
+}
+
+impl From<RelayInitiatedEventPayload> for String {
+    fn from(val: RelayInitiatedEventPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize RelayInitiatedEventPayload to String")
+    }
+}
+
+/// Payload for relay completed event
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct RelayCompletedEventPayload {
+    pub email: String,
+    pub payload: HashMap<String, String>,
+}
+
+impl RelayCompletedEventPayload {
+    pub fn new(
+        email: String,
+        payload: HashMap<String, String>,
+    ) -> Result<Self, ValidationError> {
+        let event = Self {
+            email: email.clone(),
+            payload,
+        };
+        event.validate()?;
+        Ok(event)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(&[("email", &self.email)], "RelayCompletedEventPayload")
+    }
+}
+
+impl From<String> for RelayCompletedEventPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize RelayCompletedEventPayload from String")
+    }
+}
+
+impl From<RelayCompletedEventPayload> for String {
+    fn from(val: RelayCompletedEventPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize RelayCompletedEventPayload to String")
+    }
+}
+
+/// Payload for relay onboarded event
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct RelayOnboardedEventPayload {
+    pub email: String,
+    pub payload: HashMap<String, String>,
+}
+
+impl RelayOnboardedEventPayload {
+    pub fn new(
+        email: String,
+        payload: HashMap<String, String>,
+    ) -> Result<Self, ValidationError> {
+        let event = Self {
+            email: email.clone(),
+            payload,
+        };
+        event.validate()?;
+        Ok(event)
+    }
+
+    pub fn validate(&self) -> Result<(), ValidationError> {
+        validate_required_fields(&[("email", &self.email)], "RelayOnboardedEventPayload")
+    }
+}
+
+impl From<String> for RelayOnboardedEventPayload {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value)
+            .expect("Failed to deserialize RelayOnboardedEventPayload from String")
+    }
+}
+
+impl From<RelayOnboardedEventPayload> for String {
+    fn from(val: RelayOnboardedEventPayload) -> Self {
+        serde_json::to_string(&val)
+            .expect("Failed to serialize RelayOnboardedEventPayload to String")
     }
 }

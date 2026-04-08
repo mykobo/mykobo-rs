@@ -96,6 +96,10 @@ pub enum EventType {
     VerificationRequested,
     PasswordResetRequested,
     KycEvent,
+    AddressOnboarded,
+    RelayInitiated,
+    RelayCompleted,
+    RelayOnboarded,
 }
 
 impl fmt::Display for EventType {
