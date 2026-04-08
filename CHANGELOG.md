@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.33] - 2026-04-08
+
+### ⛰️  Features
+
+- Circle support, and update password reset message
+
 ## [1.0.32] - 2026-02-25
 
 ### ⛰️  Features
 
 - Add chain to mint and burn
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.32
 
 ## [1.0.31] - 2026-02-20
 
