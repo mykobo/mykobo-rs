@@ -1,4 +1,5 @@
 use crate::anchor::models::DappTransaction as Transaction;
+use crate::identity::models::ServiceToken;
 use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use log::debug;
@@ -21,13 +22,13 @@ impl DappAnchor {
         self.host.clone()
     }
 
-    pub async fn get_transaction(&self, transaction_id: &str) -> Result<Transaction, ServiceError> {
-        let url = format!("{}/api/transactions/{}", self.host, transaction_id);
+    pub async fn get_transaction(&self, service_token: ServiceToken, transaction_id: &str) -> Result<Transaction, ServiceError> {
+        let url = format!("{}/v1/transactions/{}", self.host, transaction_id);
         debug!("Requesting transaction data from {}", self.host());
         let response = self
             .client
             .get(url)
-            .headers(generate_headers(None, None))
+            .headers(generate_headers(Some(service_token), None))
             .send()
             .await;
         parse_response::<Transaction>(response).await
