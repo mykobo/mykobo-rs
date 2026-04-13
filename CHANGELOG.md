@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.34] - 2026-04-13
+
+### 🐛 Bug Fixes
+
+- DAPP API path
+
 ## [1.0.33] - 2026-04-08
 
 ### ⛰️  Features
 
 - Circle support, and update password reset message
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.33
 
 ## [1.0.32] - 2026-02-25
 
