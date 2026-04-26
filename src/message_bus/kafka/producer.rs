@@ -6,6 +6,21 @@ use serde::Serialize;
 use std::env;
 use std::time::Duration;
 
+pub const MESSAGE_SOURCE: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+
+pub fn build_message_headers() -> OwnedHeaders {
+    let generated_at = chrono::Utc::now().to_rfc3339();
+    OwnedHeaders::new()
+        .insert(Header {
+            key: "source",
+            value: Some(MESSAGE_SOURCE),
+        })
+        .insert(Header {
+            key: "generated_at",
+            value: Some(generated_at.as_str()),
+        })
+}
+
 pub struct EventProducer {
     producer: FutureProducer,
     topic: String,
@@ -67,10 +82,7 @@ impl EventProducer {
         let payload_json =
             serde_json::to_string(&payload).map_err(|e| KafkaError::MessageSend(e.to_string()))?;
         let record: FutureRecord<String, String> = FutureRecord::to(&self.topic)
-            .headers(OwnedHeaders::new().insert(Header {
-                key: "source",
-                value: Some("kafka_test_rs/producer.rs"),
-            }))
+            .headers(build_message_headers())
             .payload(&payload_json)
             .key(&key);
 
