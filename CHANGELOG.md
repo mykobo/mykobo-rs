@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.35] - 2026-04-26
+
+### 🐛 Bug Fixes
+
+- Add headers to kafka messages
+
 ## [1.0.34] - 2026-04-13
 
 ### 🐛 Bug Fixes
 
 - DAPP API path
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.34
 
 ## [1.0.33] - 2026-04-08
 
