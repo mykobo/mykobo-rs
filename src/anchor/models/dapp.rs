@@ -6,7 +6,9 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum TransactionType {
+    #[serde(alias = "deposit")]
     Deposit,
+    #[serde(alias = "withdraw")]
     Withdraw,
 }
 
@@ -14,20 +16,29 @@ pub enum TransactionType {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TransactionStatus {
+    #[serde(alias = "pending_payer")]
     PendingPayer,
+    #[serde(alias = "pending_payee")]
     PendingPayee,
+    #[serde(alias = "pending_anchor")]
     PendingAnchor,
+    #[serde(alias = "pending_ramp")]
     PendingRamp,
+    #[serde(alias = "pending_user")]
     PendingUser,
+    #[serde(alias = "completed")]
     Completed,
+    #[serde(alias = "failed")]
     Failed,
+    #[serde(alias = "cancelled")]
     Cancelled,
 }
 
 /// Transaction source enumeration
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TransactionSource {
+    #[default]
     AnchorDapp,
     AnchorStellar,
 }
@@ -47,6 +58,7 @@ pub struct Transaction {
 
     /// Transaction identifiers
     pub reference: String,
+    #[serde(default)]
     pub idempotency_key: String,
 
     /// Transaction details
@@ -66,7 +78,11 @@ pub struct Transaction {
     pub last_name: Option<String>,
     pub wallet_address: String,
 
+    /// Network (e.g. SOLANA, STELLAR)
+    pub network: Option<String>,
+
     /// Source and metadata
+    #[serde(default)]
     pub source: TransactionSource,
     /// IPv4 or IPv6 address
     pub ip_address: Option<String>,
@@ -117,6 +133,7 @@ impl Transaction {
             first_name: None,
             last_name: None,
             wallet_address,
+            network: None,
             source,
             ip_address: None,
             message_id: None,
@@ -192,6 +209,7 @@ impl Default for Transaction {
             first_name: None,
             last_name: None,
             wallet_address: String::new(),
+            network: None,
             source: TransactionSource::AnchorDapp,
             ip_address: None,
             message_id: None,

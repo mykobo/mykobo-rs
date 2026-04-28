@@ -4,6 +4,12 @@ use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
 use log::debug;
 use reqwest::Client;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct TransactionEnvelope {
+    transaction: Transaction,
+}
 
 pub struct DappAnchor {
     pub host: String,
@@ -31,6 +37,8 @@ impl DappAnchor {
             .headers(generate_headers(Some(service_token), None))
             .send()
             .await;
-        parse_response::<Transaction>(response).await
+        parse_response::<TransactionEnvelope>(response)
+            .await
+            .map(|envelope| envelope.transaction)
     }
 }

@@ -207,6 +207,54 @@ fn test_solana_deposit_deserialization() {
 }
 
 #[test]
+fn test_solana_deposit_envelope_deserialization() {
+    let payload = r#"
+        {
+          "transaction": {
+            "created_at": "2025-10-29T18:58:11.611297+00:00",
+            "fee": "0.120000",
+            "id": "ada3f414-8d70-4eb4-b297-2c79936c6abe",
+            "incoming_currency": "EUR",
+            "network": "SOLANA",
+            "outgoing_currency": "EURC",
+            "reference": "MYK1761764290",
+            "status": "pending_payer",
+            "transaction_type": "DEPOSIT",
+            "tx_hash": null,
+            "updated_at": "2025-10-29T18:58:11.753986+00:00",
+            "value": "10.000000",
+            "wallet_address": "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J"
+          }
+        }
+        "#;
+
+    #[derive(serde::Deserialize)]
+    struct Envelope {
+        transaction: Transaction,
+    }
+
+    let envelope: Envelope = serde_json::from_str(payload).unwrap();
+    let transaction = envelope.transaction;
+
+    assert_eq!(transaction.id, "ada3f414-8d70-4eb4-b297-2c79936c6abe");
+    assert_eq!(transaction.reference, "MYK1761764290");
+    assert_eq!(transaction.transaction_type, TransactionType::Deposit);
+    assert_eq!(transaction.status, TransactionStatus::PendingPayer);
+    assert_eq!(transaction.incoming_currency, "EUR");
+    assert_eq!(transaction.outgoing_currency, "EURC");
+    assert_eq!(transaction.value, "10.000000");
+    assert_eq!(transaction.fee, "0.120000");
+    assert_eq!(transaction.network, Some("SOLANA".to_string()));
+    assert_eq!(transaction.tx_hash, None);
+    assert_eq!(transaction.idempotency_key, "");
+    assert_eq!(transaction.source, TransactionSource::AnchorDapp);
+    assert_eq!(
+        transaction.wallet_address,
+        "B2JAtKctzWLt4cegWpqBjRqABZDxSSBCNCXPP7Kyk24J"
+    );
+}
+
+#[test]
 fn test_solana_deposit_deserialization_2() {
     let payload = r#"
     {
