@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.37] - 2026-04-30
+
+### ⛰️  Features
+
+- Support service management
+
 ## [1.0.36] - 2026-04-28
 
 ### 🐛 Bug Fixes
 
 - Support new dapp transaction payload
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.36
 
 ## [1.0.35] - 2026-04-26
 
