@@ -9,8 +9,10 @@ use crate::{
     models::error::ServiceError,
     util::{generate_headers, parse_response},
 };
-use models::{CircleAddress, CreateRelayAddressPairRequest, PaginatedTransactions, RelayAddress, Transaction};
 use models::response::RelayAddressPair;
+use models::{
+    CircleAddress, CreateRelayAddressPairRequest, PaginatedTransactions, RelayAddress, Transaction,
+};
 
 #[derive(Clone)]
 pub struct CircleServiceClient {

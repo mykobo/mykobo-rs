@@ -853,11 +853,8 @@ fn test_message_with_address_onboarded_event() {
     let mut payload_data = HashMap::new();
     payload_data.insert("address".to_string(), "0xabc123".to_string());
 
-    let payload = AddressOnboardedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        AddressOnboardedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -879,11 +876,8 @@ fn test_message_with_relay_initiated_event() {
     let mut payload_data = HashMap::new();
     payload_data.insert("transaction_id".to_string(), "TX123".to_string());
 
-    let payload = RelayInitiatedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayInitiatedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -906,11 +900,8 @@ fn test_message_with_relay_completed_event() {
     payload_data.insert("transaction_id".to_string(), "TX123".to_string());
     payload_data.insert("status".to_string(), "SUCCESS".to_string());
 
-    let payload = RelayCompletedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayCompletedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -929,13 +920,8 @@ fn test_message_with_relay_completed_event() {
 
 #[test]
 fn test_address_onboarded_validates_payload_type() {
-    let payload = StatusUpdatePayload::new(
-        "REF123".to_string(),
-        "PENDING".to_string(),
-        None,
-        None,
-    )
-    .unwrap();
+    let payload =
+        StatusUpdatePayload::new("REF123".to_string(), "PENDING".to_string(), None, None).unwrap();
 
     let metadata = MetaData::new(
         "RELAY_SERVICE".to_string(),
@@ -958,11 +944,8 @@ fn test_message_address_onboarded_serialization_roundtrip() {
     payload_data.insert("address".to_string(), "0xabc123".to_string());
     payload_data.insert("chain".to_string(), "stellar".to_string());
 
-    let payload = AddressOnboardedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        AddressOnboardedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -986,11 +969,8 @@ fn test_message_relay_initiated_serialization_roundtrip() {
     let mut payload_data = HashMap::new();
     payload_data.insert("transaction_id".to_string(), "TX123".to_string());
 
-    let payload = RelayInitiatedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayInitiatedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -1015,11 +995,8 @@ fn test_message_relay_completed_serialization_roundtrip() {
     payload_data.insert("transaction_id".to_string(), "TX123".to_string());
     payload_data.insert("status".to_string(), "SUCCESS".to_string());
 
-    let payload = RelayCompletedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayCompletedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -1044,11 +1021,8 @@ fn test_message_with_relay_onboarded_event() {
     payload_data.insert("wallet_id".to_string(), "W123".to_string());
     payload_data.insert("chain".to_string(), "STELLAR".to_string());
 
-    let payload = RelayOnboardedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayOnboardedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),
@@ -1071,11 +1045,8 @@ fn test_message_relay_onboarded_serialization_roundtrip() {
     payload_data.insert("wallet_id".to_string(), "W123".to_string());
     payload_data.insert("chain".to_string(), "STELLAR".to_string());
 
-    let payload = RelayOnboardedEventPayload::new(
-        "user@example.com".to_string(),
-        payload_data,
-    )
-    .unwrap();
+    let payload =
+        RelayOnboardedEventPayload::new("user@example.com".to_string(), payload_data).unwrap();
 
     let message = MessageBusMessage::create(
         "RELAY_SERVICE".to_string(),

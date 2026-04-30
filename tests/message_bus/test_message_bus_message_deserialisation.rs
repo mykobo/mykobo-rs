@@ -1066,8 +1066,12 @@ fn test_all_event_payloads_roundtrip() {
     let _: MessageBusMessage = serde_json::from_str(&json).unwrap();
 
     // PasswordReset
-    let payload =
-        PasswordResetEventPayload::new("user@test.com".to_string(), "Reset".to_string(), "pass123".to_string()).unwrap();
+    let payload = PasswordResetEventPayload::new(
+        "user@test.com".to_string(),
+        "Reset".to_string(),
+        "pass123".to_string(),
+    )
+    .unwrap();
     let msg = MessageBusMessage::create(
         "SRC".to_string(),
         Payload::PasswordReset(payload),

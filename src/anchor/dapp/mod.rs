@@ -28,7 +28,11 @@ impl DappAnchor {
         self.host.clone()
     }
 
-    pub async fn get_transaction(&self, service_token: ServiceToken, transaction_id: &str) -> Result<Transaction, ServiceError> {
+    pub async fn get_transaction(
+        &self,
+        service_token: ServiceToken,
+        transaction_id: &str,
+    ) -> Result<Transaction, ServiceError> {
         let url = format!("{}/v1/transactions/{}", self.host, transaction_id);
         debug!("Requesting transaction data from {}", self.host());
         let response = self

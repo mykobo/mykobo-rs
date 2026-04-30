@@ -364,7 +364,11 @@ impl PasswordResetEventPayload {
 
     pub fn validate(&self) -> Result<(), ValidationError> {
         validate_required_fields(
-            &[("to", &self.to), ("subject", &self.subject), ("password", &self.password)],
+            &[
+                ("to", &self.to),
+                ("subject", &self.subject),
+                ("password", &self.password),
+            ],
             "PasswordResetEventPayload",
         )
     }
@@ -432,10 +436,7 @@ pub struct AddressOnboardedEventPayload {
 }
 
 impl AddressOnboardedEventPayload {
-    pub fn new(
-        email: String,
-        payload: HashMap<String, String>,
-    ) -> Result<Self, ValidationError> {
+    pub fn new(email: String, payload: HashMap<String, String>) -> Result<Self, ValidationError> {
         let event = Self {
             email: email.clone(),
             payload,
@@ -471,10 +472,7 @@ pub struct RelayInitiatedEventPayload {
 }
 
 impl RelayInitiatedEventPayload {
-    pub fn new(
-        email: String,
-        payload: HashMap<String, String>,
-    ) -> Result<Self, ValidationError> {
+    pub fn new(email: String, payload: HashMap<String, String>) -> Result<Self, ValidationError> {
         let event = Self {
             email: email.clone(),
             payload,
@@ -510,10 +508,7 @@ pub struct RelayCompletedEventPayload {
 }
 
 impl RelayCompletedEventPayload {
-    pub fn new(
-        email: String,
-        payload: HashMap<String, String>,
-    ) -> Result<Self, ValidationError> {
+    pub fn new(email: String, payload: HashMap<String, String>) -> Result<Self, ValidationError> {
         let event = Self {
             email: email.clone(),
             payload,
@@ -549,10 +544,7 @@ pub struct RelayOnboardedEventPayload {
 }
 
 impl RelayOnboardedEventPayload {
-    pub fn new(
-        email: String,
-        payload: HashMap<String, String>,
-    ) -> Result<Self, ValidationError> {
+    pub fn new(email: String, payload: HashMap<String, String>) -> Result<Self, ValidationError> {
         let event = Self {
             email: email.clone(),
             payload,

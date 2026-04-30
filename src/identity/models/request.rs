@@ -94,3 +94,19 @@ pub struct NewDocumentRequest {
     pub updated_at: Option<NaiveDateTime>,
     pub document_sub_type: Option<String>,
 }
+
+#[derive(Serialize, Debug, Clone, Default)]
+pub struct UpdateServiceProfileRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+}
+
+#[derive(Serialize, Debug, Clone, Default)]
+pub struct PatchScopesRequest {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub add: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub remove: Vec<String>,
+}

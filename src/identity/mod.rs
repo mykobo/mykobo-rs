@@ -6,9 +6,10 @@ use crate::util::{generate_headers, parse_response};
 use jsonwebtoken::dangerous::insecure_decode;
 use log::{debug, info, warn};
 use models::{
-    Credentials, CustomerRequest, CustomerResponse, NewDocumentRequest, NewDocumentResponse,
+    Credentials, CredentialsResponse, CustomerRequest, CustomerResponse, NewDocumentRequest,
+    NewDocumentResponse, PaginatedServicesResponse, PatchScopesRequest, ServiceResponse,
     ServiceToken, TokenCheckRequest, TokenCheckResponse, TokenClaims, UpdateProfileRequest,
-    UserKycStatusResponse,
+    UpdateServiceProfileRequest, UserKycStatusResponse,
 };
 use reqwest::header::AUTHORIZATION;
 use reqwest::Client;
@@ -356,5 +357,159 @@ impl IdentityServiceClient {
         let url = format!("{}/user/profile/{id}/risk_profile", self.host);
         let response = self.client.get(url).headers(h).send().await;
         parse_response::<UserRiskProfileResponse>(response).await
+    }
+
+    /// List service profiles with optional status filter (`active`, `suspended`, `all`)
+    /// and pagination. Requires `service:admin` scope on the caller's token.
+    pub async fn list_services(
+        &mut self,
+        status: Option<&str>,
+        page: Option<u32>,
+        page_size: Option<u32>,
+    ) -> Result<PaginatedServicesResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let mut url = format!("{}/service/list", self.host);
+        let mut params: Vec<(String, String)> = Vec::new();
+        if let Some(s) = status {
+            params.push(("status".to_string(), s.to_string()));
+        }
+        if let Some(p) = page {
+            params.push(("page".to_string(), p.to_string()));
+        }
+        if let Some(ps) = page_size {
+            params.push(("page_size".to_string(), ps.to_string()));
+        }
+        if !params.is_empty() {
+            let qs = params
+                .into_iter()
+                .map(|(k, v)| format!("{k}={v}"))
+                .collect::<Vec<_>>()
+                .join("&");
+            url = format!("{url}?{qs}");
+        }
+        let response = self
+            .client
+            .get(url)
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<PaginatedServicesResponse>(response).await
+    }
+
+    /// Update a service profile's name and/or email. Requires `service:admin` scope.
+    pub async fn update_service(
+        &mut self,
+        id: &str,
+        req: UpdateServiceProfileRequest,
+    ) -> Result<ServiceResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .put(format!("{}/service/{id}", self.host))
+            .json(&req)
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<ServiceResponse>(response).await
+    }
+
+    /// Get the credential metadata for a service profile (does not include the secret key).
+    /// Requires `service:admin` scope.
+    pub async fn get_service_credentials(
+        &mut self,
+        id: &str,
+    ) -> Result<CredentialsResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .get(format!("{}/service/{id}/credentials", self.host))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<CredentialsResponse>(response).await
+    }
+
+    /// Add and/or remove scopes on a service's credentials. Requires `service:admin` scope.
+    pub async fn patch_service_credentials_scopes(
+        &mut self,
+        id: &str,
+        req: PatchScopesRequest,
+    ) -> Result<CredentialsResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .patch(format!("{}/service/{id}/credentials/scopes", self.host))
+            .json(&req)
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<CredentialsResponse>(response).await
+    }
+
+    /// Rotate a service's credentials. The plaintext secret is returned only in this response.
+    /// Requires `service:admin` scope.
+    pub async fn rotate_service_credentials(
+        &mut self,
+        id: &str,
+    ) -> Result<ServiceResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .post(format!("{}/service/{id}/credentials/rotate", self.host))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<ServiceResponse>(response).await
+    }
+
+    /// Suspend a service's credentials. Requires `service:admin` scope.
+    pub async fn suspend_service_credentials(
+        &mut self,
+        id: &str,
+    ) -> Result<CredentialsResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .post(format!("{}/service/{id}/credentials/suspend", self.host))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<CredentialsResponse>(response).await
+    }
+
+    /// Unsuspend a service's credentials. Requires `service:admin` scope.
+    pub async fn unsuspend_service_credentials(
+        &mut self,
+        id: &str,
+    ) -> Result<CredentialsResponse, ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .post(format!("{}/service/{id}/credentials/unsuspend", self.host))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_response::<CredentialsResponse>(response).await
     }
 }

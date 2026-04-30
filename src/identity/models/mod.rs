@@ -3,11 +3,11 @@ pub mod response;
 
 // Re-export commonly used types
 pub use request::{
-    Credentials, CustomerRequest, NewDocumentRequest, RefreshToken, TokenCheckRequest,
-    UpdateProfileRequest, ValidateToken,
+    Credentials, CustomerRequest, NewDocumentRequest, PatchScopesRequest, RefreshToken,
+    TokenCheckRequest, UpdateProfileRequest, UpdateServiceProfileRequest, ValidateToken,
 };
 pub use response::{
-    CustomerResponse, KycApplicantReviewResponse, KycDocumentResponse, KycStatus,
-    NewDocumentResponse, ServiceToken, TokenCheckResponse, TokenClaims, UserKycStatusResponse,
-    UserProfileResponse,
+    CredentialsResponse, CustomerResponse, KycApplicantReviewResponse, KycDocumentResponse,
+    KycStatus, NewDocumentResponse, PaginatedServicesResponse, ServiceResponse, ServiceToken,
+    TokenCheckResponse, TokenClaims, UserKycStatusResponse, UserProfileResponse,
 };

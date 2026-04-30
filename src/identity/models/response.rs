@@ -181,3 +181,31 @@ pub struct UserRiskProfileResponse {
     pub break_down: RiskScoreBreakdown,
     pub latest_score_history: Option<UserRiskScoreHistory>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceResponse {
+    #[serde(default)]
+    pub id: String,
+    pub name: String,
+    pub email: String,
+    pub access_key: Option<String>,
+    pub secret_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CredentialsResponse {
+    pub id: String,
+    pub access_key: String,
+    pub scopes: Vec<String>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: Option<NaiveDateTime>,
+    pub suspended_at: Option<NaiveDateTime>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PaginatedServicesResponse {
+    pub items: Vec<ServiceResponse>,
+    pub page: u32,
+    pub page_size: u32,
+    pub total: i64,
+}

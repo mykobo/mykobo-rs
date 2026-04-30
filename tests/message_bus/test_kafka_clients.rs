@@ -1,5 +1,7 @@
 use mykobo_rs::message_bus::kafka::consumer::EventConsumer;
-use mykobo_rs::message_bus::kafka::producer::{build_message_headers, EventProducer, MESSAGE_SOURCE};
+use mykobo_rs::message_bus::kafka::producer::{
+    build_message_headers, EventProducer, MESSAGE_SOURCE,
+};
 use mykobo_rs::models::error::KafkaError;
 use rdkafka::message::Headers;
 use serial_test::serial;
@@ -218,11 +220,7 @@ fn headers_to_map(headers: &rdkafka::message::OwnedHeaders) -> HashMap<String, S
 
 #[test]
 fn test_message_source_uses_package_name_and_version() {
-    let expected = format!(
-        "{}/{}",
-        env!("CARGO_PKG_NAME"),
-        env!("CARGO_PKG_VERSION")
-    );
+    let expected = format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
     assert_eq!(MESSAGE_SOURCE, expected);
 }
 
@@ -231,9 +229,7 @@ fn test_build_message_headers_sets_source_to_package_name_and_version() {
     let headers = build_message_headers();
     let map = headers_to_map(&headers);
 
-    let source = map
-        .get("source")
-        .expect("source header should be present");
+    let source = map.get("source").expect("source header should be present");
     assert_eq!(
         source,
         &format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
