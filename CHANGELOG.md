@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.38] - 2026-05-01
+
+### 🐛 Bug Fixes
+
+- Add token revocation
+
 ## [1.0.37] - 2026-04-30
 
 ### ⛰️  Features
 
 - Support service management
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.37
 
 ## [1.0.36] - 2026-04-28
 
