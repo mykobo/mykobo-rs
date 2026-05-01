@@ -2,7 +2,7 @@ pub mod models;
 
 use crate::identity::models::response::UserRiskProfileResponse;
 use crate::models::error::ServiceError;
-use crate::util::{generate_headers, parse_response};
+use crate::util::{generate_headers, parse_empty_response, parse_response};
 use jsonwebtoken::dangerous::insecure_decode;
 use log::{debug, info, warn};
 use models::{
@@ -511,5 +511,42 @@ impl IdentityServiceClient {
             .send()
             .await;
         parse_response::<CredentialsResponse>(response).await
+    }
+
+    /// Revoke all active access tokens for a service credential. The credential's
+    /// `tokens_invalid_before` is stamped to the current time and any outstanding
+    /// refresh-token row is deleted. Requires `token:admin` scope.
+    pub async fn revoke_service_sessions(&mut self, id: &str) -> Result<(), ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .post(format!(
+                "{}/service/{id}/credentials/revoke-sessions",
+                self.host
+            ))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_empty_response(response).await
+    }
+
+    /// Revoke all active access tokens for a user credential. The credential's
+    /// `tokens_invalid_before` is stamped to the current time and any outstanding
+    /// refresh-token row is deleted. Requires `token:admin` scope.
+    pub async fn revoke_user_sessions(&mut self, id: &str) -> Result<(), ServiceError> {
+        let service_token = self.attempt_token_acquisition().await;
+        let response = self
+            .client
+            .post(format!("{}/user/sessions/{id}/revoke", self.host))
+            .headers(generate_headers(
+                service_token,
+                self.client_identifier.clone(),
+            ))
+            .send()
+            .await;
+        parse_empty_response(response).await
     }
 }

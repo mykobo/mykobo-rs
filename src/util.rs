@@ -48,6 +48,27 @@ pub async fn parse_response<T: DeserializeOwned>(
     }
 }
 
+/// Variant of `parse_response` for endpoints that return no body (e.g. 204 No Content).
+pub async fn parse_empty_response(
+    response: Result<reqwest::Response, reqwest::Error>,
+) -> Result<(), ServiceError> {
+    match response {
+        Ok(response) => {
+            if response.status().is_success() {
+                Ok(())
+            } else {
+                let status = response.status();
+                let error = response.json::<ServiceError>().await?;
+                Err(ServiceError {
+                    status: MykoboStatusCode::from(status),
+                    ..error
+                })
+            }
+        }
+        Err(e) => Err(ServiceError::from(e)),
+    }
+}
+
 /**
  * Generates a unique identifier with the given prefix. NOTE no trailing colon.
  */
