@@ -2,11 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-05-30
+
+### ⛰️  Features
+
+- **message-bus**: Add notification EventType variants (relay-stuck, forwarding-failed, circle/webhook health)
+- **message-bus**: Add notification payloads; route relay events through CustomerNotificationPayload; drop legacy per-event relay classes
+- **notification**: Add IdempotencyKey helpers and NOTIFICATION_EVENTS constant
+
+### 🧪 Testing
+
+- **notification**: Add cross-language fixtures with byte-equal round-trip parity
+
 ## [1.0.38] - 2026-05-01
 
 ### 🐛 Bug Fixes
 
 - Add token revocation
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.0.38
 
 ## [1.0.37] - 2026-04-30
 
