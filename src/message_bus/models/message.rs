@@ -357,6 +357,15 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     EventType::RelayOnboarded => Payload::RelayOnboarded(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
+                    // Notification event types - will be properly typed in next iteration
+                    EventType::RelayStuckDepositing
+                    | EventType::RelayStuckBridging
+                    | EventType::RelayStuckForwarding
+                    | EventType::RelayForwardingFailed
+                    | EventType::CircleApi5xxBurst
+                    | EventType::WebhookReprocessorBacklog => Payload::Raw(
+                        serde_json::to_string(&payload_value).map_err(D::Error::custom)?,
+                    ),
                 }
             }
         } else {

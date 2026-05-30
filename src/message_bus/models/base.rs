@@ -100,6 +100,13 @@ pub enum EventType {
     RelayInitiated,
     RelayCompleted,
     RelayOnboarded,
+    RelayStuckDepositing,
+    RelayStuckBridging,
+    RelayStuckForwarding,
+    RelayForwardingFailed,
+    #[serde(rename = "CIRCLE_API_5XX_BURST")]
+    CircleApi5xxBurst,
+    WebhookReprocessorBacklog,
 }
 
 impl fmt::Display for EventType {
