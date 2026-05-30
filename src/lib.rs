@@ -5,5 +5,6 @@ pub mod identity;
 pub mod ledger;
 pub mod message_bus;
 pub mod models;
+pub mod notification;
 pub mod util;
 pub mod wallets;

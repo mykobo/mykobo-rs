@@ -4,6 +4,7 @@ mod identity;
 mod ledger;
 mod message_bus;
 mod models;
+mod notification;
 mod wallets;
 
 use std::fs;
