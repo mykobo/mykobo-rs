@@ -1,6 +1,7 @@
 use super::base::{validate_required_fields, EventType, InstructionType, ValidationError};
 use super::event::*;
 use super::instruction::*;
+use super::notification::{CustomerNotificationPayload, PlatformNotificationPayload};
 use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
@@ -121,9 +122,10 @@ pub enum Payload {
     PasswordReset(PasswordResetEventPayload),
     VerificationRequested(VerificationRequestedEventPayload),
     AddressOnboarded(AddressOnboardedEventPayload),
-    RelayInitiated(RelayInitiatedEventPayload),
-    RelayCompleted(RelayCompletedEventPayload),
-    RelayOnboarded(RelayOnboardedEventPayload),
+
+    // Notification payloads
+    CustomerNotification(CustomerNotificationPayload),
+    PlatformNotification(PlatformNotificationPayload),
 
     // Generic payload
     Raw(String),
@@ -193,9 +195,21 @@ impl MessageBusMessage {
                 (EventType::PasswordResetRequested, Payload::PasswordReset(_)) => Ok(()),
                 (EventType::VerificationRequested, Payload::VerificationRequested(_)) => Ok(()),
                 (EventType::AddressOnboarded, Payload::AddressOnboarded(_)) => Ok(()),
-                (EventType::RelayInitiated, Payload::RelayInitiated(_)) => Ok(()),
-                (EventType::RelayCompleted, Payload::RelayCompleted(_)) => Ok(()),
-                (EventType::RelayOnboarded, Payload::RelayOnboarded(_)) => Ok(()),
+                (
+                    EventType::RelayInitiated
+                    | EventType::RelayCompleted
+                    | EventType::RelayOnboarded,
+                    Payload::CustomerNotification(_),
+                ) => Ok(()),
+                (
+                    EventType::RelayStuckDepositing
+                    | EventType::RelayStuckBridging
+                    | EventType::RelayStuckForwarding
+                    | EventType::RelayForwardingFailed
+                    | EventType::CircleApi5xxBurst
+                    | EventType::WebhookReprocessorBacklog,
+                    Payload::PlatformNotification(_),
+                ) => Ok(()),
                 _ => Err(ValidationError {
                     class_name: "MessageBusMessage".to_string(),
                     fields: vec![format!(
@@ -348,23 +362,18 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     EventType::AddressOnboarded => Payload::AddressOnboarded(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
-                    EventType::RelayInitiated => Payload::RelayInitiated(
+                    EventType::RelayInitiated
+                    | EventType::RelayCompleted
+                    | EventType::RelayOnboarded => Payload::CustomerNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
-                    EventType::RelayCompleted => Payload::RelayCompleted(
-                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
-                    ),
-                    EventType::RelayOnboarded => Payload::RelayOnboarded(
-                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
-                    ),
-                    // Notification event types - will be properly typed in next iteration
                     EventType::RelayStuckDepositing
                     | EventType::RelayStuckBridging
                     | EventType::RelayStuckForwarding
                     | EventType::RelayForwardingFailed
                     | EventType::CircleApi5xxBurst
-                    | EventType::WebhookReprocessorBacklog => Payload::Raw(
-                        serde_json::to_string(&payload_value).map_err(D::Error::custom)?,
+                    | EventType::WebhookReprocessorBacklog => Payload::PlatformNotification(
+                        serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
             }
