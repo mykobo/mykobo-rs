@@ -1,0 +1,23 @@
+{
+  "meta_data": {
+    "source": "circle",
+    "created_at": "2026-05-30T12:00:00Z",
+    "token": "test-service-token",
+    "idempotency_key": "circle:relay_initiated:abc-123",
+    "event": "RELAY_INITIATED"
+  },
+  "payload": {
+    "subject": {
+      "type": "relay",
+      "id": "abc-123",
+      "source_chain": "stellar",
+      "destination_chain": "solana"
+    },
+    "data": {
+      "email": "user@example.com",
+      "first_name": "Ada",
+      "amount": "100.00",
+      "currency": "USDC"
+    }
+  }
+}

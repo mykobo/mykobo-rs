@@ -1,0 +1,18 @@
+{
+  "meta_data": {
+    "source": "circle",
+    "created_at": "2026-05-30T12:00:00Z",
+    "token": "test-service-token",
+    "idempotency_key": "circle:circle_api_5xx_burst:2026-05-30T12:30:00+00:00",
+    "event": "CIRCLE_API_5XX_BURST"
+  },
+  "payload": {
+    "severity": "warning",
+    "data": {
+      "errors_in_window": 7,
+      "threshold": 5,
+      "window_minutes": 15
+    },
+    "subject": "service:circle:circle_api"
+  }
+}
