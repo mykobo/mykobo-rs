@@ -103,7 +103,7 @@ pub enum EventType {
     RelayStuckDepositing,
     RelayStuckBridging,
     RelayStuckForwarding,
-    RelayForwardingFailed,
+    RelayFailed,
     #[serde(rename = "CIRCLE_API_5XX_BURST")]
     CircleApi5xxBurst,
     WebhookReprocessorBacklog,

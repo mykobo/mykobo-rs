@@ -16,8 +16,8 @@ fn includes_relay_stuck() {
 }
 
 #[test]
-fn includes_forwarding_failed() {
-    assert!(NOTIFICATION_EVENTS.contains(&EventType::RelayForwardingFailed));
+fn includes_relay_failed() {
+    assert!(NOTIFICATION_EVENTS.contains(&EventType::RelayFailed));
 }
 
 #[test]

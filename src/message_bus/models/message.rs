@@ -205,7 +205,7 @@ impl MessageBusMessage {
                     EventType::RelayStuckDepositing
                     | EventType::RelayStuckBridging
                     | EventType::RelayStuckForwarding
-                    | EventType::RelayForwardingFailed
+                    | EventType::RelayFailed
                     | EventType::CircleApi5xxBurst
                     | EventType::WebhookReprocessorBacklog,
                     Payload::PlatformNotification(_),
@@ -370,7 +370,7 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     EventType::RelayStuckDepositing
                     | EventType::RelayStuckBridging
                     | EventType::RelayStuckForwarding
-                    | EventType::RelayForwardingFailed
+                    | EventType::RelayFailed
                     | EventType::CircleApi5xxBurst
                     | EventType::WebhookReprocessorBacklog => Payload::PlatformNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,

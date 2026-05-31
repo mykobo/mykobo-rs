@@ -127,20 +127,21 @@ fn platform_relay_stuck_depositing_byte_equal() {
 }
 
 #[test]
-fn platform_relay_forwarding_failed_byte_equal() {
+fn platform_relay_failed_byte_equal() {
     let data = json!({
         "relay_id": "abc-123",
+        "phase": "forwarding",
         "attempts": 5,
-        "last_error": "timeout"
+        "reason": "timeout"
     });
     let msg = build_platform(
-        EventType::RelayForwardingFailed,
-        "circle:relay_forwarding_failed:abc-123",
+        EventType::RelayFailed,
+        "circle:relay_failed:abc-123",
         Severity::Critical,
         "relay:abc-123",
         data,
     );
-    assert_fixture_matches("platform_relay_forwarding_failed.json", &msg);
+    assert_fixture_matches("platform_relay_failed.json", &msg);
 }
 
 #[test]

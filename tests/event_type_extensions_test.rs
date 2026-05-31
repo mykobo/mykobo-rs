@@ -8,8 +8,8 @@ fn new_relay_stuck_variants_serialize() {
 }
 
 #[test]
-fn forwarding_failed_serializes() {
-    assert_eq!(serde_json::to_string(&EventType::RelayForwardingFailed).unwrap(), "\"RELAY_FORWARDING_FAILED\"");
+fn relay_failed_serializes() {
+    assert_eq!(serde_json::to_string(&EventType::RelayFailed).unwrap(), "\"RELAY_FAILED\"");
 }
 
 #[test]

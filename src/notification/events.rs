@@ -7,7 +7,7 @@ pub const NOTIFICATION_EVENTS: &[EventType] = &[
     EventType::RelayStuckDepositing,
     EventType::RelayStuckBridging,
     EventType::RelayStuckForwarding,
-    EventType::RelayForwardingFailed,
+    EventType::RelayFailed,
     EventType::CircleApi5xxBurst,
     EventType::WebhookReprocessorBacklog,
 ];
