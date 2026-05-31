@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-05-31
+
+### ⛰️  Features
+
+- **notification**: [**breaking**] Replace RelayForwardingFailed with generic RelayFailed
+
 ## [1.1.0] - 2026-05-30
 
 ### ⛰️  Features
@@ -13,6 +19,10 @@ All notable changes to this project will be documented in this file.
 ### 🧪 Testing
 
 - **notification**: Add cross-language fixtures with byte-equal round-trip parity
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.1.0
 
 ## [1.0.38] - 2026-05-01
 
