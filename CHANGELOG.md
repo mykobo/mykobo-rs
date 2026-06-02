@@ -2,11 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2026-06-02
+
+### ⛰️  Features
+
+- Scaffold notification_contract module
+- Notification_contract predicate AST + matcher
+- Notification_contract predicate parser
+- Notification_contract registry types, loader, YAML
+- Notification_contract canonical snapshot + verify-peer
+
+### Build
+
+- Add serde_yaml for notification_contract registry
+
 ## [1.1.1] - 2026-05-31
 
 ### ⛰️  Features
 
 - **notification**: [**breaking**] Replace RelayForwardingFailed with generic RelayFailed
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.1.1
 
 ## [1.1.0] - 2026-05-30
 
