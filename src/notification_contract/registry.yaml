@@ -20,8 +20,6 @@ variants:
   RELAY_FAILED:           { kind: notification, audience: platform, severity: critical }
   CIRCLE_API_5XX_BURST:   { kind: notification, audience: platform, severity: warning }
   WEBHOOK_REPROCESSOR_BACKLOG: { kind: notification, audience: platform, severity: warning }
-  VERIFICATION_REQUESTED: { kind: notification, audience: customer }
-  PASSWORD_RESET_REQUESTED: { kind: notification, audience: customer }
 
   # ── Domain-event variants ────────────────────────────────────────────
   NEW_TRANSACTION:
@@ -87,3 +85,21 @@ variants:
     reason: >-
       Internal indexing event. User-facing onboarding lands via RELAY_ONBOARDED
       on the relay rail.
+
+  VERIFICATION_REQUESTED:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's verification email is derived in the notifications service
+      (legacy CommandVerifyEmail path in app/message_handlers/kafka.py).
+      Per-producer migration (Identity) will introduce an explicit
+      CUSTOMER_VERIFICATION_REQUESTED notification variant.
+
+  PASSWORD_RESET_REQUESTED:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's password-reset email is derived in the notifications service
+      (legacy CommandPasswordReset path in app/message_handlers/kafka.py).
+      Per-producer migration (Identity) will introduce an explicit
+      CUSTOMER_PASSWORD_RESET_REQUESTED notification variant.
