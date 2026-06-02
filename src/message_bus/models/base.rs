@@ -84,7 +84,7 @@ impl From<String> for PaymentDirection {
 }
 
 /// Enum for event types
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum EventType {
     NewTransaction,
@@ -119,6 +119,61 @@ impl fmt::Display for EventType {
                 .and_then(|v| v.as_str().map(String::from))
                 .unwrap_or_default()
         )
+    }
+}
+
+impl EventType {
+    pub const ALL: &'static [EventType] = &[
+        EventType::NewTransaction,
+        EventType::TransactionStatusUpdate,
+        EventType::Payment,
+        EventType::BankPayment,
+        EventType::NewProfile,
+        EventType::NewUser,
+        EventType::VerificationRequested,
+        EventType::PasswordResetRequested,
+        EventType::KycEvent,
+        EventType::AddressOnboarded,
+        EventType::RelayInitiated,
+        EventType::RelayCompleted,
+        EventType::RelayOnboarded,
+        EventType::RelayStuckDepositing,
+        EventType::RelayStuckBridging,
+        EventType::RelayStuckForwarding,
+        EventType::RelayFailed,
+        EventType::CircleApi5xxBurst,
+        EventType::WebhookReprocessorBacklog,
+    ];
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::NewTransaction => "NEW_TRANSACTION",
+            Self::TransactionStatusUpdate => "TRANSACTION_STATUS_UPDATE",
+            Self::Payment => "PAYMENT",
+            Self::BankPayment => "BANK_PAYMENT",
+            Self::NewProfile => "NEW_PROFILE",
+            Self::NewUser => "NEW_USER",
+            Self::VerificationRequested => "VERIFICATION_REQUESTED",
+            Self::PasswordResetRequested => "PASSWORD_RESET_REQUESTED",
+            Self::KycEvent => "KYC_EVENT",
+            Self::AddressOnboarded => "ADDRESS_ONBOARDED",
+            Self::RelayInitiated => "RELAY_INITIATED",
+            Self::RelayCompleted => "RELAY_COMPLETED",
+            Self::RelayOnboarded => "RELAY_ONBOARDED",
+            Self::RelayStuckDepositing => "RELAY_STUCK_DEPOSITING",
+            Self::RelayStuckBridging => "RELAY_STUCK_BRIDGING",
+            Self::RelayStuckForwarding => "RELAY_STUCK_FORWARDING",
+            Self::RelayFailed => "RELAY_FAILED",
+            Self::CircleApi5xxBurst => "CIRCLE_API_5XX_BURST",
+            Self::WebhookReprocessorBacklog => "WEBHOOK_REPROCESSOR_BACKLOG",
+        }
+    }
+}
+
+impl TryFrom<&str> for EventType {
+    type Error = String;
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        Self::ALL.iter().find(|e| e.as_str() == s).copied().ok_or_else(|| s.to_string())
     }
 }
 

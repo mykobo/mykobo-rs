@@ -1,6 +1,12 @@
 //! Producer-intended notification registry.
-//!
-//! See docs/superpowers/specs/2026-06-01-notifications-guardrail-design.md
 
 pub mod predicates;
 pub mod parser;
+pub mod registry;
+
+pub use registry::{
+    Audience, Entry, NotificationRule, Registry, RegistryError, Severity, VariantKind,
+    REGISTRY, REGISTRY_VERSION,
+};
+pub use predicates::Predicate;
+pub use parser::parse_predicate;
