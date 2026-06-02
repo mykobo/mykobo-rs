@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "ADDRESS_ONBOARDED": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Internal indexing event. User-facing onboarding lands via RELAY_ONBOARDED on the relay rail."
+    },
+    "BANK_PAYMENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Bank payment ingress event from banking-gateway; user is told via the resulting NEW_TRANSACTION + TRANSACTION_STATUS_UPDATE rails."
+    },
+    "CIRCLE_API_5XX_BURST": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "KYC_EVENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "KYC outcomes surface to the user via dapp's idenfy/sumsub callbacks, not via this rail. No notification today; no migration planned."
+    },
+    "NEW_PROFILE": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's profile-created Slack post is derived in the notifications service. Per-producer migration (Identity) will introduce an explicit CUSTOMER_PROFILE_CREATED notification variant."
+    },
+    "NEW_TRANSACTION": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Customer notification (a \"transaction received\" mail/Slack) is not yet emitted by any producer. When Ledger or Banking-Gateway introduces a CUSTOMER_TRANSACTION_RECEIVED notification variant, this entry gains a `fires` rule. Captured as audited \"no notification today\" for now."
+    },
+    "NEW_USER": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's welcome email is derived in the notifications service. Per-producer migration (Identity) will introduce an explicit CUSTOMER_WELCOME notification variant."
+    },
+    "PASSWORD_RESET_REQUESTED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "PAYMENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Generic payment event used by ledger; downstream notifications are emitted via NEW_TRANSACTION / TRANSACTION_STATUS_UPDATE rails, not this event."
+    },
+    "RELAY_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_FAILED": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "critical"
+    },
+    "RELAY_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_ONBOARDED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_STUCK_BRIDGING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "RELAY_STUCK_DEPOSITING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "RELAY_STUCK_FORWARDING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "TRANSACTION_STATUS_UPDATE": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's FUNDS_RECEIVED email is derived in the notifications service (legacy path in app/message_handlers/kafka.py). Per ADR 0003 the producer should emit the notification explicitly. When the per-producer migration introduces a CUSTOMER_FUNDS_RECEIVED notification variant, this entry gains a `when: status == \"FUNDS_RECEIVED\"` rule. Captured as audited \"legacy-derived, migration pending\" for now."
+    },
+    "VERIFICATION_REQUESTED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "WEBHOOK_REPROCESSOR_BACKLOG": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    }
+  },
+  "version": 1
+}
