@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-06-03
+
+### ⛰️  Features
+
+- **notification_contract**: Reclassify VERIFICATION/PASSWORD_RESET as domain-kind
+- Add mint/burn EventType variants for circle notifications
+- Mirror mint/burn notification entries in mykobo-rs registry
+
+### ⚙️ Miscellaneous Tasks
+
+- Regenerate notification registry canonical snapshot
+
 ## [1.1.2] - 2026-06-02
 
 ### ⛰️  Features
@@ -11,6 +23,10 @@ All notable changes to this project will be documented in this file.
 - Notification_contract predicate parser
 - Notification_contract registry types, loader, YAML
 - Notification_contract canonical snapshot + verify-peer
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.1.2
 
 ### Build
 
