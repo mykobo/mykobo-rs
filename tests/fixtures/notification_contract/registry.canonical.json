@@ -10,7 +10,32 @@
       "notifies": [],
       "reason": "Bank payment ingress event from banking-gateway; user is told via the resulting NEW_TRANSACTION + TRANSACTION_STATUS_UPDATE rails."
     },
+    "BURN_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "BURN_HELD": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "BURN_HELD_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BURN_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
     "CIRCLE_API_5XX_BURST": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "CUSTOMER_NOTIFY_FAILED": {
       "audience": "platform",
       "kind": "notification",
       "severity": "warning"
@@ -19,6 +44,26 @@
       "kind": "domain",
       "notifies": [],
       "reason": "KYC outcomes surface to the user via dapp's idenfy/sumsub callbacks, not via this rail. No notification today; no migration planned."
+    },
+    "MINT_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "MINT_HELD": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "MINT_HELD_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "MINT_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
     },
     "NEW_PROFILE": {
       "kind": "domain",
