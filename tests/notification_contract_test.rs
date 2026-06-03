@@ -42,3 +42,16 @@ fn kyc_event_has_reason() {
         other => panic!("expected domain kyc entry, got {:?}", other),
     }
 }
+
+#[test]
+fn mint_burn_event_variants_exist() {
+    assert_eq!(EventType::MintCompleted.as_str(), "MINT_COMPLETED");
+    assert_eq!(EventType::BurnCompleted.as_str(), "BURN_COMPLETED");
+    assert_eq!(EventType::MintHeld.as_str(), "MINT_HELD");
+    assert_eq!(EventType::BurnHeld.as_str(), "BURN_HELD");
+    assert_eq!(EventType::MintHeldAlert.as_str(), "MINT_HELD_ALERT");
+    assert_eq!(EventType::BurnHeldAlert.as_str(), "BURN_HELD_ALERT");
+    assert_eq!(EventType::CustomerNotifyFailed.as_str(), "CUSTOMER_NOTIFY_FAILED");
+    assert_eq!(EventType::MintInfo.as_str(), "MINT_INFO");
+    assert_eq!(EventType::BurnInfo.as_str(), "BURN_INFO");
+}

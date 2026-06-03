@@ -107,6 +107,15 @@ pub enum EventType {
     #[serde(rename = "CIRCLE_API_5XX_BURST")]
     CircleApi5xxBurst,
     WebhookReprocessorBacklog,
+    MintCompleted,
+    BurnCompleted,
+    MintHeld,
+    BurnHeld,
+    MintHeldAlert,
+    BurnHeldAlert,
+    CustomerNotifyFailed,
+    MintInfo,
+    BurnInfo,
 }
 
 impl fmt::Display for EventType {
@@ -143,6 +152,15 @@ impl EventType {
         EventType::RelayFailed,
         EventType::CircleApi5xxBurst,
         EventType::WebhookReprocessorBacklog,
+        EventType::MintCompleted,
+        EventType::BurnCompleted,
+        EventType::MintHeld,
+        EventType::BurnHeld,
+        EventType::MintHeldAlert,
+        EventType::BurnHeldAlert,
+        EventType::CustomerNotifyFailed,
+        EventType::MintInfo,
+        EventType::BurnInfo,
     ];
 
     pub fn as_str(&self) -> &'static str {
@@ -166,6 +184,15 @@ impl EventType {
             Self::RelayFailed => "RELAY_FAILED",
             Self::CircleApi5xxBurst => "CIRCLE_API_5XX_BURST",
             Self::WebhookReprocessorBacklog => "WEBHOOK_REPROCESSOR_BACKLOG",
+            Self::MintCompleted => "MINT_COMPLETED",
+            Self::BurnCompleted => "BURN_COMPLETED",
+            Self::MintHeld => "MINT_HELD",
+            Self::BurnHeld => "BURN_HELD",
+            Self::MintHeldAlert => "MINT_HELD_ALERT",
+            Self::BurnHeldAlert => "BURN_HELD_ALERT",
+            Self::CustomerNotifyFailed => "CUSTOMER_NOTIFY_FAILED",
+            Self::MintInfo => "MINT_INFO",
+            Self::BurnInfo => "BURN_INFO",
         }
     }
 }
