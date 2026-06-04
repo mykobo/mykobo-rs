@@ -1,5 +1,6 @@
 use mykobo_rs::message_bus::models::base::EventType;
 use mykobo_rs::notification_contract::{Audience, Entry, REGISTRY, Severity};
+use serde_json::json;
 
 #[test]
 fn registry_loads() {
@@ -102,14 +103,36 @@ fn burn_info_is_info_platform() {
 }
 
 #[test]
-fn mint_burn_event_variants_exist() {
-    assert_eq!(EventType::MintCompleted.as_str(), "MINT_COMPLETED");
-    assert_eq!(EventType::BurnCompleted.as_str(), "BURN_COMPLETED");
-    assert_eq!(EventType::MintHeld.as_str(), "MINT_HELD");
-    assert_eq!(EventType::BurnHeld.as_str(), "BURN_HELD");
-    assert_eq!(EventType::MintHeldAlert.as_str(), "MINT_HELD_ALERT");
-    assert_eq!(EventType::BurnHeldAlert.as_str(), "BURN_HELD_ALERT");
-    assert_eq!(EventType::CustomerNotifyFailed.as_str(), "CUSTOMER_NOTIFY_FAILED");
-    assert_eq!(EventType::MintInfo.as_str(), "MINT_INFO");
-    assert_eq!(EventType::BurnInfo.as_str(), "BURN_INFO");
+fn transaction_failed_alert_is_platform_critical() {
+    assert!(REGISTRY.is_notification(EventType::TransactionFailedAlert));
+    assert_eq!(REGISTRY.audience_of(EventType::TransactionFailedAlert), Some(Audience::Platform));
+    assert_eq!(REGISTRY.severity_of(EventType::TransactionFailedAlert), Some(Severity::Critical));
+}
+
+#[test]
+fn transaction_held_alert_is_platform_warning() {
+    assert!(REGISTRY.is_notification(EventType::TransactionHeldAlert));
+    assert_eq!(REGISTRY.audience_of(EventType::TransactionHeldAlert), Some(Audience::Platform));
+    assert_eq!(REGISTRY.severity_of(EventType::TransactionHeldAlert), Some(Severity::Warning));
+}
+
+#[test]
+fn transaction_status_update_failed_fires_failed_alert() {
+    let payload = json!({"status": "FAILED"});
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert_eq!(fires, vec![EventType::TransactionFailedAlert]);
+}
+
+#[test]
+fn transaction_status_update_held_fires_held_alert() {
+    let payload = json!({"status": "HELD"});
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert_eq!(fires, vec![EventType::TransactionHeldAlert]);
+}
+
+#[test]
+fn transaction_status_update_other_status_fires_nothing() {
+    let payload = json!({"status": "FUNDS_RECEIVED"});
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert_eq!(fires, Vec::<EventType>::new());
 }

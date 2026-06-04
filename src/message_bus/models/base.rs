@@ -116,6 +116,8 @@ pub enum EventType {
     CustomerNotifyFailed,
     MintInfo,
     BurnInfo,
+    TransactionFailedAlert,
+    TransactionHeldAlert,
 }
 
 impl fmt::Display for EventType {
@@ -161,6 +163,8 @@ impl EventType {
         EventType::CustomerNotifyFailed,
         EventType::MintInfo,
         EventType::BurnInfo,
+        EventType::TransactionFailedAlert,
+        EventType::TransactionHeldAlert,
     ];
 
     pub fn as_str(&self) -> &'static str {
@@ -193,6 +197,8 @@ impl EventType {
             Self::CustomerNotifyFailed => "CUSTOMER_NOTIFY_FAILED",
             Self::MintInfo => "MINT_INFO",
             Self::BurnInfo => "BURN_INFO",
+            Self::TransactionFailedAlert => "TRANSACTION_FAILED_ALERT",
+            Self::TransactionHeldAlert => "TRANSACTION_HELD_ALERT",
         }
     }
 }

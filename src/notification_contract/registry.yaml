@@ -36,6 +36,10 @@ variants:
   MINT_INFO:               { kind: notification, audience: platform, severity: info }
   BURN_INFO:               { kind: notification, audience: platform, severity: info }
 
+  # ── Transaction status alert variants (platform) ─────────────────────
+  TRANSACTION_FAILED_ALERT: { kind: notification, audience: platform, severity: critical }
+  TRANSACTION_HELD_ALERT:   { kind: notification, audience: platform, severity: warning }
+
   # ── Domain-event variants ────────────────────────────────────────────
   NEW_TRANSACTION:
     kind: domain
@@ -46,16 +50,18 @@ variants:
       CUSTOMER_TRANSACTION_RECEIVED notification variant, this entry gains a
       `fires` rule. Captured as audited "no notification today" for now.
 
+  # Customer-facing FUNDS_RECEIVED email is still legacy-derived in the
+  # notifications service (app/message_handlers/kafka.py). The per-producer
+  # migration that introduces an explicit CUSTOMER_FUNDS_RECEIVED variant
+  # is tracked separately and will add a `when: status == "FUNDS_RECEIVED"`
+  # rule alongside the platform alerts below.
   TRANSACTION_STATUS_UPDATE:
     kind: domain
-    notifies: []
-    reason: >-
-      Today's FUNDS_RECEIVED email is derived in the notifications service
-      (legacy path in app/message_handlers/kafka.py). Per ADR 0003 the producer
-      should emit the notification explicitly. When the per-producer migration
-      introduces a CUSTOMER_FUNDS_RECEIVED notification variant, this entry
-      gains a `when: status == "FUNDS_RECEIVED"` rule. Captured as audited
-      "legacy-derived, migration pending" for now.
+    notifies:
+      - when: 'status == "FAILED"'
+        fires: [TRANSACTION_FAILED_ALERT]
+      - when: 'status == "HELD"'
+        fires: [TRANSACTION_HELD_ALERT]
 
   PAYMENT:
     kind: domain

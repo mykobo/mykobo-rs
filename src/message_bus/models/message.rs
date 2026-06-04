@@ -198,7 +198,11 @@ impl MessageBusMessage {
                 (
                     EventType::RelayInitiated
                     | EventType::RelayCompleted
-                    | EventType::RelayOnboarded,
+                    | EventType::RelayOnboarded
+                    | EventType::MintCompleted
+                    | EventType::BurnCompleted
+                    | EventType::MintHeld
+                    | EventType::BurnHeld,
                     Payload::CustomerNotification(_),
                 ) => Ok(()),
                 (
@@ -207,7 +211,14 @@ impl MessageBusMessage {
                     | EventType::RelayStuckForwarding
                     | EventType::RelayFailed
                     | EventType::CircleApi5xxBurst
-                    | EventType::WebhookReprocessorBacklog,
+                    | EventType::WebhookReprocessorBacklog
+                    | EventType::MintHeldAlert
+                    | EventType::BurnHeldAlert
+                    | EventType::CustomerNotifyFailed
+                    | EventType::MintInfo
+                    | EventType::BurnInfo
+                    | EventType::TransactionFailedAlert
+                    | EventType::TransactionHeldAlert,
                     Payload::PlatformNotification(_),
                 ) => Ok(()),
                 _ => Err(ValidationError {
@@ -381,7 +392,9 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::BurnHeldAlert
                     | EventType::CustomerNotifyFailed
                     | EventType::MintInfo
-                    | EventType::BurnInfo => Payload::PlatformNotification(
+                    | EventType::BurnInfo
+                    | EventType::TransactionFailedAlert
+                    | EventType::TransactionHeldAlert => Payload::PlatformNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
