@@ -40,6 +40,21 @@
       "kind": "notification",
       "severity": "warning"
     },
+    "DEPOSIT_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "DEPOSIT_FAILED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "DEPOSIT_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
     "KYC_EVENT": {
       "kind": "domain",
       "notifies": [],
@@ -170,6 +185,21 @@
       "audience": "platform",
       "kind": "notification",
       "severity": "warning"
+    },
+    "WITHDRAW_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "WITHDRAW_FAILED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "WITHDRAW_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
     }
   },
   "version": 1

@@ -27,6 +27,14 @@ variants:
   MINT_HELD:               { kind: notification, audience: customer }
   BURN_HELD:               { kind: notification, audience: customer }
 
+  # ── Deposit/Withdrawal notification variants (customer) ────────────────
+  DEPOSIT_INITIATED:      { kind: notification, audience: customer }
+  DEPOSIT_COMPLETED:      { kind: notification, audience: customer }
+  DEPOSIT_FAILED:         { kind: notification, audience: customer }
+  WITHDRAW_INITIATED:     { kind: notification, audience: customer }
+  WITHDRAW_COMPLETED:     { kind: notification, audience: customer }
+  WITHDRAW_FAILED:        { kind: notification, audience: customer }
+
   # ── Mint/burn notification variants (platform / warning) ─────────────
   MINT_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }
   BURN_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }

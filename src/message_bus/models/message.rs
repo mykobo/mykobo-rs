@@ -379,7 +379,13 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::MintCompleted
                     | EventType::BurnCompleted
                     | EventType::MintHeld
-                    | EventType::BurnHeld => Payload::CustomerNotification(
+                    | EventType::BurnHeld
+                    | EventType::DepositInitiated
+                    | EventType::DepositCompleted
+                    | EventType::DepositFailed
+                    | EventType::WithdrawInitiated
+                    | EventType::WithdrawCompleted
+                    | EventType::WithdrawFailed => Payload::CustomerNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                     EventType::RelayStuckDepositing

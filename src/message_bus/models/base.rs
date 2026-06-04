@@ -118,6 +118,12 @@ pub enum EventType {
     BurnInfo,
     TransactionFailedAlert,
     TransactionHeldAlert,
+    DepositInitiated,
+    DepositCompleted,
+    DepositFailed,
+    WithdrawInitiated,
+    WithdrawCompleted,
+    WithdrawFailed,
 }
 
 impl fmt::Display for EventType {
@@ -165,6 +171,12 @@ impl EventType {
         EventType::BurnInfo,
         EventType::TransactionFailedAlert,
         EventType::TransactionHeldAlert,
+        EventType::DepositInitiated,
+        EventType::DepositCompleted,
+        EventType::DepositFailed,
+        EventType::WithdrawInitiated,
+        EventType::WithdrawCompleted,
+        EventType::WithdrawFailed,
     ];
 
     pub fn as_str(&self) -> &'static str {
@@ -199,6 +211,12 @@ impl EventType {
             Self::BurnInfo => "BURN_INFO",
             Self::TransactionFailedAlert => "TRANSACTION_FAILED_ALERT",
             Self::TransactionHeldAlert => "TRANSACTION_HELD_ALERT",
+            Self::DepositInitiated => "DEPOSIT_INITIATED",
+            Self::DepositCompleted => "DEPOSIT_COMPLETED",
+            Self::DepositFailed => "DEPOSIT_FAILED",
+            Self::WithdrawInitiated => "WITHDRAW_INITIATED",
+            Self::WithdrawCompleted => "WITHDRAW_COMPLETED",
+            Self::WithdrawFailed => "WITHDRAW_FAILED",
         }
     }
 }
