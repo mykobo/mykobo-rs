@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-06-04
+
+### ⛰️  Features
+
+- **notification-contract**: Add TRANSACTION_FAILED_ALERT and TRANSACTION_HELD_ALERT
+
+### 🐛 Bug Fixes
+
+- Add missing EventType variants and update snapshot
+
 ## [1.2.0] - 2026-06-03
 
 ### ⛰️  Features
@@ -13,6 +23,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Regenerate notification registry canonical snapshot
+- Release mykobo-rs version 1.2.0
 
 ## [1.1.2] - 2026-06-02
 
