@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-06-07
+
+### 🐛 Bug Fixes
+
+- Path fix for regsitry
+
 ## [1.3.0] - 2026-06-04
 
 ### ⛰️  Features
@@ -11,6 +17,10 @@ All notable changes to this project will be documented in this file.
 ### 🐛 Bug Fixes
 
 - Add missing EventType variants and update snapshot
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.0
 
 ## [1.2.0] - 2026-06-03
 
