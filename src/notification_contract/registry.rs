@@ -1,7 +1,7 @@
 //! Registry: typed model, loader, query helpers.
 
 use std::collections::BTreeMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -250,9 +250,8 @@ fn parse_notification(event: &EventType, raw: &RawEntry) -> Result<Entry, Regist
 fn event_str(e: &EventType) -> &'static str { e.as_str() }
 
 pub static REGISTRY: Lazy<Registry> = Lazy::new(|| {
-    let path: PathBuf = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("src/notification_contract/registry.yaml");
-    Registry::load_from_path(&path).unwrap_or_else(|e| {
+    const YAML: &str = include_str!("registry.yaml");
+    Registry::from_str(YAML).unwrap_or_else(|e| {
         panic!("failed to load notification_contract registry: {e}");
     })
 });
