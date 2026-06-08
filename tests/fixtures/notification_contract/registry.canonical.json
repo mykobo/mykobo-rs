@@ -10,6 +10,26 @@
       "notifies": [],
       "reason": "Bank payment ingress event from banking-gateway; user is told via the resulting NEW_TRANSACTION + TRANSACTION_STATUS_UPDATE rails."
     },
+    "BANK_PAYMENT_BALANCE_INSUFFICIENT_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BANK_PAYMENT_EXECUTION_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "critical"
+    },
+    "BCB_WEBHOOK_PROCESSING_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BENEFICIARY_CREATION_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
     "BURN_COMPLETED": {
       "audience": "customer",
       "kind": "notification",
