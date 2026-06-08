@@ -399,6 +399,10 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::CustomerNotifyFailed
                     | EventType::MintInfo
                     | EventType::BurnInfo
+                    | EventType::BankPaymentBalanceInsufficientAlert
+                    | EventType::BankPaymentExecutionFailedAlert
+                    | EventType::BcbWebhookProcessingFailedAlert
+                    | EventType::BeneficiaryCreationFailedAlert
                     | EventType::TransactionFailedAlert
                     | EventType::TransactionHeldAlert => Payload::PlatformNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
