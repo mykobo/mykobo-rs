@@ -87,6 +87,10 @@ impl From<String> for PaymentDirection {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum EventType {
+    BankPaymentBalanceInsufficientAlert,
+    BankPaymentExecutionFailedAlert,
+    BcbWebhookProcessingFailedAlert,
+    BeneficiaryCreationFailedAlert,
     NewTransaction,
     TransactionStatusUpdate,
     Payment,
@@ -141,6 +145,10 @@ impl fmt::Display for EventType {
 
 impl EventType {
     pub const ALL: &'static [EventType] = &[
+        EventType::BankPaymentBalanceInsufficientAlert,
+        EventType::BankPaymentExecutionFailedAlert,
+        EventType::BcbWebhookProcessingFailedAlert,
+        EventType::BeneficiaryCreationFailedAlert,
         EventType::NewTransaction,
         EventType::TransactionStatusUpdate,
         EventType::Payment,
@@ -181,6 +189,10 @@ impl EventType {
 
     pub fn as_str(&self) -> &'static str {
         match self {
+            Self::BankPaymentBalanceInsufficientAlert => "BANK_PAYMENT_BALANCE_INSUFFICIENT_ALERT",
+            Self::BankPaymentExecutionFailedAlert => "BANK_PAYMENT_EXECUTION_FAILED_ALERT",
+            Self::BcbWebhookProcessingFailedAlert => "BCB_WEBHOOK_PROCESSING_FAILED_ALERT",
+            Self::BeneficiaryCreationFailedAlert => "BENEFICIARY_CREATION_FAILED_ALERT",
             Self::NewTransaction => "NEW_TRANSACTION",
             Self::TransactionStatusUpdate => "TRANSACTION_STATUS_UPDATE",
             Self::Payment => "PAYMENT",
