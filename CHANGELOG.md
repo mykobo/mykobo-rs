@@ -2,11 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2026-06-08
+
+### ⛰️  Features
+
+- Add four banking-gateway platform-alert EventType variants
+- Route four banking-gateway platform alerts through PlatformNotification payload
+- Classify four banking-gateway platform alerts in registry
+
 ## [1.3.1] - 2026-06-07
 
 ### 🐛 Bug Fixes
 
 - Path fix for regsitry
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.1
 
 ## [1.3.0] - 2026-06-04
 
