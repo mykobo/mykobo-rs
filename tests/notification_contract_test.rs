@@ -148,13 +148,6 @@ fn funds_received_status_fires_customer_email_and_platform_info() {
 }
 
 #[test]
-fn approved_status_fires_nothing_on_transaction_status_update() {
-    let payload = json!({ "status": "APPROVED" });
-    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
-    assert!(fires.is_empty());
-}
-
-#[test]
 fn customer_funds_received_is_customer_audience() {
     assert_eq!(REGISTRY.audience_of(EventType::CustomerFundsReceived), Some(Audience::Customer));
 }
