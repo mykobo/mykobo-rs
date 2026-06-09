@@ -60,6 +60,10 @@ variants:
   BCB_WEBHOOK_PROCESSING_FAILED_ALERT:     { kind: notification, audience: platform, severity: warning }
   BENEFICIARY_CREATION_FAILED_ALERT:       { kind: notification, audience: platform, severity: warning }
 
+  # ── Banking-gateway happy-path lifecycle (platform / info) ───────────
+  BANK_PAYMENT_RECEIVED_INFO:              { kind: notification, audience: platform, severity: info }
+  BANK_PAYMENT_SENT_INFO:                  { kind: notification, audience: platform, severity: info }
+
   # ── Domain-event variants ────────────────────────────────────────────
   NEW_TRANSACTION:
     kind: domain

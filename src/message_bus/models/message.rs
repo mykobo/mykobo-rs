@@ -406,7 +406,9 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::BeneficiaryCreationFailedAlert
                     | EventType::TransactionFailedAlert
                     | EventType::TransactionHeldAlert
-                    | EventType::TransactionFundedInfo => Payload::PlatformNotification(
+                    | EventType::TransactionFundedInfo
+                    | EventType::BankPaymentReceivedInfo
+                    | EventType::BankPaymentSentInfo => Payload::PlatformNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
