@@ -385,7 +385,8 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::DepositFailed
                     | EventType::WithdrawInitiated
                     | EventType::WithdrawCompleted
-                    | EventType::WithdrawFailed => Payload::CustomerNotification(
+                    | EventType::WithdrawFailed
+                    | EventType::CustomerFundsReceived => Payload::CustomerNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                     EventType::RelayStuckDepositing
@@ -404,7 +405,8 @@ impl<'de> Deserialize<'de> for MessageBusMessage {
                     | EventType::BcbWebhookProcessingFailedAlert
                     | EventType::BeneficiaryCreationFailedAlert
                     | EventType::TransactionFailedAlert
-                    | EventType::TransactionHeldAlert => Payload::PlatformNotification(
+                    | EventType::TransactionHeldAlert
+                    | EventType::TransactionFundedInfo => Payload::PlatformNotification(
                         serde_json::from_value(payload_value).map_err(D::Error::custom)?,
                     ),
                 }
