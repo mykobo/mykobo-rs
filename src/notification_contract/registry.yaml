@@ -64,6 +64,10 @@ variants:
   BANK_PAYMENT_RECEIVED_INFO:              { kind: notification, audience: platform, severity: info }
   BANK_PAYMENT_SENT_INFO:                  { kind: notification, audience: platform, severity: info }
 
+  # ── On-chain payment lifecycle (platform / info) ─────────────────────
+  ONCHAIN_PAYMENT_RECEIVED_INFO:           { kind: notification, audience: platform, severity: info }
+  ONCHAIN_PAYMENT_SENT_INFO:               { kind: notification, audience: platform, severity: info }
+
   # ── Domain-event variants ────────────────────────────────────────────
   NEW_TRANSACTION:
     kind: domain

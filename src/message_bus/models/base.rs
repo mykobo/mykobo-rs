@@ -132,6 +132,8 @@ pub enum EventType {
     TransactionFundedInfo,
     BankPaymentReceivedInfo,
     BankPaymentSentInfo,
+    OnchainPaymentReceivedInfo,
+    OnchainPaymentSentInfo,
 }
 
 impl fmt::Display for EventType {
@@ -193,6 +195,8 @@ impl EventType {
         EventType::TransactionFundedInfo,
         EventType::BankPaymentReceivedInfo,
         EventType::BankPaymentSentInfo,
+        EventType::OnchainPaymentReceivedInfo,
+        EventType::OnchainPaymentSentInfo,
     ];
 
     pub fn as_str(&self) -> &'static str {
@@ -241,6 +245,8 @@ impl EventType {
             Self::TransactionFundedInfo => "TRANSACTION_FUNDED_INFO",
             Self::BankPaymentReceivedInfo => "BANK_PAYMENT_RECEIVED_INFO",
             Self::BankPaymentSentInfo => "BANK_PAYMENT_SENT_INFO",
+            Self::OnchainPaymentReceivedInfo => "ONCHAIN_PAYMENT_RECEIVED_INFO",
+            Self::OnchainPaymentSentInfo => "ONCHAIN_PAYMENT_SENT_INFO",
         }
     }
 }

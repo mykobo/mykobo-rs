@@ -130,6 +130,16 @@
       "notifies": [],
       "reason": "Today's welcome email is derived in the notifications service. Per-producer migration (Identity) will introduce an explicit CUSTOMER_WELCOME notification variant."
     },
+    "ONCHAIN_PAYMENT_RECEIVED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "ONCHAIN_PAYMENT_SENT_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
     "PASSWORD_RESET_REQUESTED": {
       "kind": "domain",
       "notifies": [],
