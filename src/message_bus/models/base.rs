@@ -128,6 +128,8 @@ pub enum EventType {
     WithdrawInitiated,
     WithdrawCompleted,
     WithdrawFailed,
+    CustomerFundsReceived,
+    TransactionFundedInfo,
 }
 
 impl fmt::Display for EventType {
@@ -185,6 +187,8 @@ impl EventType {
         EventType::WithdrawInitiated,
         EventType::WithdrawCompleted,
         EventType::WithdrawFailed,
+        EventType::CustomerFundsReceived,
+        EventType::TransactionFundedInfo,
     ];
 
     pub fn as_str(&self) -> &'static str {
@@ -229,6 +233,8 @@ impl EventType {
             Self::WithdrawInitiated => "WITHDRAW_INITIATED",
             Self::WithdrawCompleted => "WITHDRAW_COMPLETED",
             Self::WithdrawFailed => "WITHDRAW_FAILED",
+            Self::CustomerFundsReceived => "CUSTOMER_FUNDS_RECEIVED",
+            Self::TransactionFundedInfo => "TRANSACTION_FUNDED_INFO",
         }
     }
 }
