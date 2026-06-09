@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.4] - 2026-06-09
+
+### ⛰️  Features
+
+- New bank payment notifications
+
 ## [1.3.3] - 2026-06-09
 
 ### ⛰️  Features
@@ -13,6 +19,10 @@ All notable changes to this project will be documented in this file.
 ### 🧪 Testing
 
 - Drop duplicate APPROVED-fires-nothing registry test
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.3
 
 ## [1.3.2] - 2026-06-08
 
