@@ -132,7 +132,35 @@ fn transaction_status_update_held_fires_held_alert() {
 
 #[test]
 fn transaction_status_update_other_status_fires_nothing() {
-    let payload = json!({"status": "FUNDS_RECEIVED"});
+    let payload = json!({"status": "APPROVED"});
     let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
     assert_eq!(fires, Vec::<EventType>::new());
+}
+
+#[test]
+fn funds_received_status_fires_customer_email_and_platform_info() {
+    let payload = json!({ "status": "FUNDS_RECEIVED" });
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+
+    assert!(fires.contains(&EventType::CustomerFundsReceived));
+    assert!(fires.contains(&EventType::TransactionFundedInfo));
+    assert_eq!(fires.len(), 2);
+}
+
+#[test]
+fn approved_status_fires_nothing_on_transaction_status_update() {
+    let payload = json!({ "status": "APPROVED" });
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert!(fires.is_empty());
+}
+
+#[test]
+fn customer_funds_received_is_customer_audience() {
+    assert_eq!(REGISTRY.audience_of(EventType::CustomerFundsReceived), Some(Audience::Customer));
+}
+
+#[test]
+fn transaction_funded_info_is_platform_info() {
+    assert_eq!(REGISTRY.audience_of(EventType::TransactionFundedInfo), Some(Audience::Platform));
+    assert_eq!(REGISTRY.severity_of(EventType::TransactionFundedInfo), Some(Severity::Info));
 }

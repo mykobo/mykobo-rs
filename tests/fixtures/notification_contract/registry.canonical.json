@@ -55,6 +55,11 @@
       "kind": "notification",
       "severity": "warning"
     },
+    "CUSTOMER_FUNDS_RECEIVED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
     "CUSTOMER_NOTIFY_FAILED": {
       "audience": "platform",
       "kind": "notification",
@@ -165,6 +170,11 @@
       "kind": "notification",
       "severity": "critical"
     },
+    "TRANSACTION_FUNDED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
     "TRANSACTION_HELD_ALERT": {
       "audience": "platform",
       "kind": "notification",
@@ -191,6 +201,17 @@
             "field": "status",
             "op": "eq",
             "value": "HELD"
+          }
+        },
+        {
+          "fires": [
+            "CUSTOMER_FUNDS_RECEIVED",
+            "TRANSACTION_FUNDED_INFO"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "FUNDS_RECEIVED"
           }
         }
       ],

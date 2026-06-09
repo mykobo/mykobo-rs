@@ -35,6 +35,9 @@ variants:
   WITHDRAW_COMPLETED:     { kind: notification, audience: customer }
   WITHDRAW_FAILED:        { kind: notification, audience: customer }
 
+  # ── Customer transaction milestone variants (customer) ───────────────
+  CUSTOMER_FUNDS_RECEIVED: { kind: notification, audience: customer }
+
   # ── Mint/burn notification variants (platform / warning) ─────────────
   MINT_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }
   BURN_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }
@@ -43,6 +46,9 @@ variants:
   # ── Mint/burn progress variants (platform / info) ────────────────────
   MINT_INFO:               { kind: notification, audience: platform, severity: info }
   BURN_INFO:               { kind: notification, audience: platform, severity: info }
+
+  # ── Transaction milestone variants (platform / info) ─────────────────
+  TRANSACTION_FUNDED_INFO:  { kind: notification, audience: platform, severity: info }
 
   # ── Transaction status alert variants (platform) ─────────────────────
   TRANSACTION_FAILED_ALERT: { kind: notification, audience: platform, severity: critical }
@@ -64,11 +70,8 @@ variants:
       CUSTOMER_TRANSACTION_RECEIVED notification variant, this entry gains a
       `fires` rule. Captured as audited "no notification today" for now.
 
-  # Customer-facing FUNDS_RECEIVED email is still legacy-derived in the
-  # notifications service (app/message_handlers/kafka.py). The per-producer
-  # migration that introduces an explicit CUSTOMER_FUNDS_RECEIVED variant
-  # is tracked separately and will add a `when: status == "FUNDS_RECEIVED"`
-  # rule alongside the platform alerts below.
+  # Status-update fan-out: producer (ledger) emits CUSTOMER_FUNDS_RECEIVED
+  # and TRANSACTION_FUNDED_INFO when status transitions to FUNDS_RECEIVED.
   TRANSACTION_STATUS_UPDATE:
     kind: domain
     notifies:
@@ -76,6 +79,8 @@ variants:
         fires: [TRANSACTION_FAILED_ALERT]
       - when: 'status == "HELD"'
         fires: [TRANSACTION_HELD_ALERT]
+      - when: 'status == "FUNDS_RECEIVED"'
+        fires: [CUSTOMER_FUNDS_RECEIVED, TRANSACTION_FUNDED_INFO]
 
   PAYMENT:
     kind: domain
