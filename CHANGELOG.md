@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3] - 2026-06-09
+
+### ⛰️  Features
+
+- **events**: Add CUSTOMER_FUNDS_RECEIVED and TRANSACTION_FUNDED_INFO EventType variants
+- **message-bus**: Route CUSTOMER_FUNDS_RECEIVED and TRANSACTION_FUNDED_INFO payloads
+- **notification-contract**: Add FUNDS_RECEIVED fan-out rule
+
+### 🧪 Testing
+
+- Drop duplicate APPROVED-fires-nothing registry test
+
 ## [1.3.2] - 2026-06-08
 
 ### ⛰️  Features
@@ -9,6 +21,10 @@ All notable changes to this project will be documented in this file.
 - Add four banking-gateway platform-alert EventType variants
 - Route four banking-gateway platform alerts through PlatformNotification payload
 - Classify four banking-gateway platform alerts in registry
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.2
 
 ## [1.3.1] - 2026-06-07
 
