@@ -52,10 +52,13 @@ fn mint_completed_is_customer_notification() {
 }
 
 #[test]
-fn burn_completed_is_customer_notification() {
+fn burn_completed_is_platform_info_notification() {
+    // BURN_COMPLETED is platform-info: the customer-facing withdraw
+    // lifecycle is told via WITHDRAW_INITIATED / WITHDRAW_COMPLETED, so
+    // BURN_COMPLETED is an ops-only signal on the slack channel.
     assert!(REGISTRY.is_notification(EventType::BurnCompleted));
-    assert_eq!(REGISTRY.audience_of(EventType::BurnCompleted), Some(Audience::Customer));
-    assert_eq!(REGISTRY.severity_of(EventType::BurnCompleted), None);
+    assert_eq!(REGISTRY.audience_of(EventType::BurnCompleted), Some(Audience::Platform));
+    assert_eq!(REGISTRY.severity_of(EventType::BurnCompleted), Some(Severity::Info));
 }
 
 #[test]
@@ -132,9 +135,23 @@ fn transaction_status_update_held_fires_held_alert() {
 
 #[test]
 fn transaction_status_update_other_status_fires_nothing() {
-    let payload = json!({"status": "APPROVED"});
+    let payload = json!({"status": "PENDING_PAYER"});
     let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
     assert_eq!(fires, Vec::<EventType>::new());
+}
+
+#[test]
+fn approved_status_fires_transaction_approved_info() {
+    let payload = json!({ "status": "APPROVED" });
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert_eq!(fires, vec![EventType::TransactionApprovedInfo]);
+}
+
+#[test]
+fn fulfilled_status_fires_transaction_fulfilled_info() {
+    let payload = json!({ "status": "FULFILLED" });
+    let fires = REGISTRY.notifications_for(EventType::TransactionStatusUpdate, &payload);
+    assert_eq!(fires, vec![EventType::TransactionFulfilledInfo]);
 }
 
 #[test]

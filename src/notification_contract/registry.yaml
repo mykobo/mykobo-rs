@@ -23,9 +23,14 @@ variants:
 
   # ── Mint/burn notification variants (customer) ───────────────────────
   MINT_COMPLETED:          { kind: notification, audience: customer }
-  BURN_COMPLETED:          { kind: notification, audience: customer }
   MINT_HELD:               { kind: notification, audience: customer }
   BURN_HELD:               { kind: notification, audience: customer }
+
+  # BURN_COMPLETED is platform-only because the customer-facing withdraw
+  # lifecycle is told by WITHDRAW_INITIATED / WITHDRAW_COMPLETED. The
+  # routing in notifications/EVENT_ROUTES is slack-only — keeping it here
+  # as `audience: customer` would mis-document the surface.
+  BURN_COMPLETED:          { kind: notification, audience: platform, severity: info }
 
   # ── Deposit/Withdrawal notification variants (customer) ────────────────
   DEPOSIT_INITIATED:      { kind: notification, audience: customer }
@@ -48,7 +53,9 @@ variants:
   BURN_INFO:               { kind: notification, audience: platform, severity: info }
 
   # ── Transaction milestone variants (platform / info) ─────────────────
-  TRANSACTION_FUNDED_INFO:  { kind: notification, audience: platform, severity: info }
+  TRANSACTION_FUNDED_INFO:    { kind: notification, audience: platform, severity: info }
+  TRANSACTION_APPROVED_INFO:  { kind: notification, audience: platform, severity: info }
+  TRANSACTION_FULFILLED_INFO: { kind: notification, audience: platform, severity: info }
 
   # ── Transaction status alert variants (platform) ─────────────────────
   TRANSACTION_FAILED_ALERT: { kind: notification, audience: platform, severity: critical }
@@ -89,6 +96,10 @@ variants:
         fires: [TRANSACTION_HELD_ALERT]
       - when: 'status == "FUNDS_RECEIVED"'
         fires: [CUSTOMER_FUNDS_RECEIVED, TRANSACTION_FUNDED_INFO]
+      - when: 'status == "APPROVED"'
+        fires: [TRANSACTION_APPROVED_INFO]
+      - when: 'status == "FULFILLED"'
+        fires: [TRANSACTION_FULFILLED_INFO]
 
   PAYMENT:
     kind: domain
