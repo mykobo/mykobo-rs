@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.6] - 2026-06-10
+
+### 🐛 Bug Fixes
+
+- Wrongly serialized payloads, and fix BURN_COMPLETE
+
 ## [1.3.5] - 2026-06-09
 
 ### ⛰️  Features
 
 - New chain payment notifications
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.5
 
 ## [1.3.4] - 2026-06-09
 
