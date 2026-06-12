@@ -1,4 +1,4 @@
-use crate::anchor::models::DappTransaction as Transaction;
+use crate::anchor::models::{DappIntentPayload, DappTransaction as Transaction};
 use crate::identity::models::ServiceToken;
 use crate::models::error::ServiceError;
 use crate::util::{generate_headers, parse_response};
@@ -26,6 +26,25 @@ impl DappAnchor {
 
     fn host(&self) -> String {
         self.host.clone()
+    }
+
+    pub async fn create_transaction_intent(
+        &self,
+        service_token: ServiceToken,
+        payload: DappIntentPayload,
+    ) -> Result<Transaction, ServiceError> {
+        let url = format!("{}/v1/transactions/intent", self.host);
+        debug!("Creating transaction intent via {}", self.host());
+        let response = self
+            .client
+            .post(url)
+            .headers(generate_headers(Some(service_token), None))
+            .json(&payload)
+            .send()
+            .await;
+        parse_response::<TransactionEnvelope>(response)
+            .await
+            .map(|envelope| envelope.transaction)
     }
 
     pub async fn get_transaction(

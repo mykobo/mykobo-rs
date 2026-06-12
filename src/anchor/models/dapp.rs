@@ -43,6 +43,30 @@ pub enum TransactionSource {
     AnchorStellar,
 }
 
+/// Payload for creating a transaction intent via the dApp REST API.
+/// Matches the request body of POST /v1/transactions/intent.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DappIntentPayload {
+    /// "DEPOSIT" or "WITHDRAW"
+    pub transaction_type: String,
+    /// Stellar, Solana, or Ethereum/Base address
+    pub wallet_address: String,
+    /// Customer's email address — must resolve to a registered profile
+    pub email_address: String,
+    /// Transaction amount (must be > 0)
+    pub value: String,
+    /// "EURC" or "USDC"
+    pub currency: String,
+    /// Client IP address (IPv4 or IPv6)
+    pub ip_address: String,
+    /// Optional wallet memo (for Stellar shared wallets)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub memo: Option<String>,
+    /// Optional client domain for fee scoping
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_domain: Option<String>,
+}
+
 /// Model for storing transaction records sent to the ledger.
 ///
 /// This stores a local copy of all transactions created through the dApp
