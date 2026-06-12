@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.9] - 2026-06-12
+
+### ⛰️  Features
+
+- Add fields to ServiceError for validation error details
+
 ## [1.3.8] - 2026-06-12
 
 ### ⛰️  Features
 
 - Add DappIntentPayload and create_transaction_intent to DappAnchor
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.8
 
 ## [1.3.6] - 2026-06-10
 
