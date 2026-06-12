@@ -35,6 +35,7 @@ pub fn extract_token_claims(token: &str) -> Result<TokenClaims, ServiceError> {
             error: Some(format!("Could not extract token claim {e}")),
             message: None,
             description: None,
+            fields: None,
             status: Default::default(),
         })
 }

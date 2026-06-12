@@ -32,6 +32,8 @@ pub struct ServiceError {
     pub error: Option<String>,
     pub message: Option<String>,
     pub description: Option<String>,
+    #[serde(default)]
+    pub fields: Option<serde_json::Value>,
     #[serde(default = "MykoboStatusCode::default")]
     pub status: MykoboStatusCode,
 }
@@ -41,8 +43,12 @@ impl Display for ServiceError {
         let message = self
             .error
             .clone()
-            .unwrap_or("Unknown error - U".to_string());
-        write!(f, "{message}")
+            .unwrap_or("Unknown error".to_string());
+        if let Some(ref fields) = self.fields {
+            write!(f, "{message}: {fields}")
+        } else {
+            write!(f, "{message}")
+        }
     }
 }
 
@@ -60,6 +66,7 @@ impl From<Error> for ServiceError {
             error: r_message.clone().unwrap().to_string().into(),
             message: r_message,
             description: None,
+            fields: None,
             status: MykoboStatusCode::from(error.status().unwrap_or(StatusCode::BAD_REQUEST)),
         }
     }
