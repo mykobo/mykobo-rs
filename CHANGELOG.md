@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.8] - 2026-06-12
+
+### ⛰️  Features
+
+- Add DappIntentPayload and create_transaction_intent to DappAnchor
+
 ## [1.3.6] - 2026-06-10
 
 ### 🐛 Bug Fixes
 
 - Wrongly serialized payloads, and fix BURN_COMPLETE
+
+### ⚙️ Miscellaneous Tasks
+
+- Release mykobo-rs version 1.3.6
 
 ## [1.3.5] - 2026-06-09
 
