@@ -1,0 +1,22 @@
+# Configuration for cargo-release
+
+# Disable pushing to crates.io (set to true when ready to publish)
+publish = false
+
+# Enable git tagging
+tag = true
+tag-message = "chore: Release {{crate_name}} version {{version}}"
+tag-name = "v{{version}}"
+
+# Enable pushing to git remote (includes tags)
+push = true
+push-remote = "origin"
+
+# Pre-release hook to update CHANGELOG
+pre-release-hook = ["git", "cliff", "--tag", "v{{version}}", "-o", "CHANGELOG.md"]
+
+# Commit message for the release
+pre-release-commit-message = "chore: Release {{crate_name}} version {{version}}"
+
+# Disable git-cliff consolidation
+consolidate-commits = false

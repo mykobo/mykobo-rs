@@ -1,0 +1,164 @@
+# Producer-intended notification registry.
+# See docs/superpowers/specs/2026-06-01-notifications-guardrail-design.md
+#
+# Per-variant classification of every EventType. Domain variants declare which
+# notification variants they fan out into (with optional predicates); notification
+# variants declare audience and severity. Adding an EventType variant without a
+# registry entry fails tests.
+
+version: 1
+
+variants:
+
+  # ── Notification-event variants ──────────────────────────────────────
+  RELAY_INITIATED:        { kind: notification, audience: customer }
+  RELAY_COMPLETED:        { kind: notification, audience: customer }
+  RELAY_ONBOARDED:        { kind: notification, audience: customer }
+  RELAY_STUCK_DEPOSITING: { kind: notification, audience: platform, severity: warning }
+  RELAY_STUCK_BRIDGING:   { kind: notification, audience: platform, severity: warning }
+  RELAY_STUCK_FORWARDING: { kind: notification, audience: platform, severity: warning }
+  RELAY_FAILED:           { kind: notification, audience: platform, severity: critical }
+  CIRCLE_API_5XX_BURST:   { kind: notification, audience: platform, severity: warning }
+  WEBHOOK_REPROCESSOR_BACKLOG: { kind: notification, audience: platform, severity: warning }
+
+  # ── Mint/burn notification variants (customer) ───────────────────────
+  MINT_COMPLETED:          { kind: notification, audience: customer }
+  MINT_HELD:               { kind: notification, audience: customer }
+  BURN_HELD:               { kind: notification, audience: customer }
+
+  # BURN_COMPLETED is platform-only because the customer-facing withdraw
+  # lifecycle is told by WITHDRAW_INITIATED / WITHDRAW_COMPLETED. The
+  # routing in notifications/EVENT_ROUTES is slack-only — keeping it here
+  # as `audience: customer` would mis-document the surface.
+  BURN_COMPLETED:          { kind: notification, audience: platform, severity: info }
+
+  # ── Deposit/Withdrawal notification variants (customer) ────────────────
+  DEPOSIT_INITIATED:      { kind: notification, audience: customer }
+  DEPOSIT_COMPLETED:      { kind: notification, audience: customer }
+  DEPOSIT_FAILED:         { kind: notification, audience: customer }
+  WITHDRAW_INITIATED:     { kind: notification, audience: customer }
+  WITHDRAW_COMPLETED:     { kind: notification, audience: customer }
+  WITHDRAW_FAILED:        { kind: notification, audience: customer }
+
+  # ── Customer transaction milestone variants (customer) ───────────────
+  CUSTOMER_FUNDS_RECEIVED: { kind: notification, audience: customer }
+
+  # ── Mint/burn notification variants (platform / warning) ─────────────
+  MINT_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }
+  BURN_HELD_ALERT:         { kind: notification, audience: platform, severity: warning }
+  CUSTOMER_NOTIFY_FAILED:  { kind: notification, audience: platform, severity: warning }
+
+  # ── Mint/burn progress variants (platform / info) ────────────────────
+  MINT_INFO:               { kind: notification, audience: platform, severity: info }
+  BURN_INFO:               { kind: notification, audience: platform, severity: info }
+
+  # ── Transaction milestone variants (platform / info) ─────────────────
+  TRANSACTION_FUNDED_INFO:    { kind: notification, audience: platform, severity: info }
+  TRANSACTION_APPROVED_INFO:  { kind: notification, audience: platform, severity: info }
+  TRANSACTION_FULFILLED_INFO: { kind: notification, audience: platform, severity: info }
+
+  # ── Transaction status alert variants (platform) ─────────────────────
+  TRANSACTION_FAILED_ALERT: { kind: notification, audience: platform, severity: critical }
+  TRANSACTION_HELD_ALERT:   { kind: notification, audience: platform, severity: warning }
+
+  # ── Banking-gateway platform alerts ──────────────────────────────────
+  BANK_PAYMENT_BALANCE_INSUFFICIENT_ALERT: { kind: notification, audience: platform, severity: warning }
+  BANK_PAYMENT_EXECUTION_FAILED_ALERT:     { kind: notification, audience: platform, severity: critical }
+  BCB_WEBHOOK_PROCESSING_FAILED_ALERT:     { kind: notification, audience: platform, severity: warning }
+  BENEFICIARY_CREATION_FAILED_ALERT:       { kind: notification, audience: platform, severity: warning }
+
+  # ── Banking-gateway happy-path lifecycle (platform / info) ───────────
+  BANK_PAYMENT_RECEIVED_INFO:              { kind: notification, audience: platform, severity: info }
+  BANK_PAYMENT_SENT_INFO:                  { kind: notification, audience: platform, severity: info }
+
+  # ── On-chain payment lifecycle (platform / info) ─────────────────────
+  ONCHAIN_PAYMENT_RECEIVED_INFO:           { kind: notification, audience: platform, severity: info }
+  ONCHAIN_PAYMENT_SENT_INFO:               { kind: notification, audience: platform, severity: info }
+
+  # ── Domain-event variants ────────────────────────────────────────────
+  NEW_TRANSACTION:
+    kind: domain
+    notifies: []
+    reason: >-
+      Customer notification (a "transaction received" mail/Slack) is not yet
+      emitted by any producer. When Ledger or Banking-Gateway introduces a
+      CUSTOMER_TRANSACTION_RECEIVED notification variant, this entry gains a
+      `fires` rule. Captured as audited "no notification today" for now.
+
+  # Status-update fan-out: producer (ledger) emits CUSTOMER_FUNDS_RECEIVED
+  # and TRANSACTION_FUNDED_INFO when status transitions to FUNDS_RECEIVED.
+  TRANSACTION_STATUS_UPDATE:
+    kind: domain
+    notifies:
+      - when: 'status == "FAILED"'
+        fires: [TRANSACTION_FAILED_ALERT]
+      - when: 'status == "HELD"'
+        fires: [TRANSACTION_HELD_ALERT]
+      - when: 'status == "FUNDS_RECEIVED"'
+        fires: [CUSTOMER_FUNDS_RECEIVED, TRANSACTION_FUNDED_INFO]
+      - when: 'status == "APPROVED"'
+        fires: [TRANSACTION_APPROVED_INFO]
+      - when: 'status == "FULFILLED"'
+        fires: [TRANSACTION_FULFILLED_INFO]
+
+  PAYMENT:
+    kind: domain
+    notifies: []
+    reason: >-
+      Generic payment event used by ledger; downstream notifications are emitted
+      via NEW_TRANSACTION / TRANSACTION_STATUS_UPDATE rails, not this event.
+
+  BANK_PAYMENT:
+    kind: domain
+    notifies: []
+    reason: >-
+      Bank payment ingress event from banking-gateway; user is told via the
+      resulting NEW_TRANSACTION + TRANSACTION_STATUS_UPDATE rails.
+
+  NEW_PROFILE:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's profile-created Slack post is derived in the notifications
+      service. Per-producer migration (Identity) will introduce an explicit
+      CUSTOMER_PROFILE_CREATED notification variant.
+
+  NEW_USER:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's welcome email is derived in the notifications service. Per-producer
+      migration (Identity) will introduce an explicit CUSTOMER_WELCOME
+      notification variant.
+
+  KYC_EVENT:
+    kind: domain
+    notifies: []
+    reason: >-
+      KYC outcomes surface to the user via dapp's idenfy/sumsub callbacks,
+      not via this rail. No notification today; no migration planned.
+
+  ADDRESS_ONBOARDED:
+    kind: domain
+    notifies: []
+    reason: >-
+      Internal indexing event. User-facing onboarding lands via RELAY_ONBOARDED
+      on the relay rail.
+
+  VERIFICATION_REQUESTED:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's verification email is derived in the notifications service
+      (legacy CommandVerifyEmail path in app/message_handlers/kafka.py).
+      Per-producer migration (Identity) will introduce an explicit
+      CUSTOMER_VERIFICATION_REQUESTED notification variant.
+
+  PASSWORD_RESET_REQUESTED:
+    kind: domain
+    notifies: []
+    reason: >-
+      Today's password-reset email is derived in the notifications service
+      (legacy CommandPasswordReset path in app/message_handlers/kafka.py).
+      Per-producer migration (Identity) will introduce an explicit
+      CUSTOMER_PASSWORD_RESET_REQUESTED notification variant.

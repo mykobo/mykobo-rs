@@ -1,0 +1,19 @@
+{
+  "meta_data": {
+    "source": "circle",
+    "created_at": "2026-05-30T12:00:00Z",
+    "token": "test-service-token",
+    "idempotency_key": "circle:relay_failed:abc-123",
+    "event": "RELAY_FAILED"
+  },
+  "payload": {
+    "severity": "critical",
+    "data": {
+      "relay_id": "abc-123",
+      "phase": "forwarding",
+      "attempts": 5,
+      "reason": "timeout"
+    },
+    "subject": "relay:abc-123"
+  }
+}

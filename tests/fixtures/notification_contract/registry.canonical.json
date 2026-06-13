@@ -1,0 +1,297 @@
+{
+  "variants": {
+    "ADDRESS_ONBOARDED": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Internal indexing event. User-facing onboarding lands via RELAY_ONBOARDED on the relay rail."
+    },
+    "BANK_PAYMENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Bank payment ingress event from banking-gateway; user is told via the resulting NEW_TRANSACTION + TRANSACTION_STATUS_UPDATE rails."
+    },
+    "BANK_PAYMENT_BALANCE_INSUFFICIENT_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BANK_PAYMENT_EXECUTION_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "critical"
+    },
+    "BANK_PAYMENT_RECEIVED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "BANK_PAYMENT_SENT_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "BCB_WEBHOOK_PROCESSING_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BENEFICIARY_CREATION_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BURN_COMPLETED": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "BURN_HELD": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "BURN_HELD_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "BURN_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "CIRCLE_API_5XX_BURST": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "CUSTOMER_FUNDS_RECEIVED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "CUSTOMER_NOTIFY_FAILED": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "DEPOSIT_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "DEPOSIT_FAILED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "DEPOSIT_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "KYC_EVENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "KYC outcomes surface to the user via dapp's idenfy/sumsub callbacks, not via this rail. No notification today; no migration planned."
+    },
+    "MINT_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "MINT_HELD": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "MINT_HELD_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "MINT_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "NEW_PROFILE": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's profile-created Slack post is derived in the notifications service. Per-producer migration (Identity) will introduce an explicit CUSTOMER_PROFILE_CREATED notification variant."
+    },
+    "NEW_TRANSACTION": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Customer notification (a \"transaction received\" mail/Slack) is not yet emitted by any producer. When Ledger or Banking-Gateway introduces a CUSTOMER_TRANSACTION_RECEIVED notification variant, this entry gains a `fires` rule. Captured as audited \"no notification today\" for now."
+    },
+    "NEW_USER": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's welcome email is derived in the notifications service. Per-producer migration (Identity) will introduce an explicit CUSTOMER_WELCOME notification variant."
+    },
+    "ONCHAIN_PAYMENT_RECEIVED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "ONCHAIN_PAYMENT_SENT_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "PASSWORD_RESET_REQUESTED": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's password-reset email is derived in the notifications service (legacy CommandPasswordReset path in app/message_handlers/kafka.py). Per-producer migration (Identity) will introduce an explicit CUSTOMER_PASSWORD_RESET_REQUESTED notification variant."
+    },
+    "PAYMENT": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Generic payment event used by ledger; downstream notifications are emitted via NEW_TRANSACTION / TRANSACTION_STATUS_UPDATE rails, not this event."
+    },
+    "RELAY_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_FAILED": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "critical"
+    },
+    "RELAY_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_ONBOARDED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "RELAY_STUCK_BRIDGING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "RELAY_STUCK_DEPOSITING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "RELAY_STUCK_FORWARDING": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "TRANSACTION_APPROVED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "TRANSACTION_FAILED_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "critical"
+    },
+    "TRANSACTION_FULFILLED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "TRANSACTION_FUNDED_INFO": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "info"
+    },
+    "TRANSACTION_HELD_ALERT": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "TRANSACTION_STATUS_UPDATE": {
+      "kind": "domain",
+      "notifies": [
+        {
+          "fires": [
+            "TRANSACTION_FAILED_ALERT"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "FAILED"
+          }
+        },
+        {
+          "fires": [
+            "TRANSACTION_HELD_ALERT"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "HELD"
+          }
+        },
+        {
+          "fires": [
+            "CUSTOMER_FUNDS_RECEIVED",
+            "TRANSACTION_FUNDED_INFO"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "FUNDS_RECEIVED"
+          }
+        },
+        {
+          "fires": [
+            "TRANSACTION_APPROVED_INFO"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "APPROVED"
+          }
+        },
+        {
+          "fires": [
+            "TRANSACTION_FULFILLED_INFO"
+          ],
+          "when": {
+            "field": "status",
+            "op": "eq",
+            "value": "FULFILLED"
+          }
+        }
+      ],
+      "reason": null
+    },
+    "VERIFICATION_REQUESTED": {
+      "kind": "domain",
+      "notifies": [],
+      "reason": "Today's verification email is derived in the notifications service (legacy CommandVerifyEmail path in app/message_handlers/kafka.py). Per-producer migration (Identity) will introduce an explicit CUSTOMER_VERIFICATION_REQUESTED notification variant."
+    },
+    "WEBHOOK_REPROCESSOR_BACKLOG": {
+      "audience": "platform",
+      "kind": "notification",
+      "severity": "warning"
+    },
+    "WITHDRAW_COMPLETED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "WITHDRAW_FAILED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    },
+    "WITHDRAW_INITIATED": {
+      "audience": "customer",
+      "kind": "notification",
+      "severity": null
+    }
+  },
+  "version": 1
+}

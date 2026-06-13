@@ -1,0 +1,49 @@
+{
+  "jsonrpc": "2.0",
+  "id": 8675309,
+  "result":     {
+    "id": "febb7461-64b9-4cab-85cd-313c55c30906",
+    "sep": "24",
+    "kind": "deposit",
+    "status": "pending_user_transfer_start",
+    "amount_expected": {
+      "amount": "20.00",
+      "asset": "stellar:EURC:GDBDEI3NV72XSORX7DNYMGRRNXAXF62RPTGGVEXM2RLXIUIUU5DNZWWH"
+    },
+    "amount_in": {
+      "amount": "20.00",
+      "asset": "iso4217:EUR"
+    },
+    "amount_out": {
+      "amount": "19.80",
+      "asset": "stellar:EURC:GDBDEI3NV72XSORX7DNYMGRRNXAXF62RPTGGVEXM2RLXIUIUU5DNZWWH"
+    },
+    "fee_details": {
+      "total": "0.20",
+      "asset": "iso4217:EUR",
+      "details": [
+        {
+          "name": "DEPOSIT",
+          "description": "Deposit fee",
+          "amount": "0.20"
+        }
+      ]
+    },
+    "started_at": "2025-06-29T16:57:19.726407Z",
+    "updated_at": "2025-06-29T16:58:02.644560Z",
+    "message": "Transaction ready for bank payment",
+    "destination_account": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6",
+    "client_domain": "app.beansapp.com",
+    "customers": {
+      "sender": {
+        "account": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6"
+      },
+      "receiver": {
+        "account": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6"
+      }
+    },
+    "creator": {
+      "account": "GCGRZQ2OZWQVUWSRAFXSNL3N2KF4IVDOONNFBRP2G3622JJYCUYBCQE6"
+    }
+  }
+}

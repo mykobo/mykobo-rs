@@ -1,0 +1,19 @@
+{
+  "meta_data": {
+    "source": "circle",
+    "created_at": "2026-05-30T12:00:00Z",
+    "token": "test-service-token",
+    "idempotency_key": "circle:relay_stuck_depositing:abc-123:2026-05-30T12:00:00+00:00",
+    "event": "RELAY_STUCK_DEPOSITING"
+  },
+  "payload": {
+    "severity": "warning",
+    "data": {
+      "relay_id": "abc-123",
+      "stuck_for_minutes": 22,
+      "threshold_minutes": 15,
+      "source_chain": "stellar"
+    },
+    "subject": "relay:abc-123"
+  }
+}

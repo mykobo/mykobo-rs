@@ -1,0 +1,52 @@
+{
+  "id": "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6",
+  "first_name": "Kwabena",
+  "last_name": "Aning",
+  "email_address": "kwabena@mykobo.co",
+  "additional_name": null,
+  "address": "116 Oxlip Way, Stowmarket",
+  "mobile_number": "07963563929",
+  "birth_date": "1982-02-09",
+  "birth_country_code": "UK",
+  "bank_account_number": "GB81REVO00997045670583",
+  "tax_id": null,
+  "tax_id_name": null,
+  "created_at": "2024-10-04T18:38:27.924242",
+  "kyc_status": {
+    "id": "538301ee-c832-4cdc-b5c4-a6c76802125e",
+    "profile_id": "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6",
+    "review_status": "completed",
+    "webhook_type": "applicantReviewed",
+    "applicant_id": "628568d95ce0940001b2ccd2",
+    "correlation_id": null,
+    "review_result": "GREEN",
+    "received_at": "2022-05-20T21:44:57",
+    "level_name": "basic-kyc-level",
+    "admin_comment": null,
+    "user_comment": null
+  },
+  "kyc_documents": [
+    {
+      "id": "bfff7aec-23ec-4ae5-9807-f85835e79025",
+      "profile_id": "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6",
+      "document_type": "photo_id_front",
+      "document_sub_type": null,
+      "document_status": "approved",
+      "document_path": "id_card.png",
+      "reject_reason": null,
+      "created_at": "2024-11-17T19:19:45",
+      "updated_at": "2024-11-01T19:19:48"
+    },
+    {
+      "id": "42a421e4-abc9-4351-b22a-247c8eb67b4c",
+      "profile_id": "urn:usrp:fb497b2fcbfa479991de4e8b0abecad6",
+      "document_type": "photo_id_back",
+      "document_sub_type": null,
+      "document_status": "rejected",
+      "document_path": "id_card_back.png",
+      "reject_reason": null,
+      "created_at": "2024-11-17T19:19:45",
+      "updated_at": "2024-11-01T19:19:48"
+    }
+  ]
+}
